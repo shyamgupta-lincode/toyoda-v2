@@ -1,0 +1,52 @@
+@import '../../../../@theme/styles/themes';
+
+@include nb-install-component() {
+  input {
+    width: 100%;
+    margin: 0.5rem 0.5rem 0.5rem 0;
+  }
+
+  .header {
+    margin-left: 38px;
+  }
+
+
+  .cancel {
+    margin-right: 1rem;
+  }
+
+  .buttons-bottom {
+
+    margin-top: 24px;
+    margin-right: 0.5rem;
+
+    button {
+      margin-right: 15px;
+    }
+  }
+  
+  .addDatasetSteps {
+    height: 300px;
+    width: 800px;
+    text-align: center;
+  }
+
+  td {
+    text-align: left;
+  }
+
+  .review {
+    text-align: right;
+    font-weight: bold;
+  }
+
+  .closeBtn {
+    width: 100%;
+
+    * {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+  }
+}

@@ -1,0 +1,223 @@
+<div class="main-content">
+    <div class="container-fluid">
+      
+      <mat-card>
+        <mat-card-title>
+          <button mat-raised-button (click)="addClients()" class="btn btn-fill btn-primary pull-right">
+            Add Clients
+          </button>  
+        </mat-card-title>
+       
+        <mat-card-content>
+          <mat-form-field class="col-md-3 col-md-offset-4">
+            <mat-label>Search Clients</mat-label>
+            <input matInput class="form-control" type="text" [(ngModel)]="filterValue"
+          (blur)="filterParts(filterValue)" placeholder="Search Clients">
+          </mat-form-field>
+          <mat-table #table [dataSource]="dataSource" matSort>
+           
+            <!-- Second Column -->
+            <ng-container matColumnDef="sl">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Sl No. </mat-header-cell>
+              <mat-cell *matCellDef="let element;let i = index"> {{(i+1)}} </mat-cell>
+            </ng-container>
+
+             <!-- Fourth Column -->
+             <ng-container matColumnDef="client_name">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Client Name </mat-header-cell>
+                <mat-cell *matCellDef="let element"><a href="/user/client/addUser"> {{element.client_name}} </a></mat-cell>
+              </ng-container>
+
+             <!-- Fourth Column -->
+             <ng-container matColumnDef="client_license_key">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> License key Count</mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.client_license_key}} </mat-cell>
+            </ng-container>
+  
+            <!-- Third Column -->
+            <ng-container matColumnDef="client_role">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Client Role </mat-header-cell>
+              <mat-cell *matCellDef="let element">
+                {{element.client_role}}
+              </mat-cell>
+            </ng-container>
+
+            
+              <!-- Third Column -->
+              <ng-container matColumnDef="assigned_to">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Assigned </mat-header-cell>
+                <mat-cell *matCellDef="let element" matTooltip="{{element.assigned_to}}" >
+                    {{element.assigned_to}}
+                 
+                </mat-cell>
+              </ng-container>
+
+                <!-- Third Column -->
+                <ng-container matColumnDef="client_address">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> Address </mat-header-cell>
+                    <mat-cell *matCellDef="let element" matTooltip="{{element.client_address}}" >
+                        {{element.client_address}}
+                     
+                    </mat-cell>
+                </ng-container>
+           
+            <!-- Action Column -->
+            <ng-container matColumnDef="operation">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Operation </mat-header-cell>
+              <mat-cell *matCellDef="let element">
+                <button mat-icon-button matTooltip="Click to Edit" class="iconbutton"
+                  color="" (click)="editClient(element._id)">
+                  <mat-icon class="livis-warning">edit</mat-icon>
+                </button> 
+                <button mat-icon-button matTooltip="Click to Delete" class="iconbutton"
+                  color="" (click)="deletePartInfo(element._id)">
+                  <mat-icon class="livis-danger">delete</mat-icon>
+                </button> 
+                </mat-cell>
+            </ng-container>
+            
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+          </mat-table>
+        </mat-card-content>
+        <mat-card-content>
+            <mat-paginator #paginator [length]="resultsLength"
+                [pageSize]="5"
+                [pageSizeOptions]="[1,5, 10, 20]">
+            </mat-paginator>
+        </mat-card-content>
+    </mat-card>
+      
+       
+    </div>
+</div>
+
+  <!-- Add Client Modal -->
+  <div class="modal fade" id="add-client-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog card">
+      <div class="modal-content">
+        <div class="modal-header card-header">
+          <h4 class="modal-title card-title">Add New Client</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body card-body">
+            <!-- <div class="card">  -->
+          <form [formGroup]="clientForm" novalidate (submit)="addNewClient(clientForm)">
+            
+            <div class="row">
+           
+
+            <mat-form-field class="col-md-6">
+                <input matInput formControlName="client_name" placeholder="Client Name *" type="text">
+                <mat-error *ngIf="isSubmitted && !clientForm.controls.client_name.valid" class="text-danger">
+                    Clients Name is required .
+                </mat-error>
+            </mat-form-field> 
+
+            <mat-form-field class="col-md-6">
+              <input matInput formControlName="client_license_key" placeholder="License Key Count *" type="number">
+              <mat-error *ngIf="isSubmitted && !clientForm.controls.client_license_key.valid" class="text-danger">
+                License Key Count is required .
+              </mat-error>
+            </mat-form-field>
+
+            
+
+            <mat-form-field class="invisible-field">
+                <input matInput type="text"  formControlName="client_role">
+            </mat-form-field>
+
+            <mat-form-field class="invisible-field">
+                <input matInput type="text"  formControlName="assigned_to">
+            </mat-form-field>
+
+           
+
+            <mat-form-field class="col-md-12">
+              <textarea matInput formControlName="client_address" placeholder="Part Description" >
+                </textarea>
+            </mat-form-field>
+
+           
+          </div>
+
+            <div class="category form-category">* Required fields</div>
+            <div class="modal-footer">
+                <button mat-raised-button type="button" class="btn btn-fill btn-dark" data-dismiss="modal">Close</button>
+                <button mat-raised-button type="submit" class="btn btn-fill btn-primary">Submit</button>
+               
+              </div>
+          </form>
+          <!-- </div> -->
+        </div>
+       
+      </div>
+    </div>
+  </div>
+  <!--  End Modal -->
+
+
+ <!-- Edit Client Modal -->
+ <div class="modal fade" id="edit-client-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog card">
+      <div class="modal-content">
+        <div class="modal-header card-header">
+          <h4 class="modal-title card-title">Edit Client Info</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body card-body">
+            <!-- <div class="card">  -->
+          <form [formGroup]="clientFormEdit" novalidate (submit)="updateClientInfo(clientFormEdit)">
+            
+            <div class="row">
+           
+
+            <mat-form-field class="col-md-6">
+                <input matInput formControlName="client_name" placeholder="Client Name *" type="text">
+                <mat-error *ngIf="isSubmitted && !clientFormEdit.controls.client_name.valid" class="text-danger">
+                    Clients Name is required .
+                </mat-error>
+            </mat-form-field> 
+
+            <mat-form-field class="col-md-6">
+              <input matInput formControlName="client_license_key" placeholder="License Key Count *" type="number">
+              <mat-error *ngIf="isSubmitted && !clientFormEdit.controls.client_license_key.valid" class="text-danger">
+                License Key Count is required .
+              </mat-error>
+            </mat-form-field>
+
+            
+
+            <mat-form-field class="invisible-field">
+                <input matInput type="text"  formControlName="_id">
+            </mat-form-field>
+
+           
+           
+
+            <mat-form-field class="col-md-12">
+              <textarea matInput formControlName="client_address" placeholder="Part Description" >
+                </textarea>
+            </mat-form-field>
+
+           
+          </div>
+
+            <div class="category form-category">* Required fields</div>
+            <div class="modal-footer">
+                <button mat-raised-button type="button" class="btn btn-fill btn-dark" data-dismiss="modal">Close</button>
+                <button mat-raised-button type="submit" class="btn btn-fill btn-primary">Submit</button>
+               
+              </div>
+          </form>
+          <!-- </div> -->
+        </div>
+       
+      </div>
+    </div>
+  </div>
+  <!--  End Modal -->

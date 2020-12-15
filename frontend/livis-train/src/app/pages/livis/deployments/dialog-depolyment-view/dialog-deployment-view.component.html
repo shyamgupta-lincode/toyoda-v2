@@ -1,0 +1,11 @@
+<nb-card class="expCard">
+  <nb-card-header>Part Number: {{ deployment.part_number }} | Experiment: {{ deployment.experiment_name }}</nb-card-header>
+  <nb-card-body>
+    <h4>Camera ID: 0</h4>
+    <br />
+    <img style="width: 50%;" src="http://localhost:8000/livis/v1/aaa/0/ccc/camera/"/>
+  </nb-card-body>
+  <nb-card-footer>
+    <button nbButton (click)="cancel()">Close</button>
+  </nb-card-footer>
+</nb-card>

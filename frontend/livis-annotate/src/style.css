@@ -1,0 +1,105 @@
+body{
+    background-color: #edf1f7 !important;  
+}
+
+.upload-button-wrap{
+    justify-content: flex-end;
+    margin-top: 5px;
+}
+
+.pagination-wrap{
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.part-img-card{
+    padding: 0px;
+}
+
+.part-img-card .card-body{
+    padding: 0px;
+}
+.part-img-card img{
+    padding: 0px;
+    height: 250px;
+    width: 100%;
+}
+
+.custom-livis-header
+{
+    max-width: 1920px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1040;
+    display: block;
+    background-color: #ffffff !important    ;
+    color: #222b45;
+    font-family: "Fira Sans", sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+}
+
+.custom-livis-header .navbar1{
+    max-width: 1920px;
+    margin: 0 auto;
+    color: #222b45;
+    box-shadow: none;
+    height: 4.75rem;
+    padding: 1.25rem;
+    align-items: center;
+    justify-content: flex-start;
+    display: flex;
+}
+
+.custom-livis-container
+{
+    margin-top: 5.4rem;
+    height: 83vh;
+    /* width: 100wh; */
+}
+.custom-label-position{
+    position: relative;
+    top:60px;
+}
+
+
+.livis-logo{
+    width: auto;
+    position: relative;
+    height: 1em;
+    vertical-align: text-top;
+    /* width: 80px;
+    margin-right: 10px; */
+}
+.livis-logo-container a{
+    color: #222b45;
+    font-size: 30px;
+    text-transform: uppercase;
+}
+.livis-logo-container a:hover{
+    text-decoration: none;
+}
+
+
+.capture-img-wrap
+{
+    height: 80vh;
+}
+
+/* .toastify-content--error {
+    border-color: #222b45 !important ;
+ }
+
+ .toastify__progress--error { 
+     background-color:#222b45 !important ;
+}
+
+.Toastify__toast--error {
+    background-color: #222b45 !important;
+  } */

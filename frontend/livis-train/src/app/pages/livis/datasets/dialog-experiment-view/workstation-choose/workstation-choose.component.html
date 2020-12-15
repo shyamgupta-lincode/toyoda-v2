@@ -1,0 +1,16 @@
+<nb-card class="expCard">
+    <nb-card-header>Choose workstation</nb-card-header>
+    <nb-card-body>
+        <div class="form-group">
+            <label for="workstation">Deploy to:</label>
+            <nb-select multiple placeholder="Multiple Select" [(selected)]="selected_workstations">
+                <nb-option *ngFor="let ws of workstations" [value]="ws">{{ ws.workstation_name }}</nb-option>
+            </nb-select>
+          </div>
+    </nb-card-body>
+    <nb-card-footer>
+        <button nbButton (click)="submit()" style="float: right">OK</button>
+        <button nbButton (click)="cancel()">Cancel</button>
+    </nb-card-footer>
+</nb-card>
+  

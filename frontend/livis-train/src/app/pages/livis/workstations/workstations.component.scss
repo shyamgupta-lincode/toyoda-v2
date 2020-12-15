@@ -1,0 +1,45 @@
+@import '../../../@theme/styles/themes';
+
+@include nb-install-component() {
+    .pageHeader {
+        padding: 10px 25px;
+        border: 1px solid gainsboro;
+        background: white;
+        margin-bottom: 20px;
+        height: 65px;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .pullRight {
+        float: right !important;
+    }
+
+    .heading {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    .searchInput {
+        margin: 5px 15px 0 10px;
+    }
+
+    .expRow {
+        box-sizing: border-box;
+        cursor: pointer;
+    }
+    
+    .expRow:hover {
+        background-color: #f2f6ff;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+    }
+
+    td {
+        padding: 0.25em 0;
+    }
+
+}

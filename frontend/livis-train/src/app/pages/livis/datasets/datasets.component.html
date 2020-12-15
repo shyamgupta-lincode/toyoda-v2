@@ -1,0 +1,101 @@
+
+<div class="pageHeader row">
+  <div class="refresh-wrap">
+  <span class="heading">Jig List</span>
+  <i class="ion ion-ios-refresh"
+         (click)="refreshPartList()"></i>
+  </div>       
+  <div>
+    <div class="pullRight">
+      <i class="livis-search-icon control-icon ion ion-ios-search"
+         (click)="showInput()"></i>
+      <input placeholder="Search Jigs..."
+             #input
+             [(ngModel)]="search_text"
+             [class.hidden]="!isInputShown"
+             class="searchInput "
+             (blur)="hideInput()"/>
+      <!-- <button nbButton (click)="open()" status="warning" class="pullRight"><nb-icon icon="plus"></nb-icon>Add Part</button> -->
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <nb-card *ngFor="let dataset of datasets | filterByPartNumber:search_text" class="col-sm-12 col-md-6 col-lg-6 col-xxxl-6 dsCard" status="info">
+    <nb-card-header>
+      ON Number: <b class="partNumber">{{ dataset.oem_number }}</b>
+    </nb-card-header>
+    <nb-card-body>
+      <table width="100%">
+        <tr>
+          <td>Jig Type</td>
+          <td align="right"><b>{{ dataset.jig_type }}</b></td>
+        </tr>
+       
+      </table>
+      <hr style="border-width: 2px;"/>
+      <nb-accordion>
+        <nb-accordion-item disabled="{{ !dataset.label_info.total_images > 0 }}">
+         <nb-accordion-item-header>Labels</nb-accordion-item-header>
+         <nb-accordion-item-body>
+          <span *ngIf="dataset.label_info.total_images > 0">
+            <table width="100%">
+              <tr>
+                <td>Total Image</td>
+                <td align="right"><b>{{ dataset.label_info.total_images }}</b></td>
+              </tr>
+              <tr>
+                <td>Total Label Images</td>
+                <td align="right"><b>{{ dataset.label_info.total_labeled_images }}</b></td>
+              </tr>
+
+              <tr>
+                <td>Total UnLabel Images</td>
+                <td align="right"><b>{{ dataset.label_info.total_unlabeled_images }}</b></td>
+              </tr>
+
+              <!-- <tr>
+                <td>Detector Label Data</td>
+                <td align="right"><b>{{ dataset.label_info.detector_label_data.Classification }}</b></td>
+              </tr>
+              <tr>
+                <td>Classifier Label Data</td>
+                <td align="right">
+                  <b>
+                    <span *ngFor="let label of objectKeys(dataset.label_info.classifier_label_data)" style="margin-left: 2px;">
+                      {{ label }}:{{dataset.label_info.classifier_label_data[label]}}
+                    </span>
+                  </b>
+                </td>
+              </tr> -->
+            </table>
+
+          </span>
+         </nb-accordion-item-body>
+        </nb-accordion-item>
+        <nb-accordion-item disabled="{{ !dataset.experiments || dataset.experiments.length < 1 }}">
+          <nb-accordion-item-header>AI Models</nb-accordion-item-header>
+          <nb-accordion-item-body>
+            <table width="100%">
+              <tr style="color: gray">
+                <td>Name</td>
+                <td>Type</td>
+                <td>Status</td>
+                <!-- <td align="right">Deployed</td> -->
+              </tr>
+              <!-- <tr *ngFor="let exp of dataset.experiments" (click)="viewExperiment(dataset, exp)" class="expRow"> -->
+              <tr *ngFor="let exp of dataset.experiments" class="expRow">
+                <td>{{ exp.experiment_name | titlecase }}</td>
+                <td><b>{{ exp.experiment_type | titlecase}}</b></td>
+                <td><b style="text-transform: capitalize;" [className]="exp.status == 'success' ? 'text-success' : 'text-primary'">{{ exp.status }}</b></td>
+                <!-- <td align="right"><b style="text-transform: capitalize;" [className]="exp.deployed ? 'text-success' : '' ">{{ exp.deployed ? 'Yes' : 'No' }}</b></td> -->
+              </tr>
+            </table>
+          </nb-accordion-item-body>
+         </nb-accordion-item>
+       </nb-accordion>
+       <a class="btmBtn" href="{{'http://localhost:3000?jig_id='+dataset._id}}" target="_blank" fullWidth nbButton outline status="primary" ><nb-icon icon="image"></nb-icon>Annotate</a>
+      <button class="btmBtn" *ngIf="dataset.label_info.total_images > 0" style="margin-top: 10px;" fullWidth nbButton outline status="info" (click)="addExperiment(dataset)"><nb-icon icon="plus"></nb-icon>Add Model</button>
+    </nb-card-body>
+  </nb-card>
+</div>

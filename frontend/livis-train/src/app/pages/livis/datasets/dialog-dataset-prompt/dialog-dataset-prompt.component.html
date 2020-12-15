@@ -1,0 +1,101 @@
+<nb-card>
+  <!-- <div (click)="cancel()" class="closeBtn" style="cursor: pointer;"> 
+    <nb-icon icon="close-square-outline" status="danger"></nb-icon>
+  </div> -->
+  <nb-card-header>Add  Part</nb-card-header>
+
+  
+  <nb-card-body>
+
+    <form [formGroup]="firstForm" (ngSubmit)="submit()" class="step-container">
+      <div class="row">
+          <div class="col-md-12">
+            <input nbInput type="text" placeholder="Part Number" class="form-control input-full-width" formControlName="part_number"
+                     [ngClass]="isSubmitted && firstForm.controls.part_number.errors ? 'form-control-danger' : '' ">
+              <div  *ngIf="isSubmitted && firstForm.controls.part_number.errors" class="text-danger text-center">
+                <span class="">Please Enter Part Number</span> 
+              </div>       
+                    
+          </div>
+          <br/>
+          <div class="col-md-12">
+            <textarea nbInput class="form-control input-full-width"  formControlName="part_description" placeholder="Part Description"></textarea>
+            
+          </div>
+
+        
+      </div>
+    </form>
+  </nb-card-body>
+
+  <nb-card-footer>
+    <button nbButton status="success" (click)="submit()" style="float: right;" >Submit</button>
+    <button nbButton (click)="cancel()">Close</button>
+  </nb-card-footer>
+</nb-card>
+  
+    <!-- <nb-stepper #stepper>
+      <nb-step [stepControl]="firstForm" >
+        <div class="addDatasetSteps">
+          <h4>
+            Enter some basic information
+          </h4>
+          <form [formGroup]="firstForm" (ngSubmit)="onFirstSubmit()" class="step-container">
+           
+            <div>
+              <input nbInput type="text" placeholder="Part Number" class="form-control" formControlName="partNumberCtrl"
+                     [ngClass]="{'form-control-danger': firstForm.invalid && (firstForm.dirty || firstForm.touched)}">
+              <input nbInput type="text" placeholder="Line Number" class="form-control" formControlName="lineNumberCtrl"
+                     [ngClass]="{'form-control-danger': firstForm.invalid && (firstForm.dirty || firstForm.touched)}">
+              <input nbInput type="text" placeholder="Factory Code" class="form-control" formControlName="factoryCodeCtrl"
+                     [ngClass]="{'form-control-danger': firstForm.invalid && (firstForm.dirty || firstForm.touched)}">
+            </div>
+            <div class="buttons-bottom">
+              <button nbButton nbStepperNext (click)="submit()">Submit</button>
+              <button nbButton nbStepperNext (click)="onFirstSubmit()">Next</button>
+            </div>
+          </form>
+        </div>
+      </nb-step> -->
+      <!-- <nb-step [stepControl]="secondForm" label="Upload">
+        <div class="addDatasetSteps">
+          <form [formGroup]="secondForm" (ngSubmit)="onSecondSubmit()" class="step-container">
+            <h4>
+              Upload the dataset (.zip, .rar, .tar.bz) containing images and a CSV with annotations
+            </h4>
+            <div>
+              <input nbInput id="datasetCtrl" type="file" class="form-control" formControlName="datasetCtrl" id="fileToUpload"
+                     [ngClass]="{'form-control-danger': secondForm.invalid && (secondForm.dirty || secondForm.touched)}"
+                     (change)="onFileChange($event)">
+            </div>
+            <div class="buttons-bottom">
+            <button nbButton nbStepperPrevious>Prev</button>
+            <button nbButton nbStepperNext (click)="collectValues()">Next</button>
+            </div>
+          </form>
+        </div>
+      </nb-step> -->
+      <!-- <nb-step label="Submit">
+          <div class="addDatasetSteps">
+            <h4>Review and Submit</h4>
+            <table width="100%">
+              <tr>
+                <td>Part Number</td>
+                <td class="review">{{ dataset.part_number }}</td>
+              </tr>
+              <tr>
+                <td>Line Number</td>
+                <td class="review">{{ dataset.line_number }}</td>
+              </tr>
+              <tr>
+                <td>Factory Code</td>
+                <td class="review">{{ dataset.factory_code }}</td>
+              </tr>
+            </table>
+            <div class="buttons-bottom">
+            <button nbButton nbStepperPrevious>Prev</button>
+            <button nbButton nbStepperNext (click)="submit()">Submit</button>
+            </div>
+          </div>
+      </nb-step> -->
+    <!-- </nb-stepper> -->

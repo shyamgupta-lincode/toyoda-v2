@@ -1,0 +1,37 @@
+<div class="pageHeader row">
+  <span class="heading">All Deployments</span>
+  <div>
+    <div class="pullRight">
+      <i class="control-icon ion ion-ios-search livis-search-icon"
+         (click)="showInput()"></i>
+      <input placeholder="Search Deployments..."
+             #input
+             [(ngModel)]="search_text"
+             [class.hidden]="!isInputShown"
+             class="searchInput"
+             (blur)="hideInput()"/>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <nb-card style="width: 100%">
+    <nb-card-body>
+      <table>
+        <tr>
+          <th>Part Number</th>
+          <th>Experiment Name</th>
+          <th>Experiment Type</th>
+          <th>Workstation </th>
+        </tr>
+        <tr *ngFor="let item of deployments | filterByPartNumber:search_text" class="expRow" (click)="viewDeployment(item)">
+          <td>{{ item.part_number | titlecase}}</td>
+          <td>{{ item.experiment_name | titlecase}}</td>
+          <td>{{ item.experiment_type | titlecase}}</td>
+          <td>{{ item.workstation | titlecase}}</td>
+        </tr>
+      </table>
+    </nb-card-body>
+  </nb-card>
+</div>
+

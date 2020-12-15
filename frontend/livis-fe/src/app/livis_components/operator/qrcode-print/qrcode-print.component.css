@@ -1,0 +1,30 @@
+/* .header, .header-space,
+.footer, .footer-space { height: 100px; }
+.header { position: fixed; top: 0; }
+.footer { position: fixed; bottom: 0; } */
+/* 
+@media screen {
+  :host {
+    display: none;
+  }
+} */
+@media print and (orientation: landscape) {
+  /* Your styles */
+  /* body{
+    height: 100px !important;
+    width: 100px !important;
+  } */
+  /* @page {
+  
+  } */
+  @page {
+    size: A8; 
+    margin: 0 !important;
+  }
+
+  /* img
+  {
+    width: 200px !important;
+  } */
+
+}

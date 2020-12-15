@@ -1,0 +1,196 @@
+<div class="main-content">
+    <div class="container-fluid">
+      
+      <mat-card>
+        <mat-card-title>
+          <button mat-raised-button (click)="addParts()" class="btn btn-fill btn-primary pull-right">
+            Add Model
+          </button>  
+        </mat-card-title>
+       
+        <mat-card-content>
+          <mat-form-field class="col-md-3 col-md-offset-4">
+            <mat-label>Search Model</mat-label>
+            <input matInput class="form-control" type="text" [(ngModel)]="filterValue"
+          (blur)="filterParts(filterValue)" placeholder="Search Parts">
+          </mat-form-field>
+          <mat-table #table [dataSource]="dataSource" matSort>
+           
+            <!-- Second Column -->
+            <ng-container matColumnDef="sl">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Sl No. </mat-header-cell>
+              <mat-cell *matCellDef="let element;let i = index"> {{(i+1)}} </mat-cell>
+            </ng-container>
+
+            
+            <!-- Third Column -->
+            <ng-container matColumnDef="part_number">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Part Number </mat-header-cell>
+              <mat-cell *matCellDef="let element">
+                {{element.part_number}}
+              </mat-cell>
+            </ng-container>
+
+            
+              <!-- Third Column -->
+              <ng-container matColumnDef="part_desc">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Part Description </mat-header-cell>
+                <mat-cell *matCellDef="let element" matTooltip="{{element.part_description}}" >
+                  {{ (element.part_description.length>10)? (element.part_description | slice:0:10)+'..':(element.part_description) }}
+                 
+                </mat-cell>
+              </ng-container>
+           
+            <!-- Action Column -->
+            <ng-container matColumnDef="operation">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Operation </mat-header-cell>
+              <mat-cell *matCellDef="let element">
+                <button mat-icon-button matTooltip="Click to Edit" class="iconbutton"
+                  color="" (click)="editPart(element._id)">
+                  <mat-icon class="livis-warning">edit</mat-icon>
+                </button> 
+                <button mat-icon-button matTooltip="Click to Delete" class="iconbutton"
+                  color="" (click)="deletePartInfo(element._id)">
+                  <mat-icon class="livis-danger">delete</mat-icon>
+                </button> 
+                </mat-cell>
+            </ng-container>
+            
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+          </mat-table>
+        </mat-card-content>
+        <mat-card-content>
+            <mat-paginator #paginator [length]="resultsLength"
+                [pageSize]="10"
+                [pageSizeOptions]="[ 10, 20,100]">
+            </mat-paginator>
+        </mat-card-content>
+    </mat-card>
+      
+       
+    </div>
+</div>
+
+  <!-- Add Parts Modal -->
+  <div class="modal fade" id="add-part-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog card">
+      <div class="modal-content">
+        <div class="modal-header card-header">
+          <h4 class="modal-title card-title">Add Part and Model</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body card-body">
+            <!-- <div class="card">  -->
+          <form [formGroup]="partsForm" novalidate (submit)="addNewPart(partsForm)">
+            
+            <div class="row">
+            
+            
+          
+            <mat-form-field class="col-md-12">
+              <input matInput formControlName="part_number" placeholder="Part Number *" type="text">
+              <!-- {{partsForm.controls}} -->
+              <mat-error *ngIf="partsForm.controls.part_number.errors">
+                <mat-error *ngIf="isSubmitted && partsForm.controls.part_number.errors.required" class="text-danger">
+                    Part Number is required .
+                </mat-error>
+              </mat-error>
+            </mat-form-field>
+
+            <!-- <mat-form-field class="col-md-6">
+              <input matInput formControlName="planned_production" placeholder="Planned Production Count *" type="text">
+              <mat-error *ngIf="partsForm.controls.planned_production.errors">
+                <mat-error *ngIf="isSubmitted && partsForm.controls.planned_production.errors.required" class="text-danger">
+                    Planned Production Count is required .
+                </mat-error>
+              </mat-error>
+            </mat-form-field> -->
+
+            <mat-form-field class="col-md-12">
+              <textarea matInput formControlName="part_description" placeholder="Part Description" >
+                </textarea>
+            </mat-form-field>
+
+           
+          </div>
+
+            <div class="category form-category">* Required fields</div>
+            <div class="modal-footer">
+                <button mat-raised-button type="button" class="btn btn-fill btn-dark" data-dismiss="modal">Close</button>
+                <button mat-raised-button type="submit" class="btn btn-fill btn-primary">Submit</button>
+               
+              </div>
+          </form>
+          <!-- </div> -->
+        </div>
+       
+      </div>
+    </div>
+  </div>
+  <!--  End Modal -->
+
+
+  <!-- EDIT Parts Modal -->
+  <div class="modal fade" id="edit-part-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog card">
+      <div class="modal-content">
+        <div class="modal-header card-header">
+          <h4 class="modal-title card-title">Edit Model</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body card-body">
+            <!-- <div class="card">  -->
+          <form [formGroup]="partsFormEdit" novalidate (submit)="updatePartInfo(partsFormEdit)">
+            <mat-form-field class="invisible-field">
+                <input matInput type="text"  formControlName="_id">
+            </mat-form-field>
+            <div class="row">
+
+               
+                <mat-form-field class="col-md-12">
+                  <input matInput formControlName="part_number" placeholder="Part Number *" type="text">
+                  <mat-error *ngIf="partsFormEdit.controls.part_number.errors">
+                    <mat-error *ngIf="isSubmitted && partsFormEdit.controls.part_number.errors.required" class="text-danger">
+                        Part Number is required .
+                    </mat-error>
+                  </mat-error>
+                </mat-form-field>
+    
+                <!-- <mat-form-field class="col-md-6">
+                  <input matInput formControlName="planned_production" placeholder="Planned Production Count *" type="text">
+                  <mat-error *ngIf="partsFormEdit.controls.planned_production.errors">
+                    <mat-error *ngIf="isSubmitted && partsFormEdit.controls.planned_production.errors.required" class="text-danger">
+                        Planned Production Count is required .
+                    </mat-error>
+                  </mat-error>
+                </mat-form-field> -->
+    
+                <mat-form-field class="col-md-12">
+                  <textarea matInput formControlName="part_description" placeholder="Part Description" type="number">
+                    </textarea>
+                </mat-form-field>
+    
+                <!-- <div class="col-md-12">
+                    <mat-checkbox formControlName="edit_part_data">Edit Part Data</mat-checkbox>
+                </div> -->
+              </div>
+            
+            <div class="category form-category">* Required fields</div>
+            <div class="modal-footer">
+                <button mat-raised-button type="button" class="btn btn-fill btn-dark" data-dismiss="modal">Close</button>
+                <button mat-raised-button type="submit" class="btn btn-fill btn-primary">Submit</button>
+               
+              </div>
+          </form>
+          <!-- </div> -->
+        </div>
+       
+      </div>
+    </div>
+  </div>
+  <!--  End Modal -->

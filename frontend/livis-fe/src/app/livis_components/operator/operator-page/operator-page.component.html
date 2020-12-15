@@ -1,0 +1,525 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="card start-header-wrap">
+            <div class="row">
+                <div class="col-md-9" id="start_data">
+                    <!-- <div > -->
+                       
+                        <!-- <table class="table start-process-data table-bordered">
+                            <tr>
+                                <th>Shift</th>
+                                <td>2:00-4:00</td>
+                                <th>Part Number</th>
+                                <td>APRT4568</td>
+                                <th>Model Number</th>
+                                <td>APRT4568</td>
+                                <th>Lot Number</th>
+                                <td>APRT4568</td>
+                            </tr>
+                        </table> -->
+                    <!-- </div> -->
+                </div>
+                <div class="col-md-3 process-action-wrap">
+                    <button (click)="processStartForm();" id="start_process_btn" mat-raised-button class="btn btn-success">
+                        <i class="material-icons">play_arrow</i> START PROCESS
+                    </button>
+
+                    <button (click)="processEndForm();" id="stop_process_btn" mat-raised-button class="btn btn-danger invisible-element">
+                        <i class="material-icons">stop</i> STOP PROCESS
+                    </button>
+                </div>   
+            </div> 
+        </div> <!-- header end -->
+
+        <div class="row">
+            <div class="col-md-9 camera-wrap">
+                <div class="card">
+                    <div class="card-header card-header-danger">
+                        <h4 class="card-title"><b>LIVE FEED</b></h4>
+                    </div>
+
+                    <div class="card-body camera-wrap-body">
+                        <div class="row" id="camera_layout_wrap">
+                            
+
+                            <!-- <div class="col-lg-6 col-md-6 col-sm-6 camera-img-wrap" >
+                                <img src="../../../../assets/img/nopreview.png" id="live_feed_01" alt="" >
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-6 camera-img-wrap" >
+                                <img src="../../../../assets/img/nopreview.png" id="live_feed_01" alt="" >
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-6 camera-img-wrap" >
+                                <img src="../../../../assets/img/nopreview.png" id="live_feed_01" alt="" >
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-6 camera-img-wrap" >
+                                <img src="../../../../assets/img/nopreview.png" id="live_feed_01" alt="" >
+                            </div> -->
+
+                            
+
+                            
+
+                           
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-3 ">
+                <div class="card">
+                    <div id="result-status-wrap" class="card-header card-header-danger text-center">
+                        <h4 class="card-title">
+                          <b>DEFECT STATS</b>
+                          <b style="display:block" id="result-status"></b>
+                        </h4>
+                    </div>
+
+                    <div class="card-body defect-stats-wrap">
+
+                        <div class="row">
+
+
+                            <div class="card">
+                                <div class="card-header card-header-icon card-header-success">
+                                  <div class="card-icon">
+                                    <i class="material-icons">thumb_up</i>
+                                  </div>
+                                  <h4 class="card-title" >Total Accepted</h4>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h4 id="livis-total-accepted">{{metrix_list.accepted?metrix_list.accepted:"0"}}/{{metrix_list.total?metrix_list.total:"0"}}</h4>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header card-header-icon card-header-danger">
+                                  <div class="card-icon">
+                                    <i class="material-icons">thumb_down</i>
+                                  </div>
+                                  <h4 class="card-title" >Total Rejected</h4>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h4 id="livis-part-rejected">
+                                      {{metrix_list.rejected?metrix_list.rejected:"0"}}/{{metrix_list.total?metrix_list.total:"0"}}
+                                    </h4>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header card-header-icon card-header-warning">
+                                  <div class="card-icon">
+                                    <i class="material-icons">extension</i>
+                                  </div>
+                                  <h4 class="card-title" >Model Number</h4>
+                                </div>
+                                <div class="card-body text-center ocr-update-wrap" *ngIf="defect_list.ocr_result">
+                                    <h4 id="livis-part-number">{{defect_list.ocr_result | uppercase}}</h4>
+                                    <a href="javascript:void(0);" (click)="editPartNumber();">
+                                      <mat-icon class="livis-warning">edit</mat-icon>
+                                    </a>
+                                    <!-- <a (click)="editWorkStation(element._id)">
+                                      <mat-icon class="livis-warning">edit</mat-icon>
+                                    </a>  -->
+                                </div>
+
+                                <div class="card-body text-center" *ngIf="!defect_list.ocr_result">
+                                  
+                                  <h4 id="livis-part-number">--</h4>
+                                 
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header card-header-icon card-header-info">
+                                  <div class="card-icon">
+                                    <i class="material-icons">power</i>
+                                  </div>
+                                  <h4 class="card-title" >Plugged Cell(%)</h4>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h4 id="livis-plugged-cell">{{defect_list.plugged_cell_percent?defect_list.plugged_cell_percent:"--"}}</h4>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header card-header-icon card-header-primary">
+                                  <div class="card-icon">
+                                    <i class="material-icons">poll</i>
+                                  </div>
+                                  <h4 class="card-title">Serial Number</h4>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h4 id="livis-serial-number">{{defect_list.serial_number?defect_list.serial_number:"--"}}</h4>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header card-header-icon card-default-info">
+                                  <div class="card-icon">
+                                    <i class="material-icons">close</i>
+                                  </div>
+                                  <h4 class="card-title">Defects</h4>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h4 id="livis-defects">{{defect_list.defect_list?defect_list.defect_list:"--"}}</h4>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header card-header-icon card-header-primary">
+                                  <div class="card-icon">
+                                    <i class="material-icons">call_missed</i>
+                                  </div>
+                                  <h4 class="card-title">Missing Features</h4>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h4 id="livis-missing-feature">{{defect_list.missingFeatures?defect_list.missingFeatures:"--"}}</h4>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </div>
+</div>
+
+  <!-- Add process start Modal -->
+  <div class="modal fade" id="start-process-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content" style="min-width: 700px;">
+        <div class="modal-header card-header">
+          <h4 class="modal-title card-title">Start Process</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+            <!-- <div class="card">  -->
+              <div class="card previsous-process-wrap"  *ngIf = "previous_process.model">
+                <div class="card-header card-header-icon card-header-primary">
+                  <div class="card-icon">
+                    Previous Process Details
+                  </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-6"> 
+                        <span *ngIf = "previous_process.shift"><b>Shift: </b>{{previous_process.shift.shift_name}}({{previous_process.shift.start_time}} - {{previous_process.shift.end_time}})</span>
+                      </div>
+                      <div class="col-md-6"> 
+                        <span><b>Model No. </b>{{previous_process.model}}</span>
+                      </div>
+                      <div class="col-md-6"> 
+                        <span><b>Part No. </b>{{previous_process.part_number}}</span>
+                      </div>
+                      <div class="col-md-6"> 
+                        <span><b>Total Bath: </b>{{previous_process.bath_number_denominator}}</span>
+                      </div>
+                      <div class="col-md-6"> 
+                        <span><b>Lot No.: </b>{{previous_process.lot_number}}</span>
+                      </div>
+                      
+                    </div>
+                       <!-- <table class="table">
+                           <tr>
+                               <th>Shift</th>
+                               <td>IMAP</td>
+                               <th>Model No.</th>
+                               <td>Ritika</td>
+                           </tr>
+
+                           <tr>
+                                <th>Part No</th>
+                                <td>8080</td>
+                                <th>Total Bath</th>
+                                <td>Password</td>
+                            </tr>
+
+                            
+                       </table>    -->
+                </div>
+              </div>  
+            <div class="form-group"  *ngIf = "previous_process.model">
+              <mat-checkbox  (change)="checkPreviosProcess($event)" id="previsous-process-btn" name="workstation_status"><span class="livis-text-color">Fill From Previous Process</span></mat-checkbox>
+            </div>
+          <form [formGroup]="startProcessForm" class="card" novalidate (submit)="startProcess(startProcessForm)">
+            <mat-form-field class="invisible-field">
+              <input matInput type="text"  formControlName="user_id">
+            </mat-form-field>
+            
+            <mat-form-field class="invisible-field">
+              <input matInput type="text"  formControlName="workstation_id">
+            </mat-form-field>
+            <div class="row" style="margin:0px">
+
+           
+            <mat-form-field class="col-md-6">
+                <mat-select id="shift_text_id" placeholder="Select Shift *" formControlName="shift">
+                    <mat-option *ngFor="let shift of shift_list" [value]="shift._id">
+                      {{ shift.shift_name }}({{shift.start_time}} - {{shift.end_time}})
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="isSubmitted && startProcessForm.controls.shift.errors">
+                    <mat-error *ngIf="startProcessForm.controls.shift.errors.required" class="text-danger">
+                      Shift Name is required .
+                    </mat-error>
+                </mat-error>
+            </mat-form-field>
+            
+            <mat-form-field class="col-md-6">
+                <mat-select (selectionChange)="modelChange($event.value)" placeholder="Select Model Number *" formControlName="model">
+                    <mat-option *ngFor="let model of model_list" [value]="model.model">
+                      {{ model.model }}
+                    </mat-option>
+                </mat-select>
+
+                <mat-error *ngIf="isSubmitted && startProcessForm.controls.model.errors">
+                    <mat-error *ngIf="startProcessForm.controls.model.errors.required" class="text-danger">
+                      Model Number is required .
+                    </mat-error>
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="col-md-6">
+                <input matInput [readonly]="true" placeholder="Part Number *" type="text"  formControlName="part_number">
+                <mat-error *ngIf="isSubmitted && startProcessForm.controls.part_number.errors">
+                    <mat-error *ngIf="startProcessForm.controls.part_number.errors.required" class="text-danger">
+                      Part Number is required .
+                    </mat-error>
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="col-md-6">
+              <input matInput [readonly]="true" placeholder="Total Bath *" type="text"  formControlName="bath_number_denominator">
+              <mat-error *ngIf="isSubmitted && startProcessForm.controls.bath_number_denominator.errors">
+                  <mat-error *ngIf="startProcessForm.controls.bath_number_denominator.errors.required" class="text-danger">
+                    Total Bath is required .
+                  </mat-error>
+              </mat-error>
+            </mat-form-field>
+
+          
+
+           
+            <mat-form-field class="col-md-6">
+                <input matInput placeholder="Enter Lot Number *" type="text"  formControlName="lot_number">
+                <mat-error *ngIf="isSubmitted && startProcessForm.controls.lot_number.errors">
+                    <mat-error *ngIf="startProcessForm.controls.lot_number.errors.required" class="text-danger">
+                      Lot Number is required .
+                    </mat-error>
+                </mat-error>
+            </mat-form-field>
+                
+          </div>
+           
+           
+            <div class="process-rew-wrap">* Required fields</div>
+            <div class="modal-footer">
+                <button mat-raised-button type="button" class="btn btn-fill btn-dark livis-close-btn" data-dismiss="modal">Close</button>
+                <button mat-raised-button type="submit" class="btn btn-primary">Submit</button>
+               
+              </div>
+          </form>
+          <!-- </div> -->
+        </div>
+       
+      </div>
+    </div>
+  </div>
+  <!--  End Modal -->
+
+
+  <!-- Add process end Modal -->
+  <div class="modal fade" id="end-process-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header card-header">
+          <h4 class="modal-title card-title">End Process</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+            <!-- <div class="card">  -->
+          <form [formGroup]="endProcessForm" novalidate (submit)="endProcess(endProcessForm)">
+            <div class="category form-category">Select Bath Number *</div>
+            <mat-form-field class="invisible-field">
+              <input matInput type="text"  formControlName="_id">
+            </mat-form-field>
+            <div class="form-group">
+                  <span *ngFor='let in of counterBathNumber(bath_number_count) ;let i = index'>
+                    <input value="{{(i+1)}}/{{bath_number_count}}"  formControlName="bathnum" class="bath-number-checkbox" type="radio" id="bath_number-{{(i+1)}}">
+                    <label class="for-bath-number-checkbox" for="bath_number-{{(i+1)}}">
+                        <span data-hover="{{(i+1)}}/{{bath_number_count}}">{{(i+1)}}/{{bath_number_count}}</span>
+                    </label>
+                  </span>  
+                    <!-- <input value="2/8"  formControlName="bath_number" class="bath-number-checkbox" type="radio" name="bath_number" id="bath_number-2" >
+                    <label class="for-bath-number-checkbox" for="bath_number-2">
+                        <span data-hover="2/8">2/8</span>
+                    </label> -->
+
+                    <!-- <input value="3/8"  formControlName="bath_number" class="bath-number-checkbox" type="radio" name="bath_number" id="bath_number-3" >
+                    <label class="for-bath-number-checkbox" for="bath_number-3">
+                        <span data-hover="3/8">3/8</span>
+                    </label>
+
+                    <input value="6/8"  formControlName="bath_number" class="bath-number-checkbox" type="radio" name="bath_number" id="bath_number-4" >
+                    <label class="for-bath-number-checkbox" for="bath_number-4">
+                        <span data-hover="6/8">6/8</span>
+                    </label> -->
+                   
+              
+            </div>
+
+     
+            <div *ngIf="isSubmittedEdit && endProcessForm.controls.bathnum.errors" class="text-danger">
+              Bath Number is required .
+            </div>
+            
+            <div class="modal-footer">
+                <button mat-raised-button type="button" class="btn btn-fill btn-dark livis-close-btn" data-dismiss="modal">Close</button>
+                <button mat-raised-button type="submit" class="btn btn-primary">Submit</button>
+               
+              </div>
+          </form>
+          <!-- </div> -->
+        </div>
+       
+      </div>
+    </div>
+  </div>
+  <!--  End Modal -->
+
+
+   <!-- Part Edit Authentication Modal -->
+   <div class="modal fade" id="part-auth-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog card">
+      <div class="modal-content">
+        <div class="modal-header card-header">
+          <h4 class="modal-title card-title">Provide Authentication Details<br><span style="font-size: 12px;">(*Accept Only TM,GL,AM Credentials)</span></h4>
+          
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body card-body">
+            <!-- <div class="card">  -->
+          <form [formGroup]="loginForm" novalidate (submit)="partAuthLogin(loginForm)">
+            
+           
+            <mat-form-field class="example-full-width">
+              <input matInput formControlName="email" placeholder="Email *"  type="text">
+              <mat-error *ngIf="isSubmitted && loginForm.controls.email.errors">
+                <mat-error *ngIf="loginForm.controls.email.errors.required" class="text-danger">
+                  Email is required .
+                </mat-error>
+                <mat-error *ngIf="loginForm.controls.email.errors.email" class="text-danger">
+                  Email must be a valid email.
+                </mat-error>
+              </mat-error>  
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width">
+              <input matInput formControlName="password" placeholder="Password *" type="password">
+              <mat-error *ngIf="isSubmitted && !loginForm.controls.password.valid" class="text-danger">
+                Password is required .
+              </mat-error>
+            </mat-form-field>
+         
+         
+            <div class="category form-category">* Required fields</div>
+            <div class="modal-footer">
+                <button mat-raised-button type="button" class="btn btn-fill btn-dark livis-close-btn" data-dismiss="modal">Close</button>
+                <button mat-raised-button type="submit" class="btn btn-fill btn-primary">Authenticate</button>
+               
+              </div>
+          </form>
+          <!-- </div> -->
+        </div>
+       
+      </div>
+    </div>
+  </div>
+  <!--  End Modal -->
+
+
+    <!-- Part Edit  Modal -->
+    <div class="modal fade" id="edit-part-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog card">
+        <div class="modal-content">
+          <div class="modal-header card-header">
+            <h4 class="modal-title card-title">Edit Model Number</h4>
+            <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              <i class="material-icons">clear</i>
+            </button>
+          </div>
+          <div class="modal-body card-body">
+              <!-- <div class="card">  -->
+            <form [formGroup]="updatePartForm" novalidate (submit)="updatePartInfo(updatePartForm)">
+              <mat-form-field class="invisible-field">
+                <input matInput type="text"  formControlName="_id">
+              </mat-form-field>
+             
+              <mat-form-field class="example-full-width">
+                <input matInput formControlName="part_number" placeholder="Part Number *" type="text">
+                <mat-error *ngIf="isSubmitted && !updatePartForm.controls.part_number.valid" class="text-danger">
+                  Part Number is required .
+                </mat-error>
+              </mat-form-field>
+  
+              <div class="category form-category">* Required fields</div>
+              <div class="modal-footer">
+                  <button mat-raised-button type="button" class="btn btn-fill btn-dark livis-close-btn" data-dismiss="modal">Close</button>
+                  <button mat-raised-button type="submit" class="btn btn-fill btn-primary">Update</button>
+                 
+              </div>
+            </form>
+            <!-- </div> -->
+          </div>
+         
+        </div>
+      </div>
+    </div>
+    <!--  End Modal -->
+
+    <!-- Process Summary Modal Modal -->
+    <div class="modal fade" id="process-summary-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog card">
+        <div class="modal-content" style="min-width: 700px;">
+          <div class="modal-header card-header">
+            <h4 class="modal-title card-title">Process Summary</h4>
+            <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              <i class="material-icons">clear</i>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div id="process_data">
+
+              </div>
+          </div>
+
+          <div class="modal-footer">
+            <button mat-raised-button type="button" class="btn btn-fill btn-primary livis-close-btn" data-dismiss="modal">OK</button>
+           
+        </div>
+         
+        </div>
+      </div>
+    </div>
+    <!--  End Modal -->

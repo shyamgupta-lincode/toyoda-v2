@@ -1,0 +1,93 @@
+.livis-app-wrap img{
+    width: 10vw;
+}
+.livis-app-wrap h4
+{
+    position: relative;
+    top: -1.5em;
+    font-weight: 600;
+    font-size: 22px;
+
+}
+.livis-apps-wrap .card-title{
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.app-wrapper {
+    justify-content: space-around;
+    margin-top: 40px;
+}
+
+.logo-container {
+    justify-content: space-between; 
+    margin: 0px 5px 15px 0px;
+    padding-top: 10px;
+    align-items: center;
+}
+
+.livis-apps-logo {
+    width: 100px;
+    height: 30px;
+}
+
+.card-icon {
+    border-radius: 5px;
+    background-color: #999;
+    padding: 80px;
+    margin-top: -20px;
+    margin-right: 15px;
+    float: left;
+}
+
+.card-icon.class1 {
+    background: linear-gradient(60deg, #4ac29a, #bdfff3);
+}
+
+.card-icon.class2 {
+    background: linear-gradient(60deg,#ffa726,#fb8c00);
+}
+
+.card-icon.class3 {
+    background: linear-gradient(60deg,#6190e8 ,#a7bfe8);
+}
+
+.card-icon.class4 {
+    background: linear-gradient(60deg,#f2994a,#f2c94c);
+}
+
+.card-icon.class5 {
+    background: linear-gradient(60deg, #d66d75, #e29587);
+}
+
+.card-icon.class6 {
+    background: linear-gradient(60deg,#4776e6,
+    #8e54e9);
+}
+
+.card-icon i {
+    font-size: 80px;
+    line-height: 90px;
+    width: 90px;
+    height: 90px;
+    text-align: center;
+    color:white;
+}
+
+.card-category {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    margin-left: 22%;
+}
+
+.wrapper {
+    background-image: url('../../../assets/img/livis-bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.app-wrapper .card-icon{
+    margin-bottom: 5px !important;
+}

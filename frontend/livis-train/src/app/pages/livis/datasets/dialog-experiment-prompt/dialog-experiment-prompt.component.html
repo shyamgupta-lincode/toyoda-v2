@@ -1,0 +1,149 @@
+<nb-card>
+  <nb-card-body>
+    <div (click)="cancel()" class="closeBtn" style="cursor: pointer;"> 
+      <nb-icon icon="close-square-outline" status="danger"></nb-icon>
+    </div>
+    <nb-stepper #stepper>
+      <nb-step [stepControl]="firstForm" label="Info">
+        <form [formGroup]="firstForm" (ngSubmit)="onFirstSubmit()" class="addExperimentSteps">
+          <h4>
+            Enter some basic information
+          </h4>
+          <div class="row">
+            <div class="col-md-6">
+              <input nbInput type="text" placeholder="Model Name" class="input-full-width" formControlName="name"
+              [ngClass]="{'form-control-danger': firstForm.invalid && (firstForm.dirty || firstForm.touched)}">
+              <!-- <span>{{dataset._id}}</span> -->
+              <span *ngIf ="!firstForm.controls.name.valid && firstForm.dirty" class="text-center text-danger">
+                Please Enter Model Name
+              </span>
+            </div>
+            <div class="col-md-6">
+              <nb-select class="full-width custom-type-select" placeholder="Select Model Type" formControlName="typeOfExperiment">
+                <!-- <nb-option value="classification">Classification</nb-option> -->
+                <nb-option value="ocr">OCR</nb-option>
+                <!-- <nb-option value="segmentation">Segmentation</nb-option> -->
+              </nb-select>
+              <span *ngIf ="!firstForm.controls.typeOfExperiment.valid && firstForm.dirty" class="text-center text-danger">
+                Please Select Model Type
+              </span>
+            </div>
+
+            <div class="editor-tag col-md-12" (click)="focusTagInput()">
+              <span class="tag-item" *ngFor="let tag of tags">
+                      {{tag}}
+                      <span class="remove-tag" (click)="removeTag(tag)">×</span>
+                    </span>
+                    <input
+                    placeholder="Enter IGBT Number"
+                    #tagInput type="text"
+                    class="input-tag"
+                    (keyup)="onKeyUp($event)"
+                    formControlName="jig_list">
+                </div>
+
+            <!-- <div class="col-md-6">
+                <input type="checkbox" value="1" formControlName="label_list[]">
+                <input type="checkbox" value="2" formControlName="label_list[]">
+
+            </div> -->
+          </div>
+          <div class="buttons-bottom">
+            <button nbButton nbStepperNext>Next</button>
+          </div>
+        </form>
+      </nb-step>
+      <nb-step  label="Model">
+        <h4>Choose a model</h4>
+        <div class="addExperimentSteps" style="text-align: left;">
+            <nb-radio-group [(ngModel)]="modelName">
+              <nb-radio *ngFor="let m of models" value="{{ m }}">{{ m | titlecase }}</nb-radio>
+            </nb-radio-group>
+            <div class="buttons-bottom">
+              <button nbButton nbStepperPrevious>Prev</button>
+              <button nbButton nbStepperNext>Next</button>
+            </div>
+          </div>
+      </nb-step>
+
+      <nb-step label="Tuning">
+        <h4>Tune your model</h4>
+        <div class="addExperimentSteps">
+          <label>Batch Size: <b>{{ tuning.batchSize }}</b></label>
+          <input type="range" min="0" max="10" value="1" [(ngModel)]="tuning.batchSize">
+          <label>Number Of Steps: <b>{{ tuning.imageSize }}</b></label>
+          <input type="range" min="10000" max="150000" step="1000" value="20000" [(ngModel)]="tuning.imageSize">
+          <label>LR Value (eg: 10^-2 = 0.01): <b>{{ tuning.lrValue }}</b></label>
+          <input type="range" min="-10" max="0" value="-1" [(ngModel)]="tuning.lrValue">
+          <div class="buttons-bottom">
+            <button nbButton nbStepperPrevious>Prev</button>
+            <button nbButton nbStepperNext (click)="collectValues()">Next</button>
+          </div>
+        </div>
+      </nb-step>
+
+      <nb-step label="Metrics">
+        <h4>Choose metrics to capture</h4>
+        <div class="addExperimentSteps">
+          <nb-checkbox status="basic" [(ngModel)]="metrics.precision">Precision</nb-checkbox>
+          <hr/>
+          <nb-checkbox status="basic" ngDefaultControl [(ngModel)]="metrics.recall">Recall</nb-checkbox>
+          <hr/>
+          <nb-checkbox status="basic" ngDefaultControl [(ngModel)]="metrics.fOneScore">F1 Score</nb-checkbox>
+          <div class="buttons-bottom">
+            <button nbButton nbStepperPrevious>Prev</button>
+            <button nbButton nbStepperNext>Next</button>
+          </div>
+        </div>
+      </nb-step>
+
+      <nb-step label="Submit">
+        <div class="addExperimentSteps">
+          <h4>Review and Submit</h4>
+          <table width="100%">
+            <tr>
+              <td>Model Name</td>
+              <td class="review">{{ experiment.experiment_name }}</td>
+            </tr>
+            <tr>
+              <td>Model Type</td>
+              <td class="review">{{ experiment.experiment_type }}</td>
+            </tr>
+            <tr>
+              <td>Model Type</td>
+              <td class="review">{{ experiment.model_type }}</td>
+            </tr>
+            <tr>
+              <td>LR value</td>
+              <td class="review">{{ experiment.lr }}</td>
+            </tr>
+            <tr>
+              <td>Image Size</td>
+              <td class="review">{{ experiment.image_size }}</td>
+            </tr>
+            <tr>
+              <td>Batch Size</td>
+              <td class="review">{{ experiment.batch_size }}</td>
+            </tr>
+            <tr>
+              <td>Precision</td>
+              <td class="review">{{ experiment.metrics && experiment.metrics.precision ? "Yes" : "No" }}</td>
+            </tr>
+            <tr>
+              <td>Recall</td>
+              <td class="review">{{ experiment.metrics && experiment.metrics.recall ? "Yes" : "No" }}</td>
+            </tr>
+            <tr>
+              <td>FOne Score</td>
+              <td class="review">{{ experiment.metrics && experiment.metrics.fOneScore ? "Yes" : "No" }}</td>
+            </tr>
+          </table>
+          <div class="buttons-bottom">
+            <button nbButton nbStepperPrevious>Prev</button>
+            <button nbButton nbStepperNext (click)="submit()">Submit</button>
+          </div>
+        </div>
+      </nb-step>
+    </nb-stepper>
+  </nb-card-body>
+</nb-card>

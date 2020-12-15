@@ -1,0 +1,30 @@
+.has-error .form-control[type="email"],
+.has-error input[type="password"] {
+    border-color: rgb(216, 12, 12) !important;
+    color: rgb(230, 14, 14);
+    /* background-color: black; */
+}
+
+.mat-option.mat-selected:not(.mat-option-multiple){
+    background-color: #ff5a60 !important;
+    color: white !important;
+}
+
+.mat-option:hover {
+    background-color: #ff5a60 !important;
+    color: white !important;
+}
+
+.mat-option.mat-selected:hover{
+    background-color: #ff5a60 !important;
+    color: white !important;
+}
+
+.login-page .page-header .container, .lock-page .page-header .container {
+    padding-top: 33vh !important;
+    /* padding-top: 2vh !important; */
+}
+
+.custom-container-padding{
+    padding-top: 2vh !important;
+}

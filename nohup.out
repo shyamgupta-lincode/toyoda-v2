@@ -1,0 +1,7 @@
+tail: cannot open 'outpit' for reading: No such file or directory
+tail: no files remaining
+tail: cannot open 'output' for reading: No such file or directory
+tail: no files remaining
+tail: error reading 'standard input': Bad file descriptor
+tail: cannot open 'out' for reading: No such file or directory
+tail: no files remaining

@@ -1,0 +1,78 @@
+<nb-card class="expCard">
+  <nb-card-header>Create Workstation</nb-card-header>
+  <nb-card-body>
+    <input id="name" name="name" class="form-control" placeholder="Name"
+      required minlength="3" [(ngModel)]="workstation_name" nbInput
+      #name="ngModel" >
+      
+    <div *ngIf="name.invalid && (name.dirty || name.touched)"
+        class="alert alert-danger">
+
+      <div *ngIf="name.errors.required">
+        Name is required.
+      </div>
+      <div *ngIf="name.errors.minlength">
+        Name must be at least 3 characters long.
+      </div>
+    </div>
+    <hr>
+    <h5>Cameras</h5>
+    <table *ngIf="cameras.length > 0">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Remove</th>
+      </tr>
+      <tr *ngFor="let camera of cameras">
+        <td>{{ camera.camera_id }}</td>
+        <td>{{ camera.camera_name }}</td>
+        <td>
+          <button nbButton size="tiny" (click)="removeCamera(camera)" > 
+            <nb-icon icon="close-square-outline" status="danger"></nb-icon>
+          </button>
+        </td>
+      </tr>
+    </table>
+    <hr>
+    <form #cameraForm="ngForm">
+      <label for="cid">
+        Camera ID
+      </label>
+      <input id="cid" name="cid" class="form-control"
+        nbInput fieldSize="tiny" placeholder="Camera ID"
+        required [(ngModel)]="camera_id"
+        #cid="ngModel" >
+        
+      <div *ngIf="(cid.dirty || cid.touched) && cid.invalid"
+          class="alert alert-danger">
+
+        <div *ngIf="cid.errors.required">
+          ID is required.
+        </div>
+      </div>
+      <label for="cname">Camera Name</label>
+      <input nbInput id="cname" name="cname" class="form-control" fieldSize="tiny"
+      placeholder="Overhead"
+        required minlength="3" [(ngModel)]="camera_name"
+        #cname="ngModel" >
+        
+      <div *ngIf="(cname.dirty || cname.touched) && cname.invalid"
+          class="alert alert-danger">
+
+        <div *ngIf="cname.errors.required">
+          Name is required.
+        </div>
+        <div *ngIf="cname.errors.minlength">
+          Name must be at least 3 characters long.
+        </div>
+      </div>
+      <button nbButton (click)="this.camera_name && this.camera_id && addCamera()">Add Camera</button>
+    </form>
+
+
+  </nb-card-body>
+  <nb-card-footer>
+    <button nbButton status="success" (click)="create()" style="float: right;" [disabled]="!this.workstation_name || this.cameras.length < 0">Create</button>
+    <button nbButton (click)="cancel()">Close</button>
+  </nb-card-footer>
+</nb-card>

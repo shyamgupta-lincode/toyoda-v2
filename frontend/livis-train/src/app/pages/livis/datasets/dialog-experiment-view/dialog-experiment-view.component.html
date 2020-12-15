@@ -1,0 +1,41 @@
+<nb-card class="expCard">
+  <nb-card-header>Jig Number: {{ dataset.part_number }} | Experiment: {{ exp.experiment_name }} <b *ngIf="deployed" class="live">LIVE</b></nb-card-header>
+  <nb-card-body>
+    <h6 *ngIf="deployed">Deployed On</h6>
+    <span *ngFor="let ws of depolyed_on"><nb-icon icon="monitor-outline" class=""></nb-icon>&nbsp;{{ ws.workstation_name }}<br></span>
+    <hr>
+    <h6>Label wise report</h6>
+    <div *ngIf="getLabelwiseReport().length > 0; then showTable else noData"></div>
+    <ng-template #showTable>
+      <table>
+        <tr>
+          <th>Name</th>
+          <th>F1</th>
+          <th>Precision</th>
+          <th>Recall</th>
+          <th>Support</th>
+        </tr>
+        <tr *ngFor="let label of getLabelwiseReport()">
+          <td class="labelName">{{ label[0] }}</td>
+          <td>{{ label[1]['precision'] }}</td>
+          <td>{{ label[1]['recall'] }}</td>
+          <td>{{ label[1]['f1-score'] }}</td>
+          <td>{{ label[1]['support'] }}</td>
+        </tr>
+      </table>
+    </ng-template>
+    <hr />
+    <h6>Confusion Matrix</h6>
+    <div class="mat" *ngIf="getConfusionMatrix().length > 0; then showMatrix else noData"></div>
+    <ng-template #showMatrix>
+      <div *ngFor="let data of getConfusionMatrix()" class="matRow">
+        <div *ngFor="let item of data" class="matCell" [style.backgroundColor]="getBgColor(item)">{{ item }}</div>
+      </div>
+    </ng-template>
+    <ng-template #noData>No Data</ng-template>
+  </nb-card-body>
+  <nb-card-footer>
+    <button nbButton status="success" (click)="deploy()" [disabled]="deployed || deployRequested" style="float: right;">Deploy</button>
+    <button nbButton (click)="cancel()">Close</button>
+  </nb-card-footer>
+</nb-card>
