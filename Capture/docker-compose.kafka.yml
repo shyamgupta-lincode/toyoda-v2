@@ -22,7 +22,7 @@ services:
     ports:
       - "27017:27107"
     volumes:
-      - "~/Documents/LincodeLabs/Smart_Manuf/test/mongo_collections:/data/db/"
+      - "~/Documents/LincodeLabs/Livis_product/Republic/Capture/mongo_collections/:/data/db/"
 
 networks:
   default:

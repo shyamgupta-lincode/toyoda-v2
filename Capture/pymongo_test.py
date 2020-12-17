@@ -9,8 +9,9 @@ from pymongo import MongoClient
 
 # build a new client instance for MongoDB passing
 # the string domain and integer port to the host parameters
-mongo_client = MongoClient('mongodb', 27017) #-- for MAC
-#mongo_client = MongoClient('kafka-network', 27017)
+#-- for MAC and docker-compose where mongodb is the name of the mongo container
+mongo_client = MongoClient('mongodb', 27017)
+
 
 host_info = mongo_client['HOST']
 print("\nhost:", host_info)

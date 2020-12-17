@@ -39,40 +39,16 @@ class Producer():
         cap.release()
         return 0
 
+
 if __name__ == "__main__":
         ## Can be live video capture
         ## Can be RTSP input
         #video_input = 'part_abc.mp4'
         video_input = sys.argv[1]
-        #part = "xyz"
         part = sys.argv[2]
-        #topic = "WorkStation1"
         topic = sys.argv[3]
 
         print("\nCreating WorkStation\n")
-
         producer_ws = Producer(KAFKA_BROKER_URL, video_input, part, topic)
         producer_ws.stream_video()
         print("\nDone streaming\n")
-
-    ## producer = KafkaProducer(bootstrap_servers=KAFKA_BROKER_URL)
-    # producer = KafkaProducer(bootstrap_servers=KAFKA_BROKER_URL,
-    #                          value_serializer=lambda value: json.dumps(value).encode(), )
-
-    # Sending a video
-    # cap = cv2.VideoCapture(video_input)
-    # frames_iter = 0
-    # while (cap.isOpened()):
-    #     ret, frame = cap.read()
-    #     if ret == True:
-    #         frames_iter = frames_iter +1
-    #         cv2.imwrite("tmp.jpg", frame)
-    #         with open("tmp.jpg", 'rb') as f:
-    #             im_b64 = base64.b64encode(f.read())
-    #         payload_video_frame = {"frame": str(im_b64), "part": part, "frame_idx": frames_iter}
-    #         producer.send("WorkStation1", value=payload_video_frame)
-    #     else:
-    #         break
-    #
-    # cap.release()
-

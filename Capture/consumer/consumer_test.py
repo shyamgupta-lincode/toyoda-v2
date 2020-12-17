@@ -10,19 +10,33 @@ import pickle
 from PIL import Image
 import io
 import logging
+import sys
+import pandas as pd
+from pymongo import MongoClient
 
 KAFKA_BROKER_URL = "broker:9092"
+
+
+class mongo_client():
+    def __init__(self, collections_name):
+        self.client = MongoClient('mongodb', 27017)
+        self.db = self.client[collections_name]
+        self.capture_table = self.db.capture
+
+    def insert_doc(self, payload):
+        self.capture_table.insert_one(payload)
+        return
 
 
 class Consumer():
     def __init__(self, KAFKA_BROKER_URL, topic, auto_offset_reset_value):
         self.obj = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL,
         value_deserializer=lambda value: json.loads(value), auto_offset_reset=auto_offset_reset_value, )
+        self.topic = topic
 
-    def collect_stream(self):
+    def collect_stream(self, mongo_client):
         print("\nReceiving\n")
         for message in self.obj:
-            print(message.value["frame_idx"])
             im_b64_str = message.value["frame"]
             im_b64 = bytes(im_b64_str[2:], 'utf-8')
             im_binary = base64.b64decode(im_b64)
@@ -30,6 +44,14 @@ class Consumer():
             img = Image.open(buf)
             img_path = os.getcwd() + "/data/frame" + str(message.value["frame_idx"]) + ".jpg"
             img.save(img_path)
+            capture_doc = {
+                "image_path": img_path,
+                "topic": self.topic,
+                "part_name": str(message.value["part"]),
+                "timestamp": pd.Timestamp.now()
+            }
+            print("\n\n")
+            mongo_client.insert_doc(capture_doc)
 
     def close(self):
         self.obj.close()
@@ -38,47 +60,10 @@ class Consumer():
 if __name__ == "__main__":
 
     print("\nCreating WorkStation 1\n")
-    topic = "WorkStation1"
+    topic = sys.argv[1]
     consumer_ws = Consumer(KAFKA_BROKER_URL, topic, auto_offset_reset_value='earliest')
-
-    consumer_ws.collect_stream()
-
-    # consumer1 = KafkaConsumer(
-    #      "WorkStation1",
-    #      bootstrap_servers=KAFKA_BROKER_URL,
-    #      value_deserializer=lambda value: json.loads(value),
-    #      auto_offset_reset='earliest',
-    # )
-
-    ### For accepting single frame by topic ---
-    # for message in consumer1:
-    #      print(message.value)
-    #      im_b64_str = message.value["key"]
-    #      im_b64 = bytes(im_b64_str[2:], 'utf-8')
-    #      im_binary = base64.b64decode(im_b64)
-    #      buf = io.BytesIO(im_binary)
-    #      img = Image.open(buf)
-    #      img.save("result_video.jpg")
-
-
-    ### For accepting video by topic ---
-
-    # for message in consumer1:
-    #     # print(message.value["frame"])
-    #     # print("\n\n\n")
-    #     # print(message.value["part"])
-    #     # print("\n\n\n")
-    #     # print(message.value["frame_idx"])
-    #     # print("\n\n\n")
-    #     im_b64_str = message.value["frame"]
-    #     im_b64 = bytes(im_b64_str[2:], 'utf-8')
-    #     im_binary = base64.b64decode(im_b64)
-    #     buf = io.BytesIO(im_binary)
-    #     img = Image.open(buf)
-    #     #print(os.getcwd())
-    #     img_path = os.getcwd()+"/data/frame"+str(message.value["frame_idx"])+".jpg"
-    #     img.save(img_path)
-
+    ws_client = mongo_client("capture-collections")
+    consumer_ws.collect_stream(ws_client)
 
 
 
