@@ -1,17 +1,19 @@
+docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ inference_img_2
+
 To run Producer:
 
 cd /apps/producer/
 
-python3 producer_test.py "video_input" "part_name" "topic"
+python3 producer.py "video_input" "part_name" "topic"
 
 eg:
-python3 producer_test.py "part_xyz.mp4" "part_a" "WorkStation1"
+python3 producer.py "part_xyz.mp4" "part_a" "WorkStation1"
 
 To run Consumer:
 
 cd /apps/consumer/
 
-python3 consumer_test.py "topic"
+python3 consumer.py "topic"
 
 eg:
-python3 consumer_test.py "WorkStation1"
+python3 consumer.py "WorkStation1"

@@ -36,13 +36,14 @@ class Consumer():
 
     def collect_stream(self, mongo_client):
         print("\nReceiving\n")
+        frame_iter_ = 0
         for message in self.obj:
             im_b64_str = message.value["frame"]
             im_b64 = bytes(im_b64_str[2:], 'utf-8')
             im_binary = base64.b64decode(im_b64)
             buf = io.BytesIO(im_binary)
             img = Image.open(buf)
-            img_path = os.getcwd() + "/data/frame" + str(message.value["frame_idx"]) + ".jpg"
+            img_path = os.getcwd() + "/data/frame" + str(frame_iter_) + ".jpg"
             img.save(img_path)
             capture_doc = {
                 "image_path": img_path,
@@ -52,6 +53,7 @@ class Consumer():
             }
             print("\n\n")
             mongo_client.insert_doc(capture_doc)
+            frame_iter_ = frame_iter_ + 1
 
     def close(self):
         self.obj.close()

@@ -1,0 +1,10 @@
+FROM ubuntu:18.04
+RUN apt update && \
+    apt install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt update && apt install -y python3.6 && \
+    apt install -y python3-pip && pip3 install --upgrade pip 
+
+RUN pip3 install kafka-python opencv-python Pillow && \
+	apt install -y libgl1-mesa-glx
+COPY /producer/producer.py /apps/producer/

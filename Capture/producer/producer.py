@@ -1,11 +1,9 @@
 import os
-from time import sleep
 from kafka import KafkaProducer
 import json
 import cv2
 import numpy as np
 import base64
-import pickle
 import time
 from PIL import Image
 import sys
