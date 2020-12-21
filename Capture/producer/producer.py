@@ -8,8 +8,6 @@ import time
 from PIL import Image
 import sys
 
-KAFKA_BROKER_URL = "broker:9092"
-
 
 class Producer():
     def __init__(self, KAFKA_BROKER_URL, video_input, part, topic):
@@ -45,6 +43,8 @@ if __name__ == "__main__":
         video_input = sys.argv[1]
         part = sys.argv[2]
         topic = sys.argv[3]
+        #KAFKA_BROKER_URL = "broker:9092"
+        KAFKA_BROKER_URL = sys.argv[4]
 
         print("\nCreating WorkStation\n")
         producer_ws = Producer(KAFKA_BROKER_URL, video_input, part, topic)

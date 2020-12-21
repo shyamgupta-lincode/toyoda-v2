@@ -19,7 +19,8 @@ To see the collections inside the MongoDB container
 -- "mongo" on terminal
 -- "show dbs"
 --"use <collections-name>"
---"db.collection.find()"
+-- "show collections"
+--"db.<collection-name>.find()"
 
 To delete DBS
 On terminal
