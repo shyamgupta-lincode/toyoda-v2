@@ -23,13 +23,14 @@ class mongo_client():
         #self.capture_table = self.db.capture
         #self.db_table = ""
 
-    def add_to_metadata_collection(self, part_name):
+    def add_to_metadata_collection(self, part_name, topic):
+        # checking to see if part_name and gtopic is already registered???
         db = self.client["parts-metadata"]
         metadata_table = db.partsmetadata
-        metadata_table.insert_one({"part_name": part_name})
+        metadata_table.insert_one({"part_name": part_name, "topic": topic})
         # get part id for part name from collection
         #part_id =
-        part_payload = metadata_table.find_one({"part_name": part_name})
+        part_payload = metadata_table.find_one({"topic": topic})
         part_id = part_payload["_id"]
         return part_id
 
@@ -50,12 +51,13 @@ class Consumer():
         print("\nReceiving\n")
         frame_iter_ = 0
         for message in self.obj:
+            print(message.value)
             im_b64_str = message.value["frame"]
             im_b64 = bytes(im_b64_str[2:], 'utf-8')
             im_binary = base64.b64decode(im_b64)
             buf = io.BytesIO(im_binary)
             img = Image.open(buf)
-            img_path = os.getcwd() + "/data/frame" + str(frame_iter_) + ".jpg"
+            img_path = os.getcwd() + "/"+str(message.value["part"])+"/frame" + str(frame_iter_) + ".jpg"
             img.save(img_path)
             capture_doc = {
                 "part_id": part_id,
@@ -92,17 +94,18 @@ class Consumer():
 if __name__ == "__main__":
 
     print("\nCreating WorkStation consumer by Part name\n")
-    topic = sys.argv[1]
     #KAFKA_BROKER_URL = "broker:9092"
-    KAFKA_BROKER_URL = sys.argv[2]
+    KAFKA_BROKER_URL = sys.argv[1]
     #mongo_host = 'mongodb'
-    mongo_host = sys.argv[3]
+    mongo_host = sys.argv[2]
     #mongo_port = 27017
-    mongo_port = sys.argv[4]
-    part_name = sys.argv[5]
+    mongo_port = sys.argv[3]
+    part_name = sys.argv[4]
+    topic = sys.argv[5]
     consumer_ws = Consumer(KAFKA_BROKER_URL, topic, auto_offset_reset_value='earliest')
     ws_client = mongo_client(mongo_host, mongo_port)
-    part_id = ws_client.add_to_metadata_collection(part_name)
+    part_id = ws_client.add_to_metadata_collection(part_name, topic)
+    os.mkdir(os.getcwd() + "/"+part_name)
     consumer_ws.collect_stream(ws_client, part_id)
 
 
