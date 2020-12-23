@@ -12,5 +12,4 @@ ENV mongo_host="mongodb"
 ENV mongo_port="27017"
 ENV part_name="abc"
 COPY /consumer/consumer.py /apps/consumer/consumer.py
-#RUN python3 /apps/consumer/consumer.py topic broker_server mongo_host mongo_port part_name
-#not able to add kafka-network
+#RUN python3 /apps/consumer/consumer.py broker_server mongo_host mongo_port part_name topic

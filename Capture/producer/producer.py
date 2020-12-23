@@ -24,15 +24,12 @@ class Producer():
             ret, frame = cap.read()
             if ret == True:
                 frames_iter = frames_iter + 1
+                # Encoding and sending the frame
                 cv2.imwrite("tmp.jpg", frame)
                 with open("tmp.jpg", 'rb') as f:
                     im_b64 = base64.b64encode(f.read())
                 payload_video_frame = {"frame": str(im_b64), "part": self.part, "frame_idx": frames_iter}
                 self.obj.send(self.topic, value=payload_video_frame)
-                #print(payload_video_frame["frame_idx"])
-                print("\n")
-                print(payload_video_frame)
-                print("\n")
             else:
                 break
         cap.release()
@@ -46,9 +43,9 @@ if __name__ == "__main__":
         video_input = sys.argv[1]
         part = sys.argv[2]
         topic = sys.argv[3]
-        #KAFKA_BROKER_URL = "broker:9092"
         KAFKA_BROKER_URL = sys.argv[4]
         print("\nCreating WorkStation\n")
         producer_ws = Producer(KAFKA_BROKER_URL, video_input, part, topic)
+        # Streaming the frames
         producer_ws.stream_video()
         print("\nDone streaming\n")

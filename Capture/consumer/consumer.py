@@ -18,18 +18,11 @@ from pymongo import MongoClient
 class mongo_client():
     def __init__(self, mongo_host, mongo_port):
         self.client = MongoClient(mongo_host, int(mongo_port))
-        #self.db = self.client[collections_name]
-        #self.db = ""
-        #self.capture_table = self.db.capture
-        #self.db_table = ""
 
     def add_to_metadata_collection(self, part_name, topic):
-        # checking to see if part_name and gtopic is already registered???
         db = self.client["parts-metadata"]
         metadata_table = db.partsmetadata
         metadata_table.insert_one({"part_name": part_name, "topic": topic})
-        # get part id for part name from collection
-        #part_id =
         part_payload = metadata_table.find_one({"topic": topic})
         part_id = part_payload["_id"]
         return part_id
@@ -48,17 +41,19 @@ class Consumer():
         self.topic = topic
 
     def collect_stream(self, mongo_client, part_id):
-        print("\nReceiving\n")
+        print("\nReceiving the stream images\n")
         frame_iter_ = 0
         for message in self.obj:
-            print(message.value)
+            # Decoding the image stream
             im_b64_str = message.value["frame"]
             im_b64 = bytes(im_b64_str[2:], 'utf-8')
             im_binary = base64.b64decode(im_b64)
             buf = io.BytesIO(im_binary)
             img = Image.open(buf)
+            # Saving the frame
             img_path = os.getcwd() + "/"+str(message.value["part"])+"/frame" + str(frame_iter_) + ".jpg"
             img.save(img_path)
+            # Adding the payload data to mongo collection
             capture_doc = {
                 "part_id": part_id,
                 "image_path": img_path,
@@ -75,18 +70,6 @@ class Consumer():
             mongo_client.add_to_parts_collection(capture_doc)
             frame_iter_ = frame_iter_ + 1
 
-            #Parts-Collection
-            # collection_obj = {
-            #     'file_path': os.path.join(settings.TRAIN_DATA_STATIC, name_of_img),
-            #     'file_url': "http://164.52.194.78:3306/" + name_of_img,
-            #     'state': 'untagged',
-            #     'regions': [],
-            #     'regions_history': [],
-            #     'classifier_label': "",
-            #     'classifier_label_history': [],
-            #     'annotator': ''
-            # }
-
     def close(self):
         self.obj.close()
 
@@ -94,18 +77,20 @@ class Consumer():
 if __name__ == "__main__":
 
     print("\nCreating WorkStation consumer by Part name\n")
-    #KAFKA_BROKER_URL = "broker:9092"
     KAFKA_BROKER_URL = sys.argv[1]
-    #mongo_host = 'mongodb'
     mongo_host = sys.argv[2]
-    #mongo_port = 27017
     mongo_port = sys.argv[3]
     part_name = sys.argv[4]
     topic = sys.argv[5]
+    # Creating a Kafka consumer
     consumer_ws = Consumer(KAFKA_BROKER_URL, topic, auto_offset_reset_value='earliest')
+    # Creating a mongo client to store collections
     ws_client = mongo_client(mongo_host, mongo_port)
+    # Registering the part name to parts-metadata collection
     part_id = ws_client.add_to_metadata_collection(part_name, topic)
+    # Creating a folder to store the images consumed, folder name is part name
     os.mkdir(os.getcwd() + "/"+part_name)
+    # Collecting the stream
     consumer_ws.collect_stream(ws_client, part_id)
 
 
