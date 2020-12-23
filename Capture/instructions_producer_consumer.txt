@@ -1,7 +1,7 @@
 To run Producer:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ producer
 
-cd /apps/producer/
+cd /apps/Capture/producer/
 
 python3 producer.py "video_input" "part_name" "topic" "broker_server"
 
@@ -11,9 +11,21 @@ python3 producer.py "part_xyz.mp4" "part_a" "WS1parta" "broker:9092"
 To run Consumer:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ consumer
 
-cd /apps/consumer/
+cd /apps/Capture/consumer/
 
 python3 consumer.py broker_server mongo_host mongo_port part_name "topic"
 
 eg:
 python3 consumer.py "broker:9092" "mongodb" 27017 "part_a" "WS1parta"
+
+To run Consumer for camera service:
+
+cd /apps/Capture/consumer/
+
+python3 consumer.py broker_server mongo_host mongo_port "topic_for_inference_results"
+
+python3 consumer_for_camera_service.py "broker:9092" "mongodb" 27017 "WS1"
+
+
+
+

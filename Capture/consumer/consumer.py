@@ -1,4 +1,3 @@
-# detector/app.py
 import os
 from time import sleep
 from kafka import KafkaConsumer, KafkaProducer
