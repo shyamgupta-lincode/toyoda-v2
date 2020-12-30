@@ -18,7 +18,7 @@ python3 consumer.py broker_server mongo_host mongo_port part_name "topic"
 eg:
 python3 consumer.py "broker:9092" "mongodb" 27017 "part_a" "WS1parta"
 
-To run Consumer for camera service:
+To run Consumer for inference service:
 
 cd /apps/Capture/consumer/
 

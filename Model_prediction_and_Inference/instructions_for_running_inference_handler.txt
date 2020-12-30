@@ -1,9 +1,9 @@
-To run Consumer:
+To run Producer:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ --name inference_handler inference_img_2
 
-cd /apps/consumer/
+cd /apps/Model_prediction_and_Inference/
 
-python3 consumer.py broker_server mongo_host mongo_port part_name topic_from_camera_service saved_model_path \
+python3 inference_handler.py broker_server mongo_host mongo_port part_name topic_from_camera_service saved_model_path \
  label_path topic_to_camera_service_for_results
 
 eg:

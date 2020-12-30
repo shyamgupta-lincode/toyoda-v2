@@ -12,6 +12,7 @@ import logging
 import sys
 import pandas as pd
 from pymongo import MongoClient
+import logging
 
 
 class mongo_client():
@@ -40,7 +41,7 @@ class Consumer():
         self.topic = topic
 
     def collect_stream(self, mongo_client, part_id):
-        print("\nReceiving the stream images\n")
+        logging.info("\nReceiving the stream images\n")
         frame_iter_ = 0
         for message in self.obj:
             # Decoding the image stream
@@ -68,28 +69,34 @@ class Consumer():
             print("\n\n")
             mongo_client.add_to_parts_collection(capture_doc)
             frame_iter_ = frame_iter_ + 1
+            logging.info('Received frame %s of part %s', frame_iter_, message.value["part"])
 
     def close(self):
         self.obj.close()
 
 
 if __name__ == "__main__":
-
-    print("\nCreating WorkStation consumer by Part name\n")
+    # Creating a logging object
+    logging.basicConfig(filename='Status_of_Input_Stream.log',
+                        level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+    logging.info('Creating WorkStation consumer by Part name')
     KAFKA_BROKER_URL = sys.argv[1]
     mongo_host = sys.argv[2]
     mongo_port = sys.argv[3]
     part_name = sys.argv[4]
     topic = sys.argv[5]
     # Creating a Kafka consumer
+    logging.info('Creating a Kafka consumer')
     consumer_ws = Consumer(KAFKA_BROKER_URL, topic, auto_offset_reset_value='earliest')
     # Creating a mongo client to store collections
+    logging.info('Creating a mongo client to store collections')
     ws_client = mongo_client(mongo_host, mongo_port)
     # Registering the part name to parts-metadata collection
     part_id = ws_client.add_to_metadata_collection(part_name, topic)
     # Creating a folder to store the images consumed, folder name is part name
-    os.mkdir(os.getcwd() + "/"+part_name)
+    os.mkdir(os.getcwd()+"/"+part_name)
     # Collecting the stream
+    logging.info('Collecting incoming stream')
     consumer_ws.collect_stream(ws_client, part_id)
 
 

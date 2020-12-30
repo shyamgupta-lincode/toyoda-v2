@@ -186,3 +186,4 @@ testem.log
 
 # System Files
 Thumbs.db
+/Capture/mongo_collections/

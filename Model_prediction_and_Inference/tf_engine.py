@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 ### Needs to be debugged ----------
-#from models.research.object_detection.utils import label_map_util
+from object_detection.utils import label_map_util
 
 
 class DetectorTF2:
@@ -13,9 +13,9 @@ class DetectorTF2:
         self.Threshold = threshold
         # Loading label map --------------------
         # Needs to be debugged
-        #label_map = load_labelmap(path_to_labelmap)-----
-        #categories = convert_label_map_to_categories(label_map, max_num_classes=90, use_display_name=True)----
-        #self.category_index = create_category_index(categories)-----
+        label_map = label_map_util.load_labelmap(path_to_labelmap)
+        categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=90, use_display_name=True)
+        self.category_index = label_map_util.create_category_index(categories)
 
         tf.keras.backend.clear_session()
         self.detect_fn = tf.saved_model.load(path_to_checkpoint)

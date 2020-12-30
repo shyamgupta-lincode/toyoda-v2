@@ -32,8 +32,6 @@ class Consumer():
             print(message.value)
             print("\n")
 
-
-
     def close(self):
         self.obj.close()
 
