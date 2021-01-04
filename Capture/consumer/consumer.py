@@ -42,7 +42,7 @@ class Consumer():
 
     def collect_stream(self, mongo_client, part_id):
         logging.info("\nReceiving the stream images\n")
-        frame_iter_ = 0
+        frame_iter_ = 1
         for message in self.obj:
             # Decoding the image stream
             im_b64_str = message.value["frame"]
@@ -51,7 +51,8 @@ class Consumer():
             buf = io.BytesIO(im_binary)
             img = Image.open(buf)
             # Saving the frame
-            img_path = os.getcwd() + "/"+str(message.value["part"])+"/frame" + str(frame_iter_) + ".jpg"
+            img_path = os.getcwd() + "/"+str(message.value["part"])+"/frame" + str(frame_iter_) + "."+\
+                       str(message.value["file_format"])
             img.save(img_path)
             # Adding the payload data to mongo collection
             capture_doc = {
@@ -68,6 +69,7 @@ class Consumer():
             }
             print("\n\n")
             mongo_client.add_to_parts_collection(capture_doc)
+            print(frame_iter_)
             frame_iter_ = frame_iter_ + 1
             logging.info('Received frame %s of part %s', frame_iter_, message.value["part"])
 
@@ -77,7 +79,7 @@ class Consumer():
 
 if __name__ == "__main__":
     # Creating a logging object
-    logging.basicConfig(filename='Status_of_Input_Stream.log',
+    logging.basicConfig(filename='Status.log',
                         level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
     logging.info('Creating WorkStation consumer by Part name')
     KAFKA_BROKER_URL = sys.argv[1]

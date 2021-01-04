@@ -1,7 +1,7 @@
+### Referred from github repo  https://github.com/abdelrahman-gaber/tf2-object-detection-api-tutorial
 import cv2
 import numpy as np
 import tensorflow as tf
-### Needs to be debugged ----------
 from object_detection.utils import label_map_util
 
 

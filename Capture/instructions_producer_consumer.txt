@@ -3,7 +3,7 @@ docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/
 cd /apps/Capture/producer/
 python3 producer.py "video_input" "part_name" "topic" "broker_server"
 eg:
-python3 producer.py "part_xyz.mp4" "part_a" "WS1parta" "broker:9092"
+python3 producer.py "part_xyz.mp4" "part_a" "WS1parta" "broker:9092" "jpg"
 
 
 To run Consumer:
@@ -14,18 +14,18 @@ eg:
 python3 consumer.py "broker:9092" "mongodb" 27017 "part_a" "WS1parta"
 
 
-To run Consumer for inference service:
+To run Consumer for bulk upload service:
 cd /apps/Capture/consumer/
 python3 consumer.py broker_server mongo_host mongo_port "topic_for_inference_results"
 eg:
-python3 consumer_for_camera_service.py "broker:9092" "mongodb" 27017 "WS1"
+python3 consumer_for_bulk_upload.py "broker:9092" "mongodb" 27017 "WS1" "part_a"
 
 To run Producer for bulk upload:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ producer
 cd /apps/Capture/producer/
 python3 producer_bulk_upload.py "zip_file_path" "part_name" "topic" "broker_server"
 eg:
-python3 producer_bulk_upload.py "part_a.zip" "part_a" "BulkPartA" "broker:9092"
+python3 producer_bulk_upload.py "part_a.zip" "zip" "part_a" "BulkPartA" "broker:9092" "jpg"
 
 
 
