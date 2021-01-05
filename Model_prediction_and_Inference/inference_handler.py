@@ -44,10 +44,9 @@ if __name__ == "__main__":
     mongo_host = sys.argv[2]
     mongo_port = sys.argv[3]
     part_name = sys.argv[4]
-    topic = sys.argv[5]
-    model_path = sys.argv[6]
-    label_path = sys.argv[7]
-    topic_to_camera_service_for_results = sys.argv[8]
+    model_path = sys.argv[5]
+    label_path = sys.argv[6]
+    topic_to_camera_service_for_results = sys.argv[7]
     # Creating a mongo client to store collections----------
     # Inference consumer performs inference on stored image data and publishes to topic
     logging.info('Creating a producer object')
