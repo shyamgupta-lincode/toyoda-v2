@@ -1,3 +1,0 @@
-handling different camera indexes or rtsp input---part of camera service
-
-Same consumer different topics.. is it required ??

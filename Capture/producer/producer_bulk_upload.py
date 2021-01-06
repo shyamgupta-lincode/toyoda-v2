@@ -34,27 +34,31 @@ class Producer():
         logging.info('extracted image path is %s', extracted_img_path)
         return extracted_img_path
 
+    def encode_data_for_streaming(self, extracted_img_path, filename):
+        with open(os.getcwd() + "/" + extracted_img_path + "/" + filename, 'rb') as f:
+            im_b64 = base64.b64encode(f.read())
+            img_str = str(im_b64)
+        return img_str
+
     def stream_files_from_zip(self, zip_file_path, archive_format, file_format):
         extracted_img_path = self.extract_zipfile(zip_file_path, archive_format)
         frames_iter = 1
         for filename in os.listdir(extracted_img_path):
-            logging.info('processing filename %s', filename)
             img_str = ""
             buf_str = ""
-            with open(os.getcwd()+"/"+extracted_img_path+"/"+filename, 'rb') as f:
-                im_b64 = base64.b64encode(f.read())
-                img_str = str(im_b64)
+            img_str = self.encode_data_for_streaming(extracted_img_path, filename)
             i = 0
             while i <= len(img_str)-1:
                 buf_str = img_str[i:i+10000]
                 payload = {"frame": buf_str, "part": self.part, "frame_idx": frames_iter, "file_format": file_format}
                 self.obj.send(self.topic, value=payload)
+                time.sleep(1)
                 i = i+10000
             payload = {"frame": "END", "part": self.part, "frame_idx": frames_iter, "file_format": file_format}
             self.obj.send(self.topic, value=payload)
             logging.info('Sending frame %s of part %s', frames_iter, self.part)
             frames_iter = frames_iter + 1
-        time.sleep(100)
+            time.sleep(1)
         return 0
 
 

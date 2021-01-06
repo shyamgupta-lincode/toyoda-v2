@@ -48,12 +48,18 @@ class Consumer():
             im_b64_str = message.value["frame"]
             im_b64 = bytes(im_b64_str[2:], 'utf-8')
             im_binary = base64.b64decode(im_b64)
-            buf = io.BytesIO(im_binary)
-            img = Image.open(buf)
+
+            im_arr = np.frombuffer(im_binary, dtype=np.uint8)
+            img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
             # Saving the frame
-            img_path = os.getcwd() + "/"+str(message.value["part"])+"/frame" + str(frame_iter_) + "."+\
-                       str(message.value["file_format"])
-            img.save(img_path)
+            img_path = os.getcwd() + "/" + str(message.value["part"]) + "/frame" + str(frame_iter_) + ".png"
+            cv2.imwrite(img_path, img)
+
+
+            # buf = io.BytesIO(im_binary)
+            # img = Image.open(buf)
+            #
+            # img.save(img_path)
             # Adding the payload data to mongo collection
             capture_doc = {
                 "part_id": part_id,

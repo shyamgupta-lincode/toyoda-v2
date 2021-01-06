@@ -32,6 +32,7 @@ class Producer():
                 payload_video_frame = {"frame": str(im_b64), "part": self.part, "frame_idx": frames_iter,\
                                        "file_format": file_format}
                 self.obj.send(self.topic, value=payload_video_frame)
+                time.sleep(1)
             else:
                 break
         cap.release()
