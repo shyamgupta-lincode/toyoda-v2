@@ -12,6 +12,8 @@ from drf_yasg import openapi
 from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
 from drf_yasg.utils import swagger_auto_schema
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 ################################################################USER CRUDS################################################################
 
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
@@ -90,6 +92,9 @@ def delete_user_account(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_all_user_accounts(request):
+    token_user_id = request.user.user_id
+    token_user_email = request.user.email
+    print("user email:::",token_user_email)
     from accounts.utils import get_all_user_accounts_util
     response = get_all_user_accounts_util()
     return  HttpResponse(json.dumps(response), content_type="application/json")
@@ -426,6 +431,7 @@ def get_all_si_accounts(request):
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
+@permission_classes((AllowAny,))
 def login_user(request):
     data = json.loads(request.body)
     from accounts.utils import login_user_util

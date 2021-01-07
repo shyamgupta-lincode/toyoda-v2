@@ -8,7 +8,7 @@ from datetime import datetime
 from django.contrib.auth import authenticate
 from common.utils import *
 from livis.settings import *
-
+from rest_framework.authtoken.models import Token
 
 ################################################################USER CRUDS################################################################
 def add_user_account_util(data):
@@ -958,22 +958,28 @@ def login_user_util(data):
     password = data.get('password',None)
     workstation_id = data.get('workstation_name',None)
     print("workstation_id::::::",workstation_id)
-    if not email or not password or not workstation_id:
+    if not email or not password:
         return "MissingField"
     else:
         try:
             user = authenticate(email=email, password=password)
+            print("user found::::::",user)
             if user:
                 #print("user::::::",user)
+                token, _ = Token.objects.get_or_create(user=user)
+                
                 user_object = {str(i.name):getattr(user, i.name) for i in user._meta.fields}
                 #print("user_object::::::",user_object)
                 del user_object['password'] 
+                user_object['token'] = str(token)
+
                 #cc = CacheHelper()
                 #user_id = user_object['user_id']
                 #print("user_id::::::",user_id)
                 #user_id_key = RedisKeyBuilderServer(workstation_id).get_key(0, 'user_id_key')
                 #print("user_id_key::::::",user_id_key)
                 #cc.set_json({user_id_key : user_id}) 
+                # print("token::::",token)
                 return user_object
             else:
                 return "AuthError"
