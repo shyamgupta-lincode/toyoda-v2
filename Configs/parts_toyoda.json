@@ -1,0 +1,73 @@
+[{
+  "_id": {
+    "$oid": "5f3e6bdb16eb06dc4df2b0b2"
+  },
+  "short_number": "IG98",
+  "model_number": "579W",
+  "planned_production": null,
+  "part_number": "622120K180B0",
+  "part_description": "FR PILLAR LH WITH SRS\n",
+  "edit_part_data": "",
+  "isdeleted": false,
+  "kanban": null
+},{
+  "_id": {
+    "$oid": "5f993f8a509390669b30159c"
+  },
+  "short_number": "IH06",
+  "model_number": "579W",
+  "planned_production": null,
+  "part_number": "624710K190B1",
+  "part_description": "Roof side inner RH",
+  "edit_part_data": "",
+  "isdeleted": false,
+  "kanban": null
+},{
+  "_id": {
+    "$oid": "5f993fc1509390669b30159d"
+  },
+  "short_number": "IH07",
+  "model_number": "579W",
+  "planned_production": null,
+  "part_number": "624720K150B1",
+  "part_description": "Roof side inner LH",
+  "edit_part_data": "",
+  "isdeleted": false,
+  "kanban": null
+},{
+  "_id": {
+    "$oid": "5fd35abd7ad510257781231b"
+  },
+  "short_number": "IG96",
+  "model_number": "579W",
+  "planned_production": null,
+  "part_number": "622110K140B0",
+  "part_description": "Garnish, FR Pillar, RH",
+  "edit_part_data": "",
+  "isdeleted": false,
+  "kanban": null
+},{
+  "_id": {
+    "$oid": "5fd35b613bca76b65768c514"
+  },
+  "short_number": "IG95",
+  "model_number": "579W",
+  "planned_production": 0,
+  "part_number": "622110K130B0",
+  "part_description": "Garnish, FR Pillar, RH (W/O SRS)",
+  "edit_part_data": "",
+  "isdeleted": false,
+  "kanban": null
+},{
+  "_id": {
+    "$oid": "5fd369042d2a6c7e4f020abe"
+  },
+  "short_number": "IG97",
+  "model_number": "579W",
+  "planned_production": 0,
+  "part_number": "622120K170B0",
+  "part_description": "Garnish, FR Pillar, LH (W/O SRS)",
+  "edit_part_data": "",
+  "isdeleted": false,
+  "kanban": null
+}]
