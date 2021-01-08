@@ -142,6 +142,7 @@ def update_user_account_util(data):   #Note: Unable to update email or username 
         role_name = data.get('role_name',None)
         phone_number = data.get('phone_number',None)
         user_obj = User.objects.get(user_id=user_id)
+        # print("user obj:::",user_obj)
         if user_obj:
             if first_name :
                 user_obj.first_name=first_name
@@ -226,9 +227,16 @@ def get_all_user_accounts_util():
     resp = []
     try:
         User_obj = User.objects.filter(is_deleted=False)
+        
         for i in range(len(User_obj)):
             User_obj_json = json.loads(serializers.serialize('json',User_obj))
-            User_obj_json = User_obj_json[i]['fields']
+            # if(i != 0):
+            # User_obj_json = User_obj_json[i]['fields']
+            User_obj_json = User_obj_json[i]
+            del User_obj_json['fields']['password']
+            # User_obj_json['user_id'] = User_obj_json[i]['pk'] if User_obj_json[i]['pk'] else None
+            # print("user::",User_obj_json[i]['pk'])
+            # break
             resp.append(User_obj_json)
         return resp
     except Exception as e:
@@ -767,7 +775,7 @@ def get_all_client_accounts_util():
         client_obj = Client.objects.filter(is_deleted=False)
         for i in range(len(client_obj)):
             client_obj_json = json.loads(serializers.serialize('json',client_obj))
-            client_obj_json = client_obj_json[i]['fields']
+            client_obj_json = client_obj_json[i]
             resp.append(client_obj_json)
         return resp
     except Exception as e:

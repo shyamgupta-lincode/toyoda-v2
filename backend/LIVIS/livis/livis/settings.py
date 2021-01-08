@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'plan.apps.PlanConfig',
     'toyoda.apps.ToyodaConfig',
     'training.apps.TrainingConfig',
+    'logs.apps.LogsConfig',
     'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
@@ -170,10 +171,10 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'accounts.User'
 
 #Settings for MongoDB
-MONGO_SERVER_HOST = "164.52.194.78"
-#MONGO_SERVER_HOST = "127.0.0.1"
+# MONGO_SERVER_HOST = "164.52.194.78"
+MONGO_SERVER_HOST = "127.0.0.1"
 MONGO_SERVER_PORT = 27017
-MONGO_DB = "LIVIS_test"
+MONGO_DB = "LIVIS"
 #MONGO_DB = "TOYODA"
 MONGO_COLLECTION_PARTS = "parts"
 MONGO_COLLECTIONS = {MONGO_COLLECTION_PARTS: "parts"}
@@ -181,6 +182,8 @@ WORKSTATION_COLLECTION = 'workstations'
 PARTS_COLLECTION = 'parts'
 SHIFT_COLLECTION = 'shift'
 PLAN_COLLECTION = 'plan'
+LOGS_COLLECTION = 'logs'
+
 
 
 #Settings for Redis
