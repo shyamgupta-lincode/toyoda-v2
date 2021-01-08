@@ -1,0 +1,9 @@
+[
+  {
+    "broker_server": "broker:9092",
+    "mongo_host": "mongodb",
+    "mongo_port": 27017,
+    "part_name": "part_a",
+    "topic": "WS1parta"
+  }
+]

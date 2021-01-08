@@ -11,24 +11,41 @@ import io
 import logging
 import sys
 import pandas as pd
-from pymongo import MongoClient
-
-
-class mongo_client():
-    def __init__(self, mongo_host, mongo_port):
-        self.client = MongoClient(mongo_host, int(mongo_port))
+from MongoHelper import *
 
 
 class Consumer():
+    """
+        Receives the image feed form the subscribed topic
+    """
     def __init__(self, KAFKA_BROKER_URL, topic, auto_offset_reset_value):
+        """
+        Instantiates the Consumer object
+
+        Arguments:
+            KAFKA_BROKER_URL: url to connect to Kafka Broker
+            topic: topic to subscribe the video frame from
+            auto_offset_reset_value: What to do when there is no initial offset in Kafka or if the current offset \
+            does not exist any more on the server (e.g. because that data has been deleted):
+        """
         self.obj = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL,
         value_deserializer=lambda value: json.loads(value), auto_offset_reset=auto_offset_reset_value,)
         self.topic = topic
 
-    def collect_bulk_upload_data(self):
+    def collect_bulk_upload_data(self, part_id, part_name, mongo_client):
+        """
+        Receives the encoded image frames from the prescribed topic
+
+        Arguments:
+            mongo_client: client to access the mongo server
+            part_id: id of the part from "parts metadata" collection being captured in the image frames
+            part_name: part name being captured in the image stream
+
+        """
         print("\n Receiving results after inference\n")
         logging.info('Receiving results after inference')
         im_str = ""
+        frames_iter = 0
         for message in self.obj:
             print("\n\n")
             print(message.value)
@@ -41,6 +58,22 @@ class Consumer():
                 img_path = os.getcwd() + "/" + str(message.value["part"]) + "/frame" + \
                            str(message.value["frame_idx"]) + "."+str(message.value["file_format"])
                 img.save(img_path)
+
+                capture_doc = {
+                    "part_id": part_id,
+                    "image_path": img_path,
+                    "file_url": "",
+                    "state": "untagged",
+                    "regions": [],
+                    "regions_history": [],
+                    "annotations": "",
+                    "topic": self.topic,
+                    "part_name": part_name,
+                    "timestamp": pd.Timestamp.now()
+                }
+
+                mongo_client.add_to_parts_collection(capture_doc)
+                frames_iter = frames_iter + 1
             if im_str == "END":
                 im_str = ""
             else:
@@ -62,10 +95,18 @@ if __name__ == "__main__":
     mongo_port = sys.argv[3]
     topic = sys.argv[4]
     part_name = sys.argv[5]
+
+    # Creating a mongo client to store collections
+    logging.info('Creating a mongo client to store collections')
+    ws_client = mongo_client(mongo_host, mongo_port)
+    # Registering the part name to parts-metadata collection
+    part_id = ws_client.add_to_metadata_collection(part_name, topic)
+    # Creating a folder to store the images consumed, folder name is part name
     os.mkdir(os.getcwd() + "/" + part_name)
+
     # Creating a Kafka consumer
     consumer_ws = Consumer(KAFKA_BROKER_URL, topic, auto_offset_reset_value='earliest')
-    consumer_ws.collect_bulk_upload_data()
+    consumer_ws.collect_bulk_upload_data(part_id, part_name, ws_client)
 
 
 

@@ -11,7 +11,19 @@ import logging
 
 
 class Producer():
+    """
+    Publishes video data from camera to topic
+    """
     def __init__(self, KAFKA_BROKER_URL, video_input, part, topic):
+        """
+        Instantiates the Producer object
+
+        Arguments:
+            KAFKA_BROKER_URL: url to connect to Kafka Broker
+            video_input: camera index to stream with
+            part: part id/name that is being captured
+            topic: topic to publish the video stream
+        """
         self.obj = KafkaProducer(bootstrap_servers=KAFKA_BROKER_URL,
                              value_serializer=lambda value: json.dumps(value).encode(), )
         self.video_input = video_input
@@ -19,6 +31,12 @@ class Producer():
         self.topic = topic
 
     def stream_video(self, file_format):
+        """
+        Accesses frames from the camera, encodes it and publishes it to the respective topic
+
+        Arguments:
+            file_format: format of the image data to be sent to the Kafka consumer
+        """
         cap = cv2.VideoCapture(self.video_input)
         frames_iter = 0
         while (cap.isOpened()):

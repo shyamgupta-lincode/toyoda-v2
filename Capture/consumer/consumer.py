@@ -11,38 +11,39 @@ import io
 import logging
 import sys
 import pandas as pd
-from pymongo import MongoClient
+from MongoHelper import *
 import logging
 
 
-class mongo_client():
-    def __init__(self, mongo_host, mongo_port):
-        self.client = MongoClient(mongo_host, int(mongo_port))
-
-    def add_to_metadata_collection(self, part_name, topic):
-        db = self.client["parts-metadata"]
-        metadata_table = db.partsmetadata
-        metadata_table.insert_one({"part_name": part_name, "topic": topic})
-        part_payload = metadata_table.find_one({"topic": topic})
-        part_id = part_payload["_id"]
-        return part_id
-
-    def add_to_parts_collection(self, payload):
-        db = self.client["parts-collection"]
-        parts_table = db.parts
-        parts_table.insert_one(payload)
-        return
-
-
 class Consumer():
+    """
+    Receives the image feed form the subscribed topic
+    """
     def __init__(self, KAFKA_BROKER_URL, topic, auto_offset_reset_value):
+        """
+        Instantiates the Consumer object
+
+        Arguments:
+            KAFKA_BROKER_URL: url to connect to Kafka Broker
+            topic: topic to subscribe the video frame from
+            auto_offset_reset_value: What to do when there is no initial offset in Kafka or if the current offset \
+            does not exist any more on the server (e.g. because that data has been deleted):
+        """
         self.obj = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL,
         value_deserializer=lambda value: json.loads(value), auto_offset_reset=auto_offset_reset_value, )
         self.topic = topic
 
     def collect_stream(self, mongo_client, part_id):
+        """"
+        Receives the encoded image frames from the prescribed topic
+
+        Arguments:
+            mongo_client: client to access the mongo server
+            part_id: part name/id being captured in the image frames
+
+        """
         logging.info("\nReceiving the stream images\n")
-        frame_iter_ = 1
+        frame_iter_ = 0
         for message in self.obj:
             # Decoding the image stream
             im_b64_str = message.value["frame"]
@@ -55,12 +56,6 @@ class Consumer():
             img_path = os.getcwd() + "/" + str(message.value["part"]) + "/frame" + str(frame_iter_) + ".png"
             cv2.imwrite(img_path, img)
 
-
-            # buf = io.BytesIO(im_binary)
-            # img = Image.open(buf)
-            #
-            # img.save(img_path)
-            # Adding the payload data to mongo collection
             capture_doc = {
                 "part_id": part_id,
                 "image_path": img_path,
