@@ -14,6 +14,10 @@ from drf_yasg.utils import swagger_auto_schema
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+
+
+from logs.utils import add_logs_util
+
 ################################################################USER CRUDS################################################################
 
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
@@ -441,6 +445,48 @@ def login_user(request):
     elif message == "AuthError":
         return HttpResponse({'Authentication failed'}, status=status.HTTP_401_UNAUTHORIZED)
     return  HttpResponse(json.dumps(message,cls=Encoder), content_type="application/json")
+
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def logout_user(request):
+    
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "logged out"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    
+    try:
+        request.user.auth_token.delete()
+    except (AttributeError, ObjectDoesNotExist):
+        pass
+
+    message = "logout success!"
+    return  HttpResponse(json.dumps(message,cls=Encoder), content_type="application/json")
+    
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def change_password(request):
+
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "change password"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    
+    data = json.loads(request.body)
+    from accounts.utils import change_password_util
+    message,message1 = change_password_util(data,request)
+    if message1 == "fail":
+        return HttpResponse({message}, status=500)
+    else:
+        return  HttpResponse(json.dumps(message,cls=Encoder), content_type="application/json")
+
+
+
 
 
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
