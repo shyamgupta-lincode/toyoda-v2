@@ -10,6 +10,9 @@ from drf_yasg import openapi
 from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
 from drf_yasg.utils import swagger_auto_schema
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT, 
     properties={
@@ -73,6 +76,7 @@ def get_workstation_config(request, workstationid):
 
 @api_view(['GET'])
 @csrf_exempt
+@permission_classes((AllowAny,))
 def get_workstations(request):
     from workstations.utils import get_workstations_task 
     skip = request.GET.get('skip', 0)
