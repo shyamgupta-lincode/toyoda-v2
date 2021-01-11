@@ -14,6 +14,10 @@ from drf_yasg.utils import swagger_auto_schema
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+
+
+from logs.utils import add_logs_util
+
 ################################################################USER CRUDS################################################################
 
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
@@ -37,6 +41,14 @@ from rest_framework.permissions import AllowAny
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def add_user_account(request):
+
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "add user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    
+    
     data = json.loads(request.body)
     from accounts.utils import add_user_account_util
     message = add_user_account_util(data)
@@ -47,6 +59,14 @@ def add_user_account(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_account(request,client_id):
+
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "get user account"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    
+    
     from accounts.utils import get_user_account_util
     response = get_user_account_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -73,6 +93,13 @@ def get_user_account(request,client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_user_account(request):
+
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "update user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    
     data = json.loads(request.body)
     from accounts.utils import update_user_account_util
     message = update_user_account_util(data)
@@ -83,6 +110,11 @@ def update_user_account(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def delete_user_account(request, client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "delete user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import delete_user_account_util
     message = delete_user_account_util(client_id)
     return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
@@ -92,6 +124,11 @@ def delete_user_account(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_all_user_accounts(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "get all user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     token_user_id = request.user.user_id
     token_user_email = request.user.email
     print("user email:::",token_user_email)
@@ -124,6 +161,11 @@ def get_all_user_accounts(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def add_user_si(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "add si user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from accounts.utils import add_user_si_util
     message = add_user_si_util(data)
@@ -151,6 +193,11 @@ def add_user_si(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_user_si(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "update si user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from accounts.utils import update_user_si_util
     message = update_user_si_util(data)
@@ -161,6 +208,11 @@ def update_user_si(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def delete_user_si(request, client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "delete si user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import delete_user_si_util
     message = delete_user_si_util(client_id)
     return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
@@ -169,6 +221,11 @@ def delete_user_si(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_si(request,client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "get si user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import get_user_si_util
     response = get_user_si_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -178,6 +235,11 @@ def get_user_si(request,client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_sis(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "get user sis"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import get_user_sis_util
     response = get_user_sis_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 
@@ -208,6 +270,11 @@ def get_user_sis(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def add_user_client(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "add user client"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     # data = json.loads(request.body)
     data = json.loads(request.body)
     from accounts.utils import add_user_client_util
@@ -237,6 +304,11 @@ def add_user_client(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_user_client(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "update user client"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from accounts.utils import update_user_client_util
     message = update_user_client_util(data)
@@ -247,6 +319,11 @@ def update_user_client(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def delete_user_client(request, client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "delete user client"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import delete_user_client_util
     message = delete_user_client_util(client_id)
     return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
@@ -256,6 +333,11 @@ def delete_user_client(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_client(request,client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "get user client"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import get_user_client_util
     response = get_user_client_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -265,6 +347,11 @@ def get_user_client(request,client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_clients(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "get user clients"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import get_user_clients_util
     response = get_user_clients_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 
@@ -287,6 +374,11 @@ def get_user_clients(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def add_client_account(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "add client account"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     print(request)
     data = json.loads(request.body)
     from accounts.utils import add_client_account_util
@@ -298,6 +390,11 @@ def add_client_account(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_client_account(request,client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "get client account"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import get_client_account_util
     response = get_client_account_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -318,6 +415,11 @@ def get_client_account(request,client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_client_account(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "update client account"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from accounts.utils import update_client_account_util
     message = update_client_account_util(data)
@@ -328,6 +430,11 @@ def update_client_account(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def delete_client_account(request, client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "delete client account"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import delete_client_account_util
     message = delete_client_account_util(client_id)
     return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
@@ -337,6 +444,11 @@ def delete_client_account(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_all_client_accounts(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "get all client account"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import get_all_client_accounts_util
     response = get_all_client_accounts_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 
@@ -362,6 +474,11 @@ def get_all_client_accounts(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def add_si_account(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "add si account"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from accounts.utils import add_si_account_util
     message = add_si_account_util(data)
@@ -372,6 +489,11 @@ def add_si_account(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_si_account(request,client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "get si account"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import get_si_account_util
     response = get_si_account_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -394,6 +516,11 @@ def get_si_account(request,client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_si_account(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "update si account"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from accounts.utils import update_si_account_util
     message = update_si_account_util(data)
@@ -404,6 +531,11 @@ def update_si_account(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def delete_si_account(request, client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "delete si account"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import delete_si_account_util
     message = delete_si_account_util(client_id)
     return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
@@ -413,6 +545,11 @@ def delete_si_account(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_all_si_accounts(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "get all si account"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from accounts.utils import get_all_si_accounts_util
     response = get_all_si_accounts_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 
@@ -433,6 +570,7 @@ def get_all_si_accounts(request):
 @csrf_exempt
 @permission_classes((AllowAny,))
 def login_user(request):
+    
     data = json.loads(request.body)
     from accounts.utils import login_user_util
     message = login_user_util(data)
@@ -441,6 +579,48 @@ def login_user(request):
     elif message == "AuthError":
         return HttpResponse({'Authentication failed'}, status=status.HTTP_401_UNAUTHORIZED)
     return  HttpResponse(json.dumps(message,cls=Encoder), content_type="application/json")
+
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def logout_user(request):
+    
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "log out"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    
+    try:
+        request.user.auth_token.delete()
+    except (AttributeError, ObjectDoesNotExist):
+        pass
+
+    message = "logout success!"
+    return  HttpResponse(json.dumps(message,cls=Encoder), content_type="application/json")
+    
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def change_password(request):
+
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "change password"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    
+    data = json.loads(request.body)
+    from accounts.utils import change_password_util
+    message,message1 = change_password_util(data,request)
+    if message1 == "fail":
+        return HttpResponse({message}, status=500)
+    else:
+        return  HttpResponse(json.dumps(message,cls=Encoder), content_type="application/json")
+
+
+
 
 
 @swagger_auto_schema(method='post', request_body=openapi.Schema(

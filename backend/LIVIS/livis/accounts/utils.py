@@ -975,7 +975,7 @@ def login_user_util(data):
             if user:
                 #print("user::::::",user)
                 token, _ = Token.objects.get_or_create(user=user)
-                
+               
                 user_object = {str(i.name):getattr(user, i.name) for i in user._meta.fields}
                 #print("user_object::::::",user_object)
                 del user_object['password'] 
@@ -994,7 +994,46 @@ def login_user_util(data):
         except Exception as e:
             print(e)
             return "AuthError"
+    
+
+def change_password_util(data,request):
+
+    user_ip_old_password = data.get('old_password',None)
+    new_password = data.get('new_password',None)
+    reenter_new_password = data.get('reenter_new_password',None)
+    
+    username = request.user.username
+    
+    
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    u = User.objects.get(username=username)
+    
+
+    if u.check_password(user_ip_old_password) is False:
+        message = "Invalid Old Password"
+        message1 = 'fail'
+        return message,message1
         
+    if str(new_password) == str(user_ip_old_password):
+        message = "New password cannot be same as old password"
+        message1 = 'fail'
+        return message,message1
+    if str(new_password) != str(reenter_new_password):
+        message = "password doesn't match"
+        message1 = 'fail'
+        return message,message1   
+           
+
+    u.set_password(new_password)
+    u.save()
+    
+    message = "Password Changed, Please logout and relogin"
+    message1 = 'pass'
+    return message,message1
+    
+    
+    
 
 
 def login_supervisor_util(data):

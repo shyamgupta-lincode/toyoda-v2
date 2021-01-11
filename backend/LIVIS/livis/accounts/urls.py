@@ -34,5 +34,8 @@ urlpatterns = [
 
     re_path(r'^login/$', views.login_user),
     re_path(r'^login_supervisor/$', views.login_supervisor),
+    re_path(r'^logout/$', views.logout_user),
+    re_path(r'^change_password/$', views.change_password),
+    
 
     ]
