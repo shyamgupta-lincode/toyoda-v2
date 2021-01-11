@@ -5,9 +5,6 @@ import cv2
 import numpy as np
 import base64
 import json
-import pickle
-from PIL import Image
-import io
 import logging
 import sys
 import pandas as pd
@@ -32,7 +29,7 @@ class Consumer():
         value_deserializer=lambda value: json.loads(value), auto_offset_reset=auto_offset_reset_value,)
         self.topic = topic
 
-    def collect_bulk_upload_data(self, part_id, part_name, mongo_client):
+    def collect_bulk_upload_data(self, part_id, part_name, mongo_client, img_database_path):
         """
         Receives the encoded image frames from the prescribed topic
 
@@ -52,12 +49,12 @@ class Consumer():
             if message.value["frame"] == "END":
                 im_b64 = bytes(im_str[2:], 'utf-8')
                 im_binary = base64.b64decode(im_b64)
-                buf = io.BytesIO(im_binary)
-                img = Image.open(buf)
+                im_arr = np.frombuffer(im_binary, dtype=np.uint8)
+                img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
                 # Saving the frame
-                img_path = os.getcwd() + "/" + str(message.value["part"]) + "/frame" + \
+                img_path = img_database_path + "/frame" + \
                            str(message.value["frame_idx"]) + "."+str(message.value["file_format"])
-                img.save(img_path)
+                cv2.imwrite(img_path, img)
 
                 capture_doc = {
                     "part_id": part_id,
@@ -95,6 +92,7 @@ if __name__ == "__main__":
     mongo_port = sys.argv[3]
     topic = sys.argv[4]
     part_name = sys.argv[5]
+    mount_path = sys.argv[6]
 
     # Creating a mongo client to store collections
     logging.info('Creating a mongo client to store collections')
@@ -102,11 +100,12 @@ if __name__ == "__main__":
     # Registering the part name to parts-metadata collection
     part_id = ws_client.add_to_metadata_collection(part_name, topic)
     # Creating a folder to store the images consumed, folder name is part name
-    os.mkdir(os.getcwd() + "/" + part_name)
+    img_database_path = mount_path + "/" + part_name
+    os.mkdir(img_database_path)
 
     # Creating a Kafka consumer
     consumer_ws = Consumer(KAFKA_BROKER_URL, topic, auto_offset_reset_value='earliest')
-    consumer_ws.collect_bulk_upload_data(part_id, part_name, ws_client)
+    consumer_ws.collect_bulk_upload_data(part_id, part_name, ws_client, img_database_path)
 
 
 

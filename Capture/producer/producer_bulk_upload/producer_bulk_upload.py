@@ -5,9 +5,7 @@ import cv2
 import numpy as np
 import base64
 import time
-from PIL import Image
 import sys
-from zipfile import ZipFile
 import logging
 import shutil
 import time
@@ -66,7 +64,7 @@ class Producer():
         Returns:
             img_str: endcoded image data
         """
-        with open(os.getcwd() + "/" + extracted_img_path + "/" + filename, 'rb') as f:
+        with open(extracted_img_path + "/" + filename, 'rb') as f:
             im_b64 = base64.b64encode(f.read())
             img_str = str(im_b64)
         return img_str

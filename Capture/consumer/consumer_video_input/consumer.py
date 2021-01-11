@@ -1,12 +1,11 @@
 import os
-from time import sleep
+import time
 from kafka import KafkaConsumer, KafkaProducer
 import cv2
 import numpy as np
 import base64
 import json
 import pickle
-from PIL import Image
 import io
 import logging
 import sys
@@ -33,7 +32,7 @@ class Consumer():
         value_deserializer=lambda value: json.loads(value), auto_offset_reset=auto_offset_reset_value, )
         self.topic = topic
 
-    def collect_stream(self, mongo_client, part_id):
+    def collect_stream(self, mongo_client, part_id, img_database_path):
         """"
         Receives the encoded image frames from the prescribed topic
 
@@ -53,7 +52,7 @@ class Consumer():
             im_arr = np.frombuffer(im_binary, dtype=np.uint8)
             img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
             # Saving the frame
-            img_path = os.getcwd() + "/" + str(message.value["part"]) + "/frame" + str(frame_iter_) + ".png"
+            img_path = img_database_path + "/frame" + str(frame_iter_) + ".png"
             cv2.imwrite(img_path, img)
 
             capture_doc = {
@@ -88,8 +87,10 @@ if __name__ == "__main__":
     mongo_port = sys.argv[3]
     part_name = sys.argv[4]
     topic = sys.argv[5]
+    mount_path = sys.argv[6]
     # Creating a Kafka consumer
     logging.info('Creating a Kafka consumer')
+    print("Creating a Kafka consumer")
     consumer_ws = Consumer(KAFKA_BROKER_URL, topic, auto_offset_reset_value='earliest')
     # Creating a mongo client to store collections
     logging.info('Creating a mongo client to store collections')
@@ -97,10 +98,12 @@ if __name__ == "__main__":
     # Registering the part name to parts-metadata collection
     part_id = ws_client.add_to_metadata_collection(part_name, topic)
     # Creating a folder to store the images consumed, folder name is part name
-    os.mkdir(os.getcwd()+"/"+part_name)
+    img_database_path = mount_path + "/" + part_name
+    os.mkdir(img_database_path)
     # Collecting the stream
     logging.info('Collecting incoming stream')
-    consumer_ws.collect_stream(ws_client, part_id)
+    print("Collecting incoming stream")
+    consumer_ws.collect_stream(ws_client, part_id, img_database_path)
 
 
 
