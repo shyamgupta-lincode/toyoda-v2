@@ -13,6 +13,9 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
+from logs.utils import add_logs_util
+
+
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT, 
     properties={
@@ -30,6 +33,13 @@ from rest_framework.permissions import AllowAny
 @api_view(['POST'])
 @csrf_exempt
 def add_workstation(request):
+
+    token_user_id = request.user.user_id
+    operation_type = "workstation"
+    notes = "add workstation"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    
     data = json.loads(request.body)
     from workstations.utils import add_workstation_task
     added_workstation_id = add_workstation_task(data)
@@ -39,6 +49,12 @@ def add_workstation(request):
 @api_view(['DELETE'])
 @csrf_exempt
 def delete_workstation(request, wid):
+
+    token_user_id = request.user.user_id
+    operation_type = "workstation"
+    notes = "delete workstation"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from workstations.utils import delete_workstation_task
     deleted_workstation_id = delete_workstation_task(wid)
     return HttpResponse(json.dumps({'message' : 'Workstation deleted Successfully!', 'deleted_workstation_id' : deleted_workstation_id}, cls=Encoder), content_type="application/json")
@@ -60,6 +76,11 @@ def delete_workstation(request, wid):
 @api_view(['PATCH'])
 @csrf_exempt
 def update_workstation(request):
+    token_user_id = request.user.user_id
+    operation_type = "workstation"
+    notes = "update workstation"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from workstations.utils import update_workstation_task
     updated_workstation_id = update_workstation_task(data)
@@ -69,6 +90,11 @@ def update_workstation(request):
 @api_view(['GET'])
 @csrf_exempt
 def get_workstation_config(request, workstationid):
+    token_user_id = request.user.user_id
+    operation_type = "workstation"
+    notes = "get workstation config"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from workstations.utils import get_workstation_config_task
     response = get_workstation_config_task(workstationid)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
@@ -78,6 +104,11 @@ def get_workstation_config(request, workstationid):
 @csrf_exempt
 @permission_classes((AllowAny,))
 def get_workstations(request):
+    token_user_id = request.user.user_id
+    operation_type = "workstation"
+    notes = "get all workstations"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from workstations.utils import get_workstations_task 
     skip = request.GET.get('skip', 0)
     limit = request.GET.get('limit' , 100)

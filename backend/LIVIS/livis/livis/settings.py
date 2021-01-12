@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'toyoda.apps.ToyodaConfig',
     'training.apps.TrainingConfig',
     'logs.apps.LogsConfig',
+    'assects.apps.AssectsConfig',
     'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
@@ -183,6 +184,7 @@ PARTS_COLLECTION = 'parts'
 SHIFT_COLLECTION = 'shift'
 PLAN_COLLECTION = 'plan'
 LOGS_COLLECTION = 'logs'
+ASSECTS_COLLECTION = 'assects'
 
 
 

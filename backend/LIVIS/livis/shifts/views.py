@@ -8,6 +8,7 @@ from drf_yasg import openapi
 from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
 from drf_yasg.utils import swagger_auto_schema
 
+from logs.utils import add_logs_util
 
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT, 
@@ -22,6 +23,12 @@ from drf_yasg.utils import swagger_auto_schema
 @api_view(['POST'])
 @csrf_exempt
 def add_shift(request):
+    token_user_id = request.user.user_id
+    operation_type = "shifts"
+    notes = "add shift"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    
     data = json.loads(request.body)
     from shifts.utils import add_shift
     response = add_shift(data)
@@ -43,6 +50,10 @@ def add_shift(request):
 @api_view(['PATCH'])
 @csrf_exempt
 def update_shift(request):
+    operation_type = "shifts"
+    notes = "update shift"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from shifts.utils import update_shift
     response = update_shift(data)
@@ -51,6 +62,10 @@ def update_shift(request):
 @api_view(['DELETE'])
 @csrf_exempt
 def delete_shift(request, shift_id):
+    operation_type = "shifts"
+    notes = "delete shift"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from shifts.utils import delete_shift
     response = delete_shift(shift_id)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
@@ -58,6 +73,10 @@ def delete_shift(request, shift_id):
 @api_view(['GET'])
 @csrf_exempt
 def shift_list(request):
+    operation_type = "shifts"
+    notes = "get all shifts"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     skip = request.GET.get('skip', 0)
     limit = request.GET.get('limit', 100)
     from shifts.utils import shift_list
@@ -67,6 +86,9 @@ def shift_list(request):
 @api_view(['GET'])
 @csrf_exempt
 def shift_single(request,shift_id):
+    operation_type = "shifts"
+    notes = "get single shift"
+    add_logs_util(token_user_id,operation_type,notes)
     from shifts.utils import shift_single
     response = shift_single(shift_id)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
