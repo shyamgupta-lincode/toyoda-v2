@@ -5,10 +5,12 @@ RUN apt update && \
     apt update && apt install -y python3.6 && \
     apt install -y python3-pip && pip3 install --upgrade pip 
 
-RUN pip3 install kafka-python opencv-python numpy pybase64 && apt install -y libgl1-mesa-glx
+RUN pip3 install kafka-python opencv-python numpy pybase64 django djangorestframework  \
+&& apt install -y libgl1-mesa-glx \
+&& apt install -y curl
 ENV topic="WorkStation1"
 ENV broker_server="broker:9092"
 ENV part_name="part_a"
 ENV video_input="part_xyz.mp4"
-COPY /producer/producer_bulk_upload/producer_bulk_upload.py /apps/producer/
+COPY /producer_api /apps/producer
 #RUN python3 /apps/producer/producer.py "video_input" "part_name" "topic" "broker_server"

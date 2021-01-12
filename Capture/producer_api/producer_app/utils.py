@@ -99,19 +99,42 @@ class Producer():
         return 0
 
 
-if __name__ == "__main__":
-        # Creating a logging object
-        logging.basicConfig(filename='Status.log',
-                        level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-        zip_file_path = sys.argv[1]
-        archive_format = sys.argv[2]
-        part = sys.argv[3]
-        topic = sys.argv[4]
-        KAFKA_BROKER_URL = sys.argv[5]
-        file_format = sys.argv[6]
-        logging.info('Creating the Producer object for streaming')
-        producer_ws = Producer(KAFKA_BROKER_URL, part, topic)
-        logging.info('Initiating the stream')
-        producer_ws.stream_data(zip_file_path, archive_format, file_format)
-        logging.info('Done streaming')
+def start_stream(data):
+    #Creating a logging object
+    logging.basicConfig(filename='Status.log',
+                         level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+    zip_file_path = data['zip_file_path']
+    archive_format = data['archive_format']
+    part = data['part_name']
+    topic = data['topic']
+    KAFKA_BROKER_URL = data['broker_url']
+    file_format = data['file_format']
+    logging.info('Creating the Producer object for streaming')
+    producer_ws = Producer(KAFKA_BROKER_URL, part, topic)
+    logging.info('Initiating the stream')
+    producer_ws.stream_data(zip_file_path, archive_format, file_format)
+    logging.info('Done streaming')
+    message = "Done streaming"
+    status_code = 200
+    return message, status_code
+
+
+
+
+
+# if __name__ == "__main__":
+#         # Creating a logging object
+#         logging.basicConfig(filename='Status.log',
+#                         level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+#         zip_file_path = sys.argv[1]
+#         archive_format = sys.argv[2]
+#         part = sys.argv[3]
+#         topic = sys.argv[4]
+#         KAFKA_BROKER_URL = sys.argv[5]
+#         file_format = sys.argv[6]
+#         logging.info('Creating the Producer object for streaming')
+#         producer_ws = Producer(KAFKA_BROKER_URL, part, topic)
+#         logging.info('Initiating the stream')
+#         producer_ws.stream_data(zip_file_path, archive_format, file_format)
+#         logging.info('Done streaming')
 
