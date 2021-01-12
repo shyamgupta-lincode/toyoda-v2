@@ -186,3 +186,7 @@ testem.log
 
 # System Files
 Thumbs.db
+
+
+models/research/object_detection/training/faster_rcnn_resnet50_v1_1024x1024_coco17_tpu-8/checkpoint
+models/research/object_detection/training/faster_rcnn_resnet50_v1_1024x1024_coco17_tpu-8/saved_model
