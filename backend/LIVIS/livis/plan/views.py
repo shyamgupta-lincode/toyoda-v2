@@ -5,6 +5,8 @@ from rest_framework.renderers import TemplateHTMLRenderer,JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes
 from common.utils import Encoder
 
+from logs.utils import add_logs_util
+
 from drf_yasg import openapi
 from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
 from drf_yasg.utils import swagger_auto_schema
@@ -23,6 +25,12 @@ from drf_yasg.utils import swagger_auto_schema
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def add_plan(request):
+
+    token_user_id = request.user.user_id
+    operation_type = "plan"
+    notes = "add plan"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from plan.utils import add_plan
     response = add_plan(data)
@@ -40,6 +48,11 @@ def add_plan(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_plan(request):
+    token_user_id = request.user.user_id
+    operation_type = "plan"
+    notes = "update plan"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from plan.utils import update_plan
     response = update_plan(data)
@@ -50,6 +63,11 @@ def update_plan(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def delete_plan(request, plan_id):
+    token_user_id = request.user.user_id
+    operation_type = "plan"
+    notes = "delete plan"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from plan.utils import delete_plan
     response = delete_plan(plan_id)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
@@ -59,6 +77,11 @@ def delete_plan(request, plan_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def plan_list(request):
+    token_user_id = request.user.user_id
+    operation_type = "plan"
+    notes = "plan list"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     skip = request.GET.get('skip', 0)
     limit = request.GET.get('limit', 100)
     from plan.utils import plan_list
@@ -69,7 +92,12 @@ def plan_list(request):
 @api_view(['GET'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
-def plan_single(request,plan_id):   
+def plan_single(request,plan_id):  
+    token_user_id = request.user.user_id
+    operation_type = "plan"
+    notes = "single plan"
+    
+    add_logs_util(token_user_id,operation_type,notes) 
     from plan.utils import plan_single
     response = plan_single(plan_id)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
@@ -79,6 +107,11 @@ def plan_single(request,plan_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_todays_planned_production(request,short_number):
+    token_user_id = request.user.user_id
+    operation_type = "plan"
+    notes = "todays plan production"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from plan.utils import get_todays_planned_production_util
     response = get_todays_planned_production_util(short_number)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")

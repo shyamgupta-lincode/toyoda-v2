@@ -7,12 +7,18 @@ from assects.utils import *
 import json
 from common.utils import *
 
+from logs.utils import add_logs_util
 
 
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def add_assects(request):
+    token_user_id = request.user.user_id
+    operation_type = "asset"
+    notes = "add assets"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     response,status_code = add_assects_util(data)
     if status_code != 200:
@@ -26,6 +32,11 @@ def add_assects(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_assect(request):
+    token_user_id = request.user.user_id
+    operation_type = "asset"
+    notes = "update asset"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     response,status_code = update_assect_util(data)
     if status_code != 200:

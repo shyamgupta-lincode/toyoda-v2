@@ -12,6 +12,11 @@ from drf_yasg import openapi
 from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
 from drf_yasg.utils import swagger_auto_schema
 
+
+from logs.utils import add_logs_util
+
+
+
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT, 
     properties={
@@ -28,6 +33,11 @@ from drf_yasg.utils import swagger_auto_schema
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def add_part_details(request):
+    token_user_id = request.user.user_id
+    operation_type = "parts"
+    notes = "add part"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from parts.utils import add_part_details_task
     part_id = add_part_details_task(data)
@@ -37,6 +47,11 @@ def add_part_details(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def delete_part(request, part_id):
+    token_user_id = request.user.user_id
+    operation_type = "parts"
+    notes = "delete part"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from parts.utils import delete_part_task
     delete_part_task(part_id)
     return HttpResponse(json.dumps({'message' : 'Part deleted Successfully!'}, cls=Encoder), content_type="application/json")
@@ -59,6 +74,11 @@ def delete_part(request, part_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_part(request):
+    token_user_id = request.user.user_id
+    operation_type = "parts"
+    notes = "update part"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from parts.utils import update_part_task
     response = update_part_task(data)
@@ -68,6 +88,11 @@ def update_part(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_part_details(request, part_id):
+    token_user_id = request.user.user_id
+    operation_type = "parts"
+    notes = "get part details"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from parts.utils import get_part_details_task
     response = get_part_details_task(part_id)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
@@ -77,6 +102,11 @@ def get_part_details(request, part_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_parts(request):
+    token_user_id = request.user.user_id
+    operation_type = "parts"
+    notes = "get parts"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from parts.utils import get_parts_task 
     skip = request.GET.get('skip', 0)
     limit = request.GET.get('limit' , 10)
@@ -88,6 +118,11 @@ def get_parts(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_partInfo(request, short_number):
+    token_user_id = request.user.user_id
+    operation_type = "parts"
+    notes = "get part info"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from parts.utils import get_partInfo
     resp = get_partInfo(short_number)
     return HttpResponse(json.dumps(resp, cls=Encoder), content_type="application/json")
@@ -97,6 +132,11 @@ def get_partInfo(request, short_number):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_short_numbers_list(request):
+    token_user_id = request.user.user_id
+    operation_type = "parts"
+    notes = "get short number list"
+    
+    add_logs_util(token_user_id,operation_type,notes)
     from parts.utils import get_short_numbers_list_util 
     skip = request.GET.get('skip', 0)
     limit = request.GET.get('limit' , 10)

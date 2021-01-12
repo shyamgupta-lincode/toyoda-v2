@@ -50,6 +50,7 @@ def add_shift(request):
 @api_view(['PATCH'])
 @csrf_exempt
 def update_shift(request):
+    token_user_id = request.user.user_id
     operation_type = "shifts"
     notes = "update shift"
     
@@ -62,6 +63,7 @@ def update_shift(request):
 @api_view(['DELETE'])
 @csrf_exempt
 def delete_shift(request, shift_id):
+    token_user_id = request.user.user_id
     operation_type = "shifts"
     notes = "delete shift"
     
@@ -73,6 +75,7 @@ def delete_shift(request, shift_id):
 @api_view(['GET'])
 @csrf_exempt
 def shift_list(request):
+    token_user_id = request.user.user_id
     operation_type = "shifts"
     notes = "get all shifts"
     
@@ -86,6 +89,7 @@ def shift_list(request):
 @api_view(['GET'])
 @csrf_exempt
 def shift_single(request,shift_id):
+    token_user_id = request.user.user_id
     operation_type = "shifts"
     notes = "get single shift"
     add_logs_util(token_user_id,operation_type,notes)
