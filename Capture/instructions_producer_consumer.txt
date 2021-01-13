@@ -1,7 +1,7 @@
 ----------To run Producer:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/Livis/ producer_video_input
 cd /apps/Capture/producer/
-python3 producer.py "video_input" "part_name" "topic" "broker_server" "file_format"
+python3 producer.py "video_input" "part_name" "topic" "broker_server" "image_file_format"
 eg:
 python3 producer.py "/Livis/Capture/producer/part_xyz.mp4" "part_a" "WS1parta" "broker:9092" "jpg"
 
@@ -16,21 +16,22 @@ python3 consumer.py "broker:9092" "mongodb" 27017 "part_a" "WS1parta" "/Livis"
 
 ---------To run Consumer for bulk upload service:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/Livis/ consumer_bulk_upload
-cd /apps/Capture/consumer/
+cd /apps/consumer/
 python3 consumer.py "broker_server" "mongo_host" "mongo_port" "topic_for_inference_results" "part_name" "mount_path"
 eg:
 python3 consumer_for_bulk_upload.py "broker:9092" "mongodb" 27017 "topic1" "part_a" "/Livis"
 
 --------To run Producer for bulk upload:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/Livis/ producer_bulk_upload
-cd /apps/Capture/producer/
-python3 producer_bulk_upload.py "zip_file_path" "archive_format" "part_name" "topic" "broker_server" "file_format"
+cd /apps/producer/
+python3 producer_bulk_upload.py "compressed_file_path" "compression_format" "part_name" "topic" "broker_server"
+"image_file_format"
 eg:
 python3 producer_bulk_upload.py "/Livis/Capture/producer/part_a.zip" "zip" "part_b" "topic1" "broker:9092" "jpg"
 
-curl -X POST -d '{"zip_file_path":"part_a.zip", "archive_format":"zip", "part_name":"part_a", "topic":"topic1",
-"broker_url":"broker:9092", "file_format":"jpg"}'
--H "Content-Type: application/json" http://127.0.0.1:8000/producer_app/bulk_upload
+curl -X POST -d '{"zip_file_path":"/Livis/part_a.zip", "archive_format":"zip", "part_name":"part_a",
+"topic":"topic1", "broker_url":"broker:9092", "file_format":"jpg"}'
+-H "Content-Type: application/json" http://127.0.0.1:8000/producer_app/bulk_upload/
 
 
 

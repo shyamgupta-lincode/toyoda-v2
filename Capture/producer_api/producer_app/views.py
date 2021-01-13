@@ -7,11 +7,22 @@ from django.http import HttpResponse
 import json
 from .utils import *
 
+
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 def bulk_upload(data):
     data = json.loads(data.body)
-    message, status_code = start_stream(data)
+    message, status_code = start_bulk_upload_stream(data)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
+
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+def video_input(data):
+    data = json.loads(data.body)
+    message, status_code = start_video_stream(data)
     if status_code == 200:
         return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")

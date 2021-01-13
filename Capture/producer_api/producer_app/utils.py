@@ -14,7 +14,7 @@ class Producer():
     """
         Publishes video data from camera to topic
     """
-    def __init__(self, KAFKA_BROKER_URL, part, topic):
+    def __init__(self, KAFKA_BROKER_URL, part, topic, video_input=""):
         """
         Instantiates the Producer object
 
@@ -27,6 +27,7 @@ class Producer():
                              value_serializer=lambda value: json.dumps(value).encode(), )
         self.part = part
         self.topic = topic
+        self.video_input = video_input
 
     def extract_zipfile(self, compressed_file_path, archive_format):
         """
@@ -42,15 +43,15 @@ class Producer():
         logging.info('Extracting all the files now...')
         # one of “zip”, “tar”, “gztar”, “bztar”, or “xztar”
         if archive_format in ["zip", "tar", "gztar", "bztar", "xztar"]:
-            shutil.unpack_archive(compressed_file_path)
+            ind_ = compressed_file_path.find(".")
+            extracted_dir = compressed_file_path[:ind_]
+            shutil.unpack_archive(compressed_file_path, extracted_dir, archive_format)
         elif archive_format == "gzip":
             # need to add
             print(".")
         logging.info('Done extracting files!')
-        ind_ = compressed_file_path.find(".")
-        extracted_img_path = compressed_file_path[:ind_]
-        logging.info('extracted image path is %s', extracted_img_path)
-        return extracted_img_path
+        logging.info('extracted image path is %s', extracted_dir)
+        return extracted_dir
 
     def encode_data_for_streaming(self, extracted_img_path, filename):
         """
@@ -68,7 +69,7 @@ class Producer():
             img_str = str(im_b64)
         return img_str
 
-    def stream_data(self, compressed_file_path, archive_format, file_format):
+    def stream_bulk_upload_data(self, compressed_file_path, archive_format, file_format):
         """
         extracts image files from folder, encodes and publishes to topic
 
@@ -78,7 +79,8 @@ class Producer():
             file_format: format of the image data to be sent to the Kafka consumer
 
         """
-        extracted_img_path = self.extract_zipfile(compressed_file_path, archive_format)
+        extracted_dir = self.extract_zipfile(compressed_file_path, archive_format)
+        extracted_img_path = extracted_dir + "/" + self.part
         frames_iter = 1
         for filename in os.listdir(extracted_img_path):
             img_str = ""
@@ -98,43 +100,147 @@ class Producer():
             time.sleep(1)
         return 0
 
+    def stream_video(self, file_format):
+        """
+        Accesses frames from the camera, encodes it and publishes it to the respective topic
 
-def start_stream(data):
+        Arguments:
+            file_format: format of the image data to be sent to the Kafka consumer
+        """
+        cap = cv2.VideoCapture(self.video_input)
+        frames_iter = 0
+        while (cap.isOpened()):
+            ret, frame = cap.read()
+            if ret == True:
+                frames_iter = frames_iter + 1
+                # Encoding and sending the frame
+                cv2.imwrite("tmp.jpg", frame)
+                with open("tmp.jpg", 'rb') as f:
+                    im_b64 = base64.b64encode(f.read())
+                payload_video_frame = {"frame": str(im_b64), "part": self.part, "frame_idx": frames_iter,\
+                                       "file_format": file_format}
+                self.obj.send(self.topic, value=payload_video_frame)
+                time.sleep(1)
+            else:
+                break
+        cap.release()
+        return 0
+
+
+def start_bulk_upload_stream(data):
     #Creating a logging object
     logging.basicConfig(filename='Status.log',
                          level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-    zip_file_path = data['zip_file_path']
-    archive_format = data['archive_format']
-    part = data['part_name']
-    topic = data['topic']
-    KAFKA_BROKER_URL = data['broker_url']
-    file_format = data['file_format']
+    try:
+        compressed_file_path = data['compressed_file_path']
+    except:
+        message = "File path not found"
+        status_code = 400
+        return message, status_code
+
+    try:
+        compression_format = data['compression_format']
+    except:
+        message = "Compression format not provided"
+        status_code = 400
+        return message, status_code
+
+    try:
+        part = data['part_name']
+    except:
+        message = "part name not provided"
+        status_code = 400
+        return message, status_code
+
+    try:
+        topic = data['topic']
+    except:
+        message = "Topic not provided"
+        status_code = 400
+        return message, status_code
+
+    try:
+        KAFKA_BROKER_URL = data['broker_url']
+    except:
+        message = "Broker url not provided"
+        status_code = 400
+        return message, status_code
+
+    try:
+        file_format = data['file_format']
+    except:
+        message = "image file format not provided"
+        status_code = 400
+        return message, status_code
     logging.info('Creating the Producer object for streaming')
-    producer_ws = Producer(KAFKA_BROKER_URL, part, topic)
+
+    try:
+        producer_ws = Producer(KAFKA_BROKER_URL, part, topic)
+    except:
+        message = "Producer object creation failed"
+        status_code = 415
+        return message, status_code
+
     logging.info('Initiating the stream')
-    producer_ws.stream_data(zip_file_path, archive_format, file_format)
+    producer_ws.stream_bulk_upload_data(compressed_file_path, compression_format, file_format)
     logging.info('Done streaming')
     message = "Done streaming"
     status_code = 200
     return message, status_code
 
 
+def start_video_stream(data):
+    logging.basicConfig(filename='Status.log',
+                        level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
+    try:
+        video_input = data['video_input']
+    except:
+        message = "video_input not provided"
+        status_code = 400
+        return message, status_code
+        
+    try:
+        part_name = data['part_name']
+    except:
+        message = "part name not provided"
+        status_code = 400
+        return message, status_code
 
+    try:
+        topic = data['topic']
+    except:
+        message = "topic not provided"
+        status_code = 400
+        return message, status_code
 
-# if __name__ == "__main__":
-#         # Creating a logging object
-#         logging.basicConfig(filename='Status.log',
-#                         level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-#         zip_file_path = sys.argv[1]
-#         archive_format = sys.argv[2]
-#         part = sys.argv[3]
-#         topic = sys.argv[4]
-#         KAFKA_BROKER_URL = sys.argv[5]
-#         file_format = sys.argv[6]
-#         logging.info('Creating the Producer object for streaming')
-#         producer_ws = Producer(KAFKA_BROKER_URL, part, topic)
-#         logging.info('Initiating the stream')
-#         producer_ws.stream_data(zip_file_path, archive_format, file_format)
-#         logging.info('Done streaming')
+    try:
+        KAFKA_BROKER_URL = data['broker_url']
+    except:
+        message = "Broker url not provided"
+        status_code = 400
+        return message, status_code
 
+    try:
+        file_format = data['image_file_format']
+    except:
+        message = "Image file format not provided"
+        status_code = 400
+        return message, status_code
+
+    logging.info('Creating the Producer object for streaming')
+
+    try:
+        producer_ws = Producer(KAFKA_BROKER_URL, part_name, topic, video_input)
+    except:
+        message = "Producer object creation failed"
+        status_code = 415
+        return message, status_code
+
+    # Streaming the frames
+    logging.info('Initiating the stream')
+    producer_ws.stream_video(file_format)
+    logging.info('Done streaming')
+    message = "Done streaming"
+    status_code = 200
+    return message, status_code
