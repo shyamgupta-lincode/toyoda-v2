@@ -64,7 +64,23 @@ def add_assects_util(data):
     
     
 
+def get_assect_util():
 
+    
+    
+    mp = MongoHelper().getCollection(ASSECTS_COLLECTION)
+        
+        
+    p = [i for i in mp.find()]
+    
+    #_id = p[0]['_id']
+    #dataset = mp.find_one({'_id' : ObjectId(_id)})
+        
+    #p = mp.find_one({'_id' : _id})
+        
+    return p,200
+    
+    
 def update_assect_util(data):
 
     side_nav = data.get('side_nav',None)

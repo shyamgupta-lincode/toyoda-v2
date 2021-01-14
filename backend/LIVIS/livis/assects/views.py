@@ -43,3 +43,21 @@ def update_assect(request):
         return HttpResponse( {message}, status=status_code)
     else:
         return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_assect(request):
+    token_user_id = request.user.user_id
+    operation_type = "asset"
+    notes = "get asset"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    #data = json.loads(request.body)
+    
+    
+    response,status_code = get_assect_util()
+    if status_code != 200:
+        return HttpResponse( {message}, status=status_code)
+    else:
+        return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
