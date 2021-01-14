@@ -51,5 +51,26 @@ def test_logs(request):
 def get_access_log_report(request):
     # from reports.utils import get_defect_list_report_util
     data = json.loads(request.body)
-    response = get_access_log_report_util(data)
-    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+    total,current,limit,message,status_code = get_access_log_report_util(data)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'message' : 'Success!', 'data' : message,'total' : total,'current' : current,'limit' : limit}, cls=Encoder), content_type="application/json")
+    else:
+        return HttpResponse( {message}, status=status_code)
+        
+    #return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")4
+    
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def export_logs(request):
+
+    data = json.loads(request.body)
+    message,status_code=export_logs_util(data)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'message' : 'Success!', 'data' : message}, cls=Encoder), content_type="application/json")
+    else:
+        return HttpResponse( {message}, status=status_code)
+    
+    
+    
