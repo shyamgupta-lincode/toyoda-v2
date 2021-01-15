@@ -5,12 +5,5 @@ RUN apt update && \
     apt update && apt install -y python3.6 && \
     apt install -y python3-pip && pip3 install --upgrade pip 
 
-RUN pip3 install kafka-python opencv-python pandas pymongo numpy pybase64 && apt install -y libgl1-mesa-glx
-ENV topic="WS1parta"
-ENV broker_server="broker:9092"
-ENV mongo_host="mongodb"
-ENV mongo_port="27017"
-ENV part_name="part_a"
-COPY /consumer/consumer_video_input/consumer.py /apps/consumer/
-COPY /consumer/consumer_video_input/MongoHelper.py /apps/consumer/
-#RUN python3 /apps/consumer/consumer.py broker_server mongo_host mongo_port part_name topic
+RUN pip3 install kafka-python opencv-python pandas pymongo numpy pybase64 pandas && apt install -y libgl1-mesa-glx
+COPY /consumer/ /apps/consumer/

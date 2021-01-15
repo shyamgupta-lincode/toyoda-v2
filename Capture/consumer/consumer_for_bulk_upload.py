@@ -101,7 +101,11 @@ if __name__ == "__main__":
     part_id = ws_client.add_to_metadata_collection(part_name, topic)
     # Creating a folder to store the images consumed, folder name is part name
     img_database_path = mount_path + "/" + part_name
-    os.mkdir(img_database_path)
+    #os.mkdir(img_database_path)
+    if os.path.exists(img_database_path):
+        pass
+    else:
+        os.makedirs(img_database_path)
 
     # Creating a Kafka consumer
     consumer_ws = Consumer(KAFKA_BROKER_URL, topic, auto_offset_reset_value='earliest')

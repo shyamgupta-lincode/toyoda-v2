@@ -5,8 +5,6 @@ import cv2
 import numpy as np
 import base64
 import json
-import pickle
-import io
 import logging
 import sys
 import pandas as pd
@@ -29,7 +27,7 @@ class Consumer():
             does not exist any more on the server (e.g. because that data has been deleted):
         """
         self.obj = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL,
-        value_deserializer=lambda value: json.loads(value), auto_offset_reset=auto_offset_reset_value, )
+        value_deserializer=lambda value: json.loads(value), auto_offset_reset=auto_offset_reset_value,)
         self.topic = topic
 
     def collect_stream(self, mongo_client, part_id, img_database_path):
@@ -99,7 +97,11 @@ if __name__ == "__main__":
     part_id = ws_client.add_to_metadata_collection(part_name, topic)
     # Creating a folder to store the images consumed, folder name is part name
     img_database_path = mount_path + "/" + part_name
-    os.mkdir(img_database_path)
+    #os.mkdir(img_database_path)
+    if os.path.exists(img_database_path):
+        pass
+    else:
+        os.makedirs(img_database_path)
     # Collecting the stream
     logging.info('Collecting incoming stream')
     print("Collecting incoming stream")
