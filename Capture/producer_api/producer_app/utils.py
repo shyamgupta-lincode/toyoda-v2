@@ -14,7 +14,7 @@ class Producer():
     """
         Publishes video data from camera to topic
     """
-    def __init__(self, KAFKA_BROKER_URL, part, topic, video_input=""):
+    def __init__(self, KAFKA_BROKER_URL, part, topic, image_path=""):
         """
         Instantiates the Producer object
 
@@ -27,7 +27,7 @@ class Producer():
                              value_serializer=lambda value: json.dumps(value).encode(), )
         self.part = part
         self.topic = topic
-        self.video_input = video_input
+        self.image_path = image_path
 
     def extract_zipfile(self, compressed_file_path, archive_format):
         """
@@ -100,30 +100,39 @@ class Producer():
             time.sleep(1)
         return 0
 
-    def stream_video(self, file_format):
+    def stream_video(self, file_format, frames_iter):
         """
         Accesses frames from the camera, encodes it and publishes it to the respective topic
 
         Arguments:
             file_format: format of the image data to be sent to the Kafka consumer
         """
-        cap = cv2.VideoCapture(self.video_input)
-        frames_iter = 0
-        while (cap.isOpened()):
-            ret, frame = cap.read()
-            if ret == True:
-                frames_iter = frames_iter + 1
-                # Encoding and sending the frame
-                cv2.imwrite("tmp.jpg", frame)
-                with open("tmp.jpg", 'rb') as f:
-                    im_b64 = base64.b64encode(f.read())
-                payload_video_frame = {"frame": str(im_b64), "part": self.part, "frame_idx": frames_iter,\
-                                       "file_format": file_format}
-                self.obj.send(self.topic, value=payload_video_frame)
-                time.sleep(1)
-            else:
-                break
-        cap.release()
+
+        with open(self.image_path, 'rb') as f:
+            im_b64 = base64.b64encode(f.read())
+        payload_video_frame = {"frame": str(im_b64), "part": self.part, "frame_idx": frames_iter,\
+                                    "file_format": file_format}
+        print("\n\n")
+        print(payload_video_frame)
+        self.obj.send(self.topic, value=payload_video_frame)
+        time.sleep(1)
+        # cap = cv2.VideoCapture(self.video_input)
+        # frames_iter = 0
+        # while (cap.isOpened()):
+        #     ret, frame = cap.read()
+        #     if ret == True:
+        #         frames_iter = frames_iter + 1
+        #         # Encoding and sending the frame
+        #         cv2.imwrite("tmp.jpg", frame)
+        #         with open("tmp.jpg", 'rb') as f:
+        #             im_b64 = base64.b64encode(f.read())
+        #         payload_video_frame = {"frame": str(im_b64), "part": self.part, "frame_idx": frames_iter,\
+        #                                "file_format": file_format}
+        #         self.obj.send(self.topic, value=payload_video_frame)
+        #         time.sleep(1)
+        #     else:
+        #         break
+        # cap.release()
         return 0
 
 
@@ -190,13 +199,14 @@ def start_bulk_upload_stream(data):
 
 
 def start_video_stream(data):
+
     logging.basicConfig(filename='Status.log',
                         level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
     try:
-        video_input = data['video_input']
+        image_path = data['image_path']
     except:
-        message = "video_input not provided"
+        message = "image path not provided"
         status_code = 400
         return message, status_code
         
@@ -228,18 +238,28 @@ def start_video_stream(data):
         status_code = 400
         return message, status_code
 
+    try:
+        frames_iter = data['frames_iter']
+    except:
+        message = "Frame count not provided"
+        status_code = 400
+        return message, status_code
+
     logging.info('Creating the Producer object for streaming')
 
     try:
-        producer_ws = Producer(KAFKA_BROKER_URL, part_name, topic, video_input)
+        producer_ws = Producer(KAFKA_BROKER_URL, part_name, topic, image_path)
     except:
         message = "Producer object creation failed"
         status_code = 415
         return message, status_code
 
+    print(producer_ws)
+
     # Streaming the frames
     logging.info('Initiating the stream')
-    producer_ws.stream_video(file_format)
+
+    producer_ws.stream_video(file_format, frames_iter)
     logging.info('Done streaming')
     message = "Done streaming"
     status_code = 200

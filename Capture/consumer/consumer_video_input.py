@@ -51,6 +51,7 @@ class Consumer():
             img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
             # Saving the frame
             img_path = img_database_path + "/frame" + str(frame_iter_) + ".png"
+
             cv2.imwrite(img_path, img)
 
             capture_doc = {
