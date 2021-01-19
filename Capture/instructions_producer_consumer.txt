@@ -1,34 +1,30 @@
 ----------To run Producer:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ producer
-cd /apps/Capture/producer/
-python3 producer.py "image_path" "part_name" "topic" "broker_server" "image_file_format"
-eg:
-python3 producer.py "/Livis/Capture/producer/tmp.jpg" "part_a" "WS1parta" "broker:9092" "jpg"
+cd /apps/Capture/main_api/
+python3 manage.py runserver
 
---------To run Producer for bulk upload:
-cd /apps/producer/
-python3 producer_bulk_upload.py "compressed_file_path" "compression_format" "part_name" "topic" "broker_server"
-"image_file_format"
-eg:
-python3 producer_bulk_upload.py "part_a.zip" "zip" "part_b" "topic1" "broker:9092" "jpg"
-
-curl -X POST -d '{"compressed_file_path":"part_a.zip", "compression_format":"zip", "part_name":"part_a",
-"topic":"topic1", "broker_url":"broker:9092", "file_format":"jpg"}'
--H "Content-Type: application/json" http://127.0.0.1:8000/producer_app/bulk_upload/
+---- For video input
+curl -X POST -d '{"part_id": "123", "workstation_id": "WS1",
+"camera_indexes": ["/apps/Capture/part_abc.mp4"]}' -H "Content-Type: application/json"
+http://127.0.0.1:8000/producer_app/producer_video_input/
 
 
---------------To run Consumer for consuming video input:
+---- For bulk upload
+curl -X POST -d '{"compressed_file_path":"/apps/Capture/part_a.zip",
+ "compression_format":"zip", "part_id":"123",
+"workstation_id": "WS1"}' -H "Content-Type: application/json"
+ http://127.0.0.1:8000/producer_app/producer_bulk_upload/
+
+
+--------------To run Consumer:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ consumer
-cd /apps/consumer/
-python3 consumer.py broker_server mongo_host mongo_port part_name "topic"
-eg:
-python3 consumer.py "broker:9092" "mongodb" 27017 "part_a" "WS1parta" "/apps"
+cd /apps/Capture/main_api/
+python3 manage.py runserver
 
----------To run Consumer for bulk upload service:
-cd /apps/consumer/
-python3 consumer.py "broker_server" "mongo_host" "mongo_port" "topic_for_inference_results" "part_name" "mount_path"
-eg:
-python3 consumer_for_bulk_upload.py "broker:9092" "mongodb" 27017 "topic1" "part_a" "/apps/Capture/consumer"
+----For calling consumer
+curl -X POST -d '{"part_id": "123", "workstation_id": "WS1"}' -H "Content-Type: application/json"
+http://127.0.0.1:8000/consumer_app/consumer_video_input/
+
 
 
 

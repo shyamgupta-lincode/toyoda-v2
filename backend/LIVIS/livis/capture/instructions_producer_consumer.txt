@@ -1,33 +1,30 @@
 ----------To run Producer:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ producer
-cd /apps/Capture/producer/
-python3 producer.py "part_id" "workstation_id" "camera_indexes"
-eg:
-python3 producer.py "123" "WS1" "WS1123" "broker:9092" "jpg"
+cd /apps/Capture/main_api/
+python3 manage.py runserver
 
---------To run Producer for bulk upload:
-cd /apps/producer/
-python3 producer_bulk_upload.py "compressed_file_path" "compression_format" "part_id" "Workstation_ID"
-eg:
-python3 producer_bulk_upload.py "part_a.zip" "zip" "123" "WS1"
+---- For video input
+curl -X POST -d '{"part_id": "123", "workstation_id": "WS1",
+"camera_indexes": ["/apps/Capture/part_abc.mp4"]}' -H "Content-Type: application/json"
+http://127.0.0.1:8000/producer_app/producer_video_input/
 
-curl -X POST -d '{"compressed_file_path":"part_a.zip", "compression_format":"zip", "part_id":"123",
+
+---- For bulk upload
+curl -X POST -d '{"compressed_file_path":"/apps/Capture/part_a.zip",
+ "compression_format":"zip", "part_id":"123",
 "workstation_id": "WS1"}' -H "Content-Type: application/json"
- http://127.0.0.1:8000/producer_app/bulk_upload/
+ http://127.0.0.1:8000/producer_app/producer_bulk_upload/
 
 
---------------To run Consumer for consuming video input:
+--------------To run Consumer:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ consumer
-cd /apps/consumer/
-python3 consumer.py "part_id" "workstation_id" "camera_indexes"
-eg:
-python3 consumer_video_input.py "broker:9092" "mongodb" 27017 "part_a" "WS1parta" "/apps"
+cd /apps/Capture/main_api/
+python3 manage.py runserver
 
----------To run Consumer for bulk upload service:
-cd /apps/consumer/
-python3 consumer.py "compressed_file_path" "compression_format" "part_id" "Workstation_ID"
-eg:
-python3 consumer_for_bulk_upload.py "broker:9092" "mongodb" 27017 "topic1" "part_a" "/apps/Capture/consumer"
+----For calling consumer
+curl -X POST -d '{"part_id": "123", "workstation_id": "WS1"}' -H "Content-Type: application/json"
+http://127.0.0.1:8000/consumer_app/consumer_video_input/
+
 
 
 

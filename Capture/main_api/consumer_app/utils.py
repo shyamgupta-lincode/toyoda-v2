@@ -8,12 +8,13 @@ import time
 import sys
 import logging
 import pandas as pd
-from MongoHelperStreaming import *
-from common.utils import MongoHelper
+from pymongo import MongoClient
+#from common.utils import MongoHelper
 
 KAFKA_BROKER_URL = "broker:9092"
-consumer_mount_path = "/Livis"
-ws_client = mongo_client(mongo_host, mongo_port)
+consumer_mount_path = "/apps/Livis"
+mongo_host = "mongodb"
+mongo_port = "27017"
 
 def singleton(cls):
     instances = {}
@@ -22,6 +23,51 @@ def singleton(cls):
             instances[cls] = cls()
         return instances[cls]
     return getinstance
+
+
+class mongo_client():
+    """
+    Creates a mongo client for accessing and performing operations on a mongo database that is hosted on a mongo server
+    """
+
+    def __init__(self, mongo_host, mongo_port):
+        """
+        Instantiates a pymongo client fir interacting with the mongo database
+
+        Arguments:
+            mongo_host: host for connecting to the server hosting the mongo server
+            mongo_port: port for connecting to the server hosting the mongo server
+        """
+        self.client = MongoClient(mongo_host, int(mongo_port))
+
+    def add_to_metadata_collection(self, part_name, topic):
+        """"
+        Registers the part id/name to the "parts metadata" collection
+
+        Arguments:
+            part_name: part to be registered
+            topic: topic that the consumer receives the images for the given part
+
+        """
+        db = self.client["parts-metadata"]
+        metadata_table = db.partsmetadata
+        metadata_table.insert_one({"part_name": part_name, "topic": topic})
+        part_payload = metadata_table.find_one({"topic": topic})
+        part_id = part_payload["_id"]
+        return part_id
+
+    def add_to_parts_collection(self, payload):
+        """
+        Records the image data received for the given topic
+
+        Arguments:
+            payload: Collection to be added to the "parts collection"
+        """
+        db = self.client["parts-collection"]
+        parts_table = db.parts
+        parts_table.insert_one(payload)
+        return
+
 
 
 class Consumer():
@@ -42,7 +88,7 @@ class Consumer():
         value_deserializer=lambda value: json.loads(value), auto_offset_reset=auto_offset_reset_value,)
         self.topic = topic
 
-    def collect_stream(self, part_id, workstation_id):
+    def collect_stream(self, part_id, workstation_id, ws_client):
         """"
         Receives the encoded image frames from the prescribed topic
 
@@ -63,7 +109,7 @@ class Consumer():
             img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
             # Saving the frame
             img_path = consumer_mount_path + "/" + str(part_id) + "/frame" + str(frame_iter_) + ".png"
-
+            print(img_path)
             cv2.imwrite(img_path, img)
 
             capture_doc = {
@@ -75,10 +121,10 @@ class Consumer():
                 "timestamp": pd.Timestamp.now()
             }
             print("\n\n")
-            ws_client.add_to_parts_collection(capture_doc)
+            #ws_client.add_to_parts_collection(capture_doc)
             print(frame_iter_)
             frame_iter_ = frame_iter_ + 1
-            logging.info('Received frame %s of part %s', frame_iter_, message.value["part"])
+            logging.info('Received frame %s of part %s', frame_iter_, part_id)
 
 
     def close(self):
@@ -87,70 +133,9 @@ class Consumer():
 
 
 
-def start_bulk_upload_stream(data):
-    #Creating a logging object
-    logging.basicConfig(filename='Status.log',
-                         level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-    try:
-        compressed_file_path = data['compressed_file_path']
-    except:
-        message = "File path not found"
-        status_code = 400
-        return message, status_code
+def start_consumer_video_stream(data):
 
-    try:
-        compression_format = data['compression_format']
-    except:
-        message = "Compression format not provided"
-        status_code = 400
-        return message, status_code
-
-    try:
-        part_id = data['part_id']
-    except:
-        message = "part id not provided"
-        status_code = 400
-        return message, status_code
-
-    try:
-        workstation_id = data['workstation_id']
-    except:
-        message = "Workstation ID not provided"
-        status_code = 400
-        return message, status_code
-
-    logging.info('Creating the Consumer object for streaming')
-
-    topic = str(part_id) + str(workstation_id)
-
-    try:
-        consumer = Consumer(KAFKA_BROKER_URL, topic, auto_offset_reset_value='earliest')
-    except:
-        message = "Consumer object creation failed"
-        status_code = 415
-        return message, status_code
-
-    # Streaming the frames
-    logging.info('Initiating the consumer')
-    # Registering the part name to parts-metadata collection
-    part_id = ws_client.add_to_metadata_collection(part_name, topic)
-    # Creating a folder to store the images consumed, folder name is part name
-    img_database_path = consumer_mount_path + "/" + str(part_id)
-    if os.path.exists(img_database_path):
-        pass
-    else:
-        os.makedirs(img_database_path)
-
-    status_code = consumer.collect_stream(part_id, workstation_id)
-    logging.info('Done receiving streaming')
-    message = "Done receiving streaming"
-    status_code = 200
-    return message, status_code
-
-
-def start_video_stream(data):
-
-    logging.basicConfig(filename='Status.log',
+    logging.basicConfig(filename='Status_consumer.log',
                         level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
     try:
@@ -167,29 +152,33 @@ def start_video_stream(data):
         status_code = 400
         return message, status_code
 
+    logging.info('Creating the Consumer object for streaming')
+
+    topic = str(part_id) + str(workstation_id)
+    # Registering the part name to parts-metadata collection
+    ws_client = ""
+    #ws_client = mongo_client(mongo_host, mongo_port)
+    #part_id = ws_client.add_to_metadata_collection(part_id, topic)
+    # Creating a folder to store the images consumed, folder name is part name
+    img_database_path = consumer_mount_path + "/" + str(part_id)
+    if os.path.exists(img_database_path):
+        pass
+    else:
+        os.makedirs(img_database_path)
+
+
     try:
-        camera_indexes = data['camera_indexes']
+        consumer = Consumer(KAFKA_BROKER_URL, topic, auto_offset_reset_value='earliest')
     except:
-        message = "camera indexes not provided"
-        status_code = 400
+        message = "Consumer object creation failed"
+        status_code = 415
         return message, status_code
 
-    logging.info('Creating the Producer object for streaming')
+    # Streaming the frames
+    logging.info('Initiating the consumer')
 
-    for id in camera_indexes:
-        topic = str(part_id) + str(workstation_id)
-        try:
-            consumer = Consumer(KAFKA_BROKER_URL, topic)
-        except:
-            message = "Consumer object creation failed"
-            status_code = 415
-            return message, status_code
-
-        # Streaming the frames
-        logging.info('Initiating the consumer')
-
-        status_code = consumer.collect_stream(part_id, workstation_id)
-        logging.info('Done receiving streaming')
-        message = "Done receiving streaming"
-        status_code = 200
-        return message, status_code
+    status_code = consumer.collect_stream(part_id, workstation_id, ws_client)
+    logging.info('Done receiving streaming')
+    message = "Done receiving streaming"
+    status_code = 200
+    return message, status_code

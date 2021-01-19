@@ -8,7 +8,7 @@ import time
 import sys
 import logging
 import shutil
-from common.utils import MongoHelper
+#from common.utils import MongoHelper
 import multiprocessing
 
 KAFKA_BROKER_URL = "broker:9092"
@@ -90,7 +90,7 @@ class Producer():
 
         """
         extracted_dir = self.extract_zipfile(compressed_file_path, archive_format)
-        extracted_img_path = extracted_dir + "/" + part_id
+        extracted_img_path = extracted_dir
         frames_iter = 1
         for filename in os.listdir(extracted_img_path):
             with open(filename, 'rb') as f:
@@ -110,7 +110,7 @@ class Producer():
         """
 
         ### Code to check if camera id is valid
-
+        print("\n")
         cap = cv2.VideoCapture(camera_index)
         frames_iter = 0
         while (cap.isOpened()):
@@ -131,9 +131,9 @@ class Producer():
         return 200
 
 
-def start_bulk_upload_stream(data):
+def start_producer_bulk_upload_stream(data):
     #Creating a logging object
-    logging.basicConfig(filename='Status.log',
+    logging.basicConfig(filename='Status_producer.log',
                          level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
     try:
         compressed_file_path = data['compressed_file_path']
@@ -182,9 +182,9 @@ def start_bulk_upload_stream(data):
     return message, status_code
 
 
-def start_video_stream(data):
+def start_producer_video_stream(data):
 
-    logging.basicConfig(filename='Status.log',
+    logging.basicConfig(filename='Status_producer.log',
                         level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
     try:
@@ -220,13 +220,16 @@ def start_video_stream(data):
         p.join()
 
     for job in jobs:
-        if job.exitcode != 0:
+        print("Job exit code " + str(job.exitcode))
+        if int(job.exitcode) == 0:
+
+            status_code = 200
+            message = "Done streaming"
+            return message, status_code
+        else:
             status_code = 400
-            message = "Failed streaming"
-            return status_code, message
-    status_code = 200
-    message = "Done streaming"
-    return status_code, message
+            message = "Streaming failed"
+            return message, status_code
 
 
 def start_multiprocess_stream(KAFKA_BROKER_URL, topic, part_id, workstation_id, camera_id):
@@ -241,6 +244,7 @@ def start_multiprocess_stream(KAFKA_BROKER_URL, topic, part_id, workstation_id, 
     logging.info('Initiating the stream')
     status_code = producer_ws.stream_video(part_id, workstation_id, camera_id)
     logging.info('Done streaming')
+    print("status code after streaming "+str(status_code))
     if status_code == 200:
         return 1
     else:
