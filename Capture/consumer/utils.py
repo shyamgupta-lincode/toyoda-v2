@@ -13,6 +13,8 @@ from common.utils import MongoHelper
 
 KAFKA_BROKER_URL = "broker:9092"
 consumer_mount_path = "/Livis"
+mongo_host = "mongodb"
+mongo_port = 27017
 ws_client = mongo_client(mongo_host, mongo_port)
 
 def singleton(cls):

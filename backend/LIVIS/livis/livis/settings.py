@@ -190,3 +190,9 @@ EXPERIMENT_DATA_STATIC = '/root/experiments'
 print("AREEEEE: : : : :   " , TRAIN_DATA_STATIC)
 if not os.path.exists(TRAIN_DATA_STATIC):
     os.makedirs(TRAIN_DATA_STATIC)
+
+# For Capture service
+KAFKA_BROKER_URL = "broker:9092"
+consumer_mount_path = "/Livis"
+mongo_host = "mongodb"
+mongo_port = 27017
