@@ -5,35 +5,24 @@ from plan.utils import get_todays_planned_production_util
 from common.utils import GetLabelData
 #######################################################################PART CRUDS#######################################################
 def add_part_details_task(data):
-    """
-    {
-	"short_number": "sht11",
-	"model_number": "md11",
-	"part_number": "pt11",
-	"planned_production": "100",
-	"part_description": "fjjff",
-	"edit_part_data": true
-    }
-    """
+
     try:
-        short_number = data.get('short_number',None)
-        model_number = data.get('model_number',None)
-        planned_production = data.get('planned_production',None)
+        
+
         part_number = data.get('part_number',None)
         part_description = data.get('part_description',None)
-        edit_part_data = data.get('edit_part_data',None)
+
         kanban = data.get('kanban',None)
+        createdAt = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
         isdeleted = False
         mp = MongoHelper().getCollection(PARTS_COLLECTION)
         collection_obj = {
-           'short_number' : short_number,
-           'model_number' : model_number,
-           'planned_production' : planned_production,
+        
            'part_number' : part_number,
            'part_description' : part_description,
-           'edit_part_data' : edit_part_data,
            'isdeleted' : isdeleted,
-           'kanban' : kanban
+           'kanban' : kanban,
+           'created_at': createdAt
         }
         _id = mp.insert(collection_obj)
         return _id
@@ -56,42 +45,28 @@ def delete_part_task(part_id):
 
 
 def update_part_task(data):
-    """
-    {
-        "_id": "242798143hdw7q33913413we2"
-	    "short_number": "sht11",
-	    "model_number": "md11",
-	    "part_number": "pt11",
-	    "planned_production": "100",
-	    "part_description": "fjjff",
-	    "edit_part_data": true
-    }
-    """
+
     _id = data.get('_id')
     if _id:
         mp = MongoHelper().getCollection(PARTS_COLLECTION)
         pc = mp.find_one({'_id' : ObjectId(_id)})
         if pc:
-            short_number = data.get('short_number',None)
-            model_number = data.get('model_number',None)
+
+            
             part_number = data.get('part_number',None)
-            planned_production = data.get('planned_production',None)
             part_description = data.get('part_description',None)
-            edit_part_data = data.get('edit_part_data',None)
-            if short_number:
-                pc['short_number'] = short_number
-            if model_number:
-                pc['model_number'] = model_number
+            kanban = data.get('kanban',None)
+            
+
             if part_number:
                 pc['part_number'] = part_number
-            if planned_production:
-                pc['planned_production'] = planned_production
+
             if part_description:
                 pc['part_description'] = part_description
-            if edit_part_data:
-                pc['edit_part_data'] = edit_part_data
+
             if kanban:
                 pc['kanban'] = kanban
+                
             mp.update({'_id' : pc['_id']}, {'$set' :  pc})
         else:
             return {"message" : "Part not found"}
@@ -129,27 +104,3 @@ def get_parts_task(skip=0, limit=100):
     else:
         return []
 
-
-def get_partInfo(short_number):      #part_info based on short_number
-    mp = MongoHelper().getCollection(PARTS_COLLECTION)
-    pr = [i for i in mp.find({"short_number" : short_number})]
-    resp = {}
-    if len(pr) > 0:
-        resp = pr[-1]
-        obj = get_todays_planned_production_util(short_number)
-        planned_production = obj['planned_production_count']
-        resp.update({'planned_production':planned_production})
-        return resp
-    else:
-        return {}
-
-
-def get_short_numbers_list_util(skip=0, limit=100):
-    mp = MongoHelper().getCollection(PARTS_COLLECTION)
-    short_numbers = [p for p in mp.find({"$and" : [{"isdeleted": False}, { "isdeleted" : {"$exists" : True}}]},{"short_number":1, "_id":0}).skip(skip).limit(limit)]
-    if short_numbers:
-        return short_numbers
-    else:
-        return []
-
-        

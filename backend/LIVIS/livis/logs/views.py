@@ -45,6 +45,19 @@ def test_logs(request):
     return HttpResponse(json.dumps(['test logs api'], cls=Encoder), content_type="application/json")
 
 
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_user_list(request,user_type):
+    #data = json.loads(request.body)
+    message,status_code=get_user_list_util(user_type)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'message' : 'Success!', 'data' : message}, cls=Encoder), content_type="application/json")
+    else:
+        return HttpResponse( {message}, status=status_code)
+    
+    
+
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt

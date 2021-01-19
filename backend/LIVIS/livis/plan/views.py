@@ -17,7 +17,6 @@ from drf_yasg.utils import swagger_auto_schema
         'start_time' : openapi.Schema(type=openapi.TYPE_STRING, example='2020-10-02'),
         'end_time' : openapi.Schema(type=openapi.TYPE_STRING, example='2020-10-05'),
         'part_number': openapi.Schema(type=openapi.TYPE_STRING, example='aaserer3423'),
-        'short_number' : openapi.Schema(type=openapi.TYPE_STRING, example='md2'),
         'planned_production_count': openapi.Schema(type=openapi.TYPE_INTEGER, example=100)
     }
 ))
@@ -106,14 +105,14 @@ def plan_single(request,plan_id):
 @api_view(['GET'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
-def get_todays_planned_production(request,short_number):
+def get_todays_planned_production(request,part_id):
     token_user_id = request.user.user_id
     operation_type = "plan"
     notes = "todays plan production"
     
     add_logs_util(token_user_id,operation_type,notes)
     from plan.utils import get_todays_planned_production_util
-    response = get_todays_planned_production_util(short_number)
+    response = get_todays_planned_production_util(part_id)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
     

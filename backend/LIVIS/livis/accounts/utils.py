@@ -110,7 +110,7 @@ def get_user_account_util(user_id):
         return resp
 
 
-def update_user_account_util(data):   #Note: Unable to update email or username as they are having unique constraints.
+def update_user_account_util(data,request):   #Note: Unable to update email or username as they are having unique constraints.
     """
     Usage: API to update a user account.
     Request Parameters: {
@@ -141,8 +141,21 @@ def update_user_account_util(data):   #Note: Unable to update email or username 
         is_superuser = data.get('is_superuser',None)
         role_name = data.get('role_name',None)
         phone_number = data.get('phone_number',None)
+        
+        password = data.get('password',None)
+        user_ip_old_password = data.get('old_password',None)
+        
+        username = request.user.username
+
+        if user_id is None:
+            return "user_id not provided","fail"
+        from django.contrib.auth import get_user_model
+        User1 = get_user_model()
+        u = User1.objects.get(username=username)
+        
         user_obj = User.objects.get(user_id=user_id)
-        # print("user obj:::",user_obj)
+        
+        #print("user obj:::",user_obj)
         if user_obj:
             if first_name :
                 user_obj.first_name=first_name
@@ -162,15 +175,32 @@ def update_user_account_util(data):   #Note: Unable to update email or username 
                 user_obj.role_name=role_name
             if phone_number :
                 user_obj.phone_number=phone_number
+            if password:
+
+
+                if u.check_password(user_ip_old_password) is False:
+                    message = "Invalid Old Password"
+                    message1 = 'fail'
+                    return message,message1
+
+                if str(password) == str(user_ip_old_password):
+                    message = "New password cannot be same as old password"
+                    message1 = 'fail'
+                    return message,message1
+
+                #u.set_password(password)
+                #u.save()
+                user_obj.set_password(password)
+
             user_obj.save()
             resp = "User Account updated successfully."
-            return resp
+            return resp,'success'
         else:
             resp = "User account could not be updated. User ID is not specified."
-            return resp   
+            return resp,"fail"
     except Exception as e:
         resp = "User account could not be updated. "+str(e)
-        return resp
+        return resp,'fail'
 
 
 def delete_user_account_util(user_id):
@@ -398,6 +428,40 @@ def delete_user_client_util(user_id):
         resp = "User Client account could not be deleted. "+str(e)
         return resp
 
+def get_list_client_util(user_id):
+    resp = []
+    user_list = []
+    user_list_details = []
+    try:
+        user_client_obj = User_Client.objects.filter(is_deleted=False)
+        for i in range(len(user_client_obj)):
+            user_client_obj_json = json.loads(serializers.serialize('json',user_client_obj))
+            
+            user_client_obj_json = user_client_obj_json[i]
+            resp.append(user_client_obj_json)
+            
+        for i in resp:
+            user_list.append(i['pk'])
+            
+        for i in user_list:
+        
+
+            user_obj = User.objects.filter(user_id=i)
+            user_obj_json = json.loads(serializers.serialize('json',user_obj))
+            resp = user_obj_json[0]['fields']
+            
+            resp['user_id'] = str(i)
+            
+            user_list_details.append(resp)
+
+
+        return user_list_details
+    except Exception as e:
+        resp = "Could not retrieve all the existing user client accounts. "+str(e)
+        return resp
+
+
+
 def get_user_client_util(user_id):
     """
     Usage: API to get details of a user client account.
@@ -412,12 +476,21 @@ def get_user_client_util(user_id):
     resp = {}
     try:
         user_client_obj = User_Client.objects.filter(user_id=user_id)
+        
+        #user_client_obj = User_Client.objects.get(user_id=user_id)
+        #print(user_client_obj)
         user_client_obj_json = json.loads(serializers.serialize('json',user_client_obj))
+        print(user_client_obj_json)
+        #return resp
         resp = user_client_obj_json[0]['fields']
         return resp
     except Exception as e:
         resp = "User client account could not be retrieved. "+str(e)
         return resp
+
+
+
+
 
 def get_user_clients_util():
     """
@@ -436,8 +509,10 @@ def get_user_clients_util():
         user_client_obj = User_Client.objects.filter(is_deleted=False)
         for i in range(len(user_client_obj)):
             user_client_obj_json = json.loads(serializers.serialize('json',user_client_obj))
+            
             user_client_obj_json = user_client_obj_json[i]['fields']
             resp.append(user_client_obj_json)
+        
         return resp
     except Exception as e:
         resp = "Could not retrieve all the existing user client accounts. "+str(e)

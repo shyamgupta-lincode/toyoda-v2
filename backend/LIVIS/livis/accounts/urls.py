@@ -10,6 +10,7 @@ urlpatterns = [
 
     re_path(r'^add_user_client/$', views.add_user_client),
     re_path(r'^get_user_client/(?P<client_id>[A-Za-z0-9-_]+)', views.get_user_client),
+    re_path(r'^get_list_client/(?P<client_id>[A-Za-z0-9-_]+)', views.get_list_client),
     re_path(r'^update_user_client/$', views.update_user_client),
     re_path(r'^delete_user_client/(?P<client_id>[A-Za-z0-9-_]+)$', views.delete_user_client),
     re_path(r'^get_user_clients/$', views.get_user_clients),

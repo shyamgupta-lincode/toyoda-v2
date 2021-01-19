@@ -114,31 +114,3 @@ def get_parts(request):
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
 
-@api_view(['GET'])
-@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
-@csrf_exempt
-def get_partInfo(request, short_number):
-    token_user_id = request.user.user_id
-    operation_type = "parts"
-    notes = "get part info"
-    
-    add_logs_util(token_user_id,operation_type,notes)
-    from parts.utils import get_partInfo
-    resp = get_partInfo(short_number)
-    return HttpResponse(json.dumps(resp, cls=Encoder), content_type="application/json")
-
-
-@api_view(['GET'])
-@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
-@csrf_exempt
-def get_short_numbers_list(request):
-    token_user_id = request.user.user_id
-    operation_type = "parts"
-    notes = "get short number list"
-    
-    add_logs_util(token_user_id,operation_type,notes)
-    from parts.utils import get_short_numbers_list_util 
-    skip = request.GET.get('skip', 0)
-    limit = request.GET.get('limit' , 10)
-    response = get_short_numbers_list_util(skip, limit)
-    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")

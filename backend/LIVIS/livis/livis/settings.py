@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'training.apps.TrainingConfig',
     'logs.apps.LogsConfig',
     'assects.apps.AssectsConfig',
+    'preprocess.apps.PreprocessConfig',
     'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',

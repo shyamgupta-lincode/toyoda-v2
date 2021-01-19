@@ -77,8 +77,11 @@ def get_assect_util():
     #dataset = mp.find_one({'_id' : ObjectId(_id)})
         
     #p = mp.find_one({'_id' : _id})
-        
-    return p,200
+    
+    if len(p)>0:
+        return p[0],200
+    else:
+        return {},200
     
     
 def update_assect_util(data):
@@ -99,7 +102,7 @@ def update_assect_util(data):
         with open(sidenav_img, "wb") as fh:
             fh.write(base64.decodebytes(side_nav))
             
-    if login_img_pth is not None:
+    if login_logo is not None:
         login_logo = str.encode(login_logo)
         with open(login_img, "wb") as fh:
             fh.write(base64.decodebytes(login_logo)) 

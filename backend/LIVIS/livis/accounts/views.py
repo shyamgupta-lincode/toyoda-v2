@@ -102,8 +102,12 @@ def update_user_account(request):
     
     data = json.loads(request.body)
     from accounts.utils import update_user_account_util
-    message = update_user_account_util(data)
-    return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
+    message,message1 = update_user_account_util(data,request)
+    if message1 == "fail":
+        return HttpResponse({message}, status=500)
+    else:
+        return  HttpResponse(json.dumps(message,cls=Encoder), content_type="application/json")
+    #return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
 
 
 @api_view(['DELETE'])
@@ -342,6 +346,24 @@ def get_user_client(request,client_id):
     response = get_user_client_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
 
+
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_list_client(request,client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "get user client"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    from accounts.utils import get_list_client_util
+    response = get_list_client_util(client_id)
+    return HttpResponse(json.dumps(response), content_type="application/json") 
+    
+    
+    
+    
 
 @api_view(['GET'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))

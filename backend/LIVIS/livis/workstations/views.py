@@ -104,11 +104,11 @@ def get_workstation_config(request, workstationid):
 @csrf_exempt
 @permission_classes((AllowAny,))
 def get_workstations(request):
-    token_user_id = request.user.user_id
-    operation_type = "workstation"
-    notes = "get all workstations"
+    #token_user_id = request.user.user_id
+    #operation_type = "workstation"
+    #notes = "get all workstations"
     
-    add_logs_util(token_user_id,operation_type,notes)
+    #add_logs_util(token_user_id,operation_type,notes)
     from workstations.utils import get_workstations_task 
     skip = request.GET.get('skip', 0)
     limit = request.GET.get('limit' , 100)

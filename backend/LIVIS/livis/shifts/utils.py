@@ -12,16 +12,15 @@ def add_shift(data):
     shift_name = data.get('shift_name')
     start_time = strToDate(data.get('start_time'))
     end_time = strToDate(data.get('end_time'))
-    status = data.get('status')
-    duration = (datetime.datetime.min + (end_time - start_time)).time()
+
+
     mp = MongoHelper().getCollection(SHIFT_COLLECTION)
     collection_obj = {
         'shift_name' : shift_name,
         'start_time' : str(start_time.time()),
         'end_time' : str(end_time.time()),
         'is_deleted' : False,
-        'status' : status,
-        'shift_duration' : str(duration)
+
     }
     _id = mp.insert(collection_obj)    
     return mp.find_one({'_id' : _id})
@@ -33,8 +32,7 @@ def update_shift(data):
         shift_name = data.get('shift_name')
         start_time = strToDate(data.get('start_time'))
         end_time = strToDate(data.get('end_time'))
-        duration = (datetime.datetime.min + (end_time - start_time)).time()
-        status = data.get('status')
+
         mp = MongoHelper().getCollection(SHIFT_COLLECTION)
         sc = mp.find_one({'_id' : ObjectId(_id)})
         if shift_name:
@@ -43,9 +41,7 @@ def update_shift(data):
             sc['start_time'] = str(start_time.time())
         if end_time:
             sc['end_time'] = str(end_time.time())
-        if status:
-            sc['status'] = status
-        sc['shift_duration'] = str(duration)
+
         mp.update({'_id' : sc['_id']}, {'$set' :  sc})
         resp = mp.find_one({'_id' : sc['_id']})
     return resp

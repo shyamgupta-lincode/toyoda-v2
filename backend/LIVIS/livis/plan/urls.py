@@ -8,5 +8,5 @@ urlpatterns = [
                url(r'^delete_plan/(?P<plan_id>[A-Za-z0-9-_]+)$', views.delete_plan), 
                url(r'^get_plans/$', views.plan_list), 
                url(r'^get_plan/(?P<plan_id>[A-Za-z0-9-_]+)$', views.plan_single), 
-               url(r'^get_todays_planned_production/(?P<short_number>[A-Za-z0-9-_]+)$', views.get_todays_planned_production), 
+               url(r'^get_todays_planned_production/(?P<part_id>[A-Za-z0-9-_]+)$', views.get_todays_planned_production), 
 ]

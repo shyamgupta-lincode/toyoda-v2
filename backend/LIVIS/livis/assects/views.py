@@ -9,6 +9,9 @@ from common.utils import *
 
 from logs.utils import add_logs_util
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+
 
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
@@ -44,15 +47,17 @@ def update_assect(request):
     else:
         return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
+
 @api_view(['GET'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
+@permission_classes((AllowAny,))
 def get_assect(request):
-    token_user_id = request.user.user_id
-    operation_type = "asset"
-    notes = "get asset"
+    #token_user_id = request.user.user_id
+    #operation_type = "asset"
+    #notes = "get asset"
     
-    add_logs_util(token_user_id,operation_type,notes)
+    #add_logs_util(token_user_id,operation_type,notes)
     #data = json.loads(request.body)
     
     

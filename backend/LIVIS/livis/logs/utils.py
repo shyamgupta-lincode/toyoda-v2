@@ -5,6 +5,7 @@ from plan.utils import get_todays_planned_production_util
 from common.utils import GetLabelData
 import datetime
 from xlsxwriter import Workbook
+import sqlite3
 #######################################################################PART CRUDS#######################################################
 
 def add_logs_util(user_id,operation_type,notes):
@@ -98,8 +99,28 @@ def get_access_log_report_util(data):
     
     new_lst = intersection(p,pr)
     
+    new_new_list = []
     
-    message = new_lst
+    from accounts.models import User,User_Client,User_SI,Client,SI
+    
+    for p in new_lst:
+        user_id = p['user_id']
+        _id = p['_id']
+        operation_type = p['operation_type']
+        notes = p['notes']
+        created_at = p['created_at']
+        
+        
+        
+        user_obj = User.objects.get(user_id=user_id)
+        username = user_obj.username
+        
+        o = {"_id":_id,"user_id":user_id,"operation_type":operation_type,"notes":notes,"created_at":created_at,"username":username}
+        
+        new_new_list.append(o)
+        
+
+    message = new_new_list
     status_code = 200
     
     
@@ -173,10 +194,31 @@ def export_logs_list(data):
                     'operation_type': r['operation_type'] ,
                     'notes':r["notes"],
                     "created_at":r["created_at"]})
-                    
+  
+    new_new_list = []  
+        
+    for p in resp_list:
+    
+        from accounts.models import User,User_Client,User_SI,Client,SI
+    
+        ind = p['id']
+        user_id = p['user_id']
+        #_id = p['_id']
+        operation_type = p['operation_type']
+        notes = p['notes']
+        created_at = p['created_at']
+        
+
+        user_obj = User.objects.get(user_id=user_id)
+        username = user_obj.username
+        
+        o = {"id":ind,"user_id":user_id,"operation_type":operation_type,"notes":notes,"created_at":created_at,"username":username}
+        
+        new_new_list.append(o)
+        
     
                    
-    return resp_list
+    return new_new_list
 
 
 def write_excel(list_dict, file_name):
@@ -214,6 +256,43 @@ def export_logs_util(data):
     
         
     
+def get_user_list_util(user_type):
+
+        
+    if user_type is None:
+        return "specify user type",400
+        
+
+    conn = sqlite3.connect('db.sqlite3')
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM accounts_user")
+    lis = cursor.fetchall()
+
+    list_dict = []
+    if user_type == 'operator':
+    
+        for l in lis:
+
+            if "operator" == l[14]:
+                a = {"user_id":l[3],
+                "role":"operator",
+                "operator_name": str(l[4] +" "+ l[5]),
+                    }
+                list_dict.append(a)
+
+    if user_type == 'admin':
+    
+        for l in lis:
+
+            if "admin" == l[14]:
+                a = {"user_id":l[3],
+                "role":"admin",
+                "admin_name": str(l[4] +" "+ l[5]),
+                    }
+                list_dict.append(a)
+      
+    return list_dict,200
 
     
     

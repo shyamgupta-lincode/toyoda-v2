@@ -51,7 +51,8 @@ urlpatterns = [
     re_path(r'livis/v1/toyoda/', include("toyoda.urls")),
     re_path(r'livis/v1/training/', include("training.urls")),
     re_path(r'livis/v1/logs/', include("logs.urls")),
-    re_path(r'livis/v1/assects/', include("assects.urls")),    
+    re_path(r'livis/v1/assects/', include("assects.urls")), 
+    re_path(r'livis/v1/preprocess/', include("preprocess.urls")),   
 
 
 ]
