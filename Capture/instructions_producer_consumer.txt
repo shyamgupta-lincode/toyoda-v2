@@ -15,6 +15,10 @@ curl -X POST -d '{"compressed_file_path":"/apps/Capture/part_a.zip",
 "workstation_id": "WS1"}' -H "Content-Type: application/json"
  http://127.0.0.1:8000/producer_app/producer_bulk_upload/
 
+---- For camera select
+curl -X POST d '{"part_id": "123", "workstation_id": "123", "camera_selected" : ["cam1", "cam2"], "overwrite": "false"}'
+-H "Content-Type: application/json" http://127.0.0.1:8000/producer_app/producer_camera_selection/
+
 
 --------------To run Consumer:
 docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ consumer

@@ -8,127 +8,12 @@ import time
 import sys
 import logging
 import shutil
-#from common.utils import MongoHelper
+#from .utils import MongoHelper
 import multiprocessing
+from .producer import *
+from bson import ObjectId
 
 KAFKA_BROKER_URL = "broker:9092"
-
-def singleton(cls):
-    instances = {}
-    def getinstance():
-        if cls not in instances:
-            instances[cls] = cls()
-        return instances[cls]
-    return getinstance
-
-
-class Producer():
-    """
-        Publishes video data from camera to topic
-    """
-    def __init__(self, KAFKA_BROKER_URL, topic):
-        """
-        Instantiates the Producer object
-
-        Arguments:
-            KAFKA_BROKER_URL: url to connect to Broker
-            part: part id/name that is being captured
-            topic: topic to publish video stream to
-        """
-        self.obj = KafkaProducer(bootstrap_servers=KAFKA_BROKER_URL,
-                             value_serializer=lambda value: json.dumps(value).encode(), )
-        self.topic = topic
-
-    def extract_zipfile(self, compressed_file_path, archive_format):
-        """
-        Extracts files from compressed folder based on the
-
-        Arguments:
-            compressed_file_path: location of the compressed folder to be extracted
-            archive_format: format of the compressed folder
-
-        Returns:
-            extracted_img_path: Folder containing the extracted image files
-        """
-        logging.info('Extracting all the files now...')
-        # one of “zip”, “tar”, “gztar”, “bztar”, or “xztar”
-        if archive_format in ["zip", "tar", "gztar", "bztar", "xztar"]:
-            ind_ = compressed_file_path.find(".")
-            extracted_dir = compressed_file_path[:ind_]
-            shutil.unpack_archive(compressed_file_path, extracted_dir, archive_format)
-        elif archive_format == "gzip":
-            # need to add
-            print(".")
-        logging.info('Done extracting files!')
-        logging.info('extracted image path is %s', extracted_dir)
-        return extracted_dir
-
-    def encode_data_for_streaming(self, extracted_img_path, filename):
-        """
-        Encode data to be streamed to consumer
-
-        Arguments:
-            extracted_img_path: Folder containing the extracted files
-            filename: Image file name to be encoded
-
-        Returns:
-            img_str: endcoded image data
-        """
-        with open(extracted_img_path + "/" + filename, 'rb') as f:
-            im_b64 = base64.b64encode(f.read())
-            img_str = str(im_b64)
-        return img_str
-
-    def stream_bulk_upload_data(self, compressed_file_path, archive_format, part_id, workstation_id):
-        """
-        extracts image files from folder, encodes and publishes to topic
-
-        Arguments:
-            compressed_file_path: Path to folder to be extracted
-            archive_format: Format of the folder to extracted can be  “zip”, “tar”, “gztar”, “bztar”, or “xztar”
-            file_format: format of the image data to be sent to the Kafka consumer
-
-        """
-        extracted_dir = self.extract_zipfile(compressed_file_path, archive_format)
-        extracted_img_path = extracted_dir
-        frames_iter = 1
-        for filename in os.listdir(extracted_img_path):
-            with open(filename, 'rb') as f:
-                im_b64 = base64.b64encode(f.read())
-            payload = {"frame": str(im_b64), "camera_index":"", "frame_idx": frames_iter}
-            self.obj.send(self.topic, value=payload)
-            time.sleep(1)
-
-        return 0
-
-    def stream_video(self, part_id, workstation_id, camera_index):
-        """
-        Accesses frames from the camera, encodes it and publishes it to the respective topic
-
-        Arguments:
-            file_format: format of the image data to be sent to the Kafka consumer
-        """
-
-        ### Code to check if camera id is valid
-        print("\n")
-        cap = cv2.VideoCapture(camera_index)
-        frames_iter = 0
-        while (cap.isOpened()):
-             ret, frame = cap.read()
-             if ret == True:
-                 frames_iter = frames_iter + 1
-                 # Encoding and sending the frame
-                 cv2.imwrite("tmp.jpg", frame)
-                 with open("tmp.jpg", 'rb') as f:
-                     im_b64 = base64.b64encode(f.read())
-                 payload_video_frame = {"frame": str(im_b64), "camera_index": str(camera_index),
-                                        "frames_iter": str(frames_iter)}
-                 self.obj.send(self.topic, value=payload_video_frame)
-                 time.sleep(1)
-             else:
-                 break
-        cap.release()
-        return 200
 
 
 def start_producer_bulk_upload_stream(data):
@@ -208,7 +93,6 @@ def start_producer_video_stream(data):
         status_code = 400
         return message, status_code
 
-    logging.info('Creating the Producer object for streaming')
     jobs = []
 
     for id in camera_indexes:
@@ -233,6 +117,7 @@ def start_producer_video_stream(data):
 
 
 def start_multiprocess_stream(KAFKA_BROKER_URL, topic, part_id, workstation_id, camera_id):
+    logging.info('Creating the Producer object for streaming')
     try:
         producer_ws = Producer(KAFKA_BROKER_URL, topic)
     except:
@@ -249,5 +134,142 @@ def start_multiprocess_stream(KAFKA_BROKER_URL, topic, part_id, workstation_id, 
         return 1
     else:
         return 0
+
+
+def start_camera_selection(data):
+    # get data from the JSON POST object
+    logging.basicConfig(filename='Status_producer.log',
+                        level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+
+    try:
+        part_id_json = data['part_id']
+    except:
+        message = "part id not provided"
+        status_code = 400
+        return message, status_code
+
+    try:
+        workstation_id = data['workstation_id']
+    except:
+        message = "workstation id not provided"
+        status_code = 400
+        return message, status_code
+
+    try:
+        camera_select_list_from_post = data['camera_selected']
+    except:
+        message = "camera selected list not provided"
+        status_code = 400
+        return message, status_code
+
+    try:
+        overwrite_flag = data['overwrite_flag']
+    except:
+        overwrite_flag = False
+
+
+    # access the parts table
+    part_id = ObjectId(part_id_json)
+    mp = MongoHelper().getCollection(PARTS_COLLECTION)
+    part_row = mp.find_one({'_id': part_id})
+    parts_camera_dict = part_row.get('camera_selected')
+
+    ## Logic for if camera_selected not exist
+    if parts_camera_dict == {}:#--- Check this condition
+        parts_camera_dict[workstation_id] = camera_select_list_from_post
+        part_row['camera_selected'] = parts_camera_dict
+        mp.update({'_id': part_row['_id']}, {'$set': part_row})
+        message = "Camera selected list updated successfully"
+        status_code = 200
+        return message, status_code
+    else:
+        ## Logic for if camera_selected exists
+        if overwrite_flag == True:
+            for key in parts_camera_dict:
+                if key == workstation_id:
+                    parts_camera_dict[key] = camera_select_list_from_post
+                    part_row['camera_selected'] = parts_camera_dict
+                    mp.update({'_id': part_row['_id']}, {'$set': part_row})
+                    message = "Camera selection updated"
+                    status_code = 200
+                    return message, status_code
+
+        else:
+            for key in parts_camera_dict:
+                if key == workstation_id:
+                    ### Checking for overwrite camera id's [camera_id's present and need to be raised]
+                    existing_camera_list = parts_camera_dict[key]
+                    for current_ in existing_camera_list:
+                        if current_ in camera_select_list_from_post:
+                            experiments_list = MongoHelper().getCollection(part_id+"_experiment")
+                            p = [p for p in experiments_list.find()]
+                            for experiment in p:
+                                experiment_status = experiment.get('status')
+                                if experiment_status == "Running":
+                                    message = "Overwrite flag is raised"
+                                    status_code = 422
+                                    print("need to raise post for overwrite flag")
+                                    return message, status_code
+                    for new_ in camera_select_list_from_post:
+                        if new_ not in existing_camera_list:
+                            existing_camera_list.append(new_)
+                    parts_camera_dict[key] = existing_camera_list
+                    part_row['camera_selected'] = parts_camera_dict
+                    mp.update({'_id': part_row['_id']}, {'$set': part_row})
+                    message = "Camera selection updated"
+                    status_code = 200
+                    return message, status_code
+
+
+def start_camera_preview(data):
+
+    try:
+        workstation_id = data['workstation_id']
+    except:
+        message = "workstation id not provided"
+        status_code = 400
+        return message, status_code
+
+    try:
+        camera_name = data['camera_name']
+    except:
+        message = "camera name not provided"
+        status_code = 400
+        return message, status_code
+
+    # access the workstation table
+    workstation_id = ObjectId(workstation_id)
+    mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
+    ws_row = mp.find_one({'_id': workstation_id})
+    ws_camera_dict = ws_row.get('cameras')
+
+    for key, value in ws_camera_dict.iter():
+        if key == camera_name:
+            camera_id = ws_camera_dict[key]
+
+    topic = str(workstation_id)+str(camera_id)
+
+    logging.info('Creating the Producer object for streaming')
+    try:
+        producer_ws = Producer(KAFKA_BROKER_URL, topic)
+    except:
+        message = "Producer object creation failed"
+        status_code = 415
+        return message, status_code
+
+    ## Streaming the frames
+    logging.info('Initiating the stream')
+    status_code = producer_ws.stream_video("", workstation_id, camera_id)
+    logging.info('Done streaming')
+    print("status code after streaming " + str(status_code))
+    message = "Done streaming"
+    return message, status_code
+
+
+
+
+
+
+
 
 
