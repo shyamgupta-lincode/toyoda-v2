@@ -73,50 +73,38 @@ def start_producer_video_stream(data):
                         level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
     try:
-        part_id = data['part_id']
-    except:
-        message = "part id not provided"
-        status_code = 400
-        return message, status_code
-        
-    try:
-        workstation_id = data['workstation_id']
+        workstation_id = data['wid']
     except:
         message = "workstation id not provided"
         status_code = 400
         return message, status_code
 
     try:
-        camera_indexes = data['camera_indexes']
+        part_id = data['partid']
     except:
-        message = "camera indexes not provided"
+        message = "part id not provided"
         status_code = 400
         return message, status_code
 
-    jobs = []
+    try:
+        camera_name = data['cameraname']
+    except:
+        message = "camera name not provided"
+        status_code = 400
+        return message, status_code
 
-    for id in camera_indexes:
-        topic = str(part_id) + str(workstation_id)
-        p = multiprocessing.Process(target=start_multiprocess_stream, args=(KAFKA_BROKER_URL, topic, part_id,
-                                                                            workstation_id, id))
-        p.start()
-        jobs.append(p)
-        p.join()
+    # access the workstation table
+    workstation_id = ObjectId(workstation_id)
+    mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
+    ws_row = mp.find_one({'_id': workstation_id})
+    ws_camera_dict = ws_row.get('cameras')
 
-    for job in jobs:
-        print("Job exit code " + str(job.exitcode))
-        if int(job.exitcode) == 0:
+    for key, value in ws_camera_dict.iter():
+        if key == camera_name:
+            camera_id = ws_camera_dict[key]
 
-            status_code = 200
-            message = "Done streaming"
-            return message, status_code
-        else:
-            status_code = 400
-            message = "Streaming failed"
-            return message, status_code
+    topic = str(workstation_id)+str(part_id)+str(camera_id)
 
-
-def start_multiprocess_stream(KAFKA_BROKER_URL, topic, part_id, workstation_id, camera_id):
     logging.info('Creating the Producer object for streaming')
     try:
         producer_ws = Producer(KAFKA_BROKER_URL, topic)
@@ -125,15 +113,13 @@ def start_multiprocess_stream(KAFKA_BROKER_URL, topic, part_id, workstation_id, 
         status_code = 415
         return message, status_code
 
-    # # Streaming the frames
+    ## Streaming the frames
     logging.info('Initiating the stream')
     status_code = producer_ws.stream_video(part_id, workstation_id, camera_id)
     logging.info('Done streaming')
-    print("status code after streaming "+str(status_code))
-    if status_code == 200:
-        return 1
-    else:
-        return 0
+    print("status code after streaming " + str(status_code))
+    message = "Done streaming"
+    return message, status_code
 
 
 def start_camera_selection(data):
@@ -208,7 +194,6 @@ def start_camera_selection(data):
                                 if experiment_status == "Running":
                                     message = "Overwrite flag is raised"
                                     status_code = 422
-                                    print("need to raise post for overwrite flag")
                                     return message, status_code
                     for new_ in camera_select_list_from_post:
                         if new_ not in existing_camera_list:
@@ -224,14 +209,14 @@ def start_camera_selection(data):
 def start_camera_preview(data):
 
     try:
-        workstation_id = data['workstation_id']
+        workstation_id = data['wid']
     except:
         message = "workstation id not provided"
         status_code = 400
         return message, status_code
 
     try:
-        camera_name = data['camera_name']
+        camera_name = data['cameraname']
     except:
         message = "camera name not provided"
         status_code = 400

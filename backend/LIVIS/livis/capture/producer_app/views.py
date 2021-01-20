@@ -30,3 +30,29 @@ def producer_video_input(data):
         return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
+
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+def producer_camera_selection(data):
+    data = json.loads(data.body)
+    message, status_code = start_camera_selection(data)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
+
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+def producer_camera_preview(data):
+    data = json.loads(data.body)
+    message, status_code = start_camera_preview(data)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
+
+
