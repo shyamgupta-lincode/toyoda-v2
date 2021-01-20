@@ -725,15 +725,15 @@ def submit_annotations_util(data):
 
     mp = MongoHelper().getCollection(PARTS_COLLECTION)
     dataset = mp.find_one({'_id' : ObjectId(part_id)})
-    mp = MongoHelper().getCollection(str(dataset['_id']))
+    mp = MongoHelper().getCollection(str(dataset['_id'])+"_dataset")
     dataset = mp.find_one({'_id' : ObjectId(file_id)})
 
 
     #change annotation if modified
-    prev_classifier_label = dataset['classifier_label']
-    prev_region = dataset['regions']
-    classifier_label_history = ['classifier_label_history']
-    regions_history = ['regions_history']
+    prev_classifier_label = dataset['annotation_classification']
+    prev_region = dataset['annotation_detection']
+    classifier_label_history = ['annotation_classification_history']
+    regions_history = ['annotation_detection_history']
 
 
     #push to history if prev exists
@@ -753,17 +753,17 @@ def submit_annotations_util(data):
     #prepare new data to push
     data = {
         'state': state,
-        'classifier_label' : classifier_label,
-        'regions' : regions,
-        'classifier_label_history' : classifier_label_history,
-        'regions_history' : regions_history
+        'annotation_classification' : classifier_label,
+        'annotation_detection' : regions,
+        'annotation_classification_history' : classifier_label_history,
+        'annotation_detection_history' : regions_history
     }
 
 
     #goto that image in db
     mp = MongoHelper().getCollection(PARTS_COLLECTION)
     dataset = mp.find_one({'_id' : ObjectId(part_id)})
-    mp = MongoHelper().getCollection(str(dataset['_id']))
+    mp = MongoHelper().getCollection(str(dataset['_id'])+"_dataset")
     dataset = mp.find_one({'_id' : ObjectId(file_id)})
 
     #print(ObjectId(dataset['_id']))
@@ -787,27 +787,31 @@ def fetch_data_util(data):
                     
                     returns json containing list of images and its annotation data.
     """
+    
+    part_id = data['part_id']
+    parts_dataset_collection = str(part_id) + "_dataset"
+    current  = None
+    limit_to = None
+    total = None
 
+    try:
+        current = data['current']
+    except:
+        pass
+    try:
+        limit_to = data['limit']
+    except:
+        pass
+        
     try:
         mp = MongoHelper().getCollection(PARTS_COLLECTION)
     except:
         message = "Cannot connect to db"
         status_code = 500
-        return message,status_code
+        return total,current,limit_to,message,status_code
 
     # error handle part_id
-    part_id = data.GET['part_id']
-    current  = None
-    limit_to = None
 
-    try:
-        current = data.GET['current']
-    except:
-        pass
-    try:
-        limit_to = data.GET['limit']
-    except:
-        pass
 
     if current is not None:
         current = int(current)
@@ -817,7 +821,7 @@ def fetch_data_util(data):
     if part_id is None:
         message = "PartId not provided"
         status_code = 400
-        return message,status_code
+        return total,current,limit_to,message,status_code
 
     try:
         dataset = mp.find_one({'_id' : ObjectId(part_id.replace('"',''))})
@@ -825,19 +829,25 @@ def fetch_data_util(data):
         if dataset is None:
             message = "Part not found in Parts collection"
             status_code = 404
-            return message,status_code
+            return total,current,limit_to,message,status_code
 
     except Exception as e:
         message = "Invalid partID"
         status_code = 400
-        return message,status_code
+        return total,current,limit_to,message,status_code
 
-    _id = str(dataset['_id'])
 
-    mp = MongoHelper().getCollection(str(dataset['_id']))
+
+
+
+    mp = MongoHelper().getCollection(parts_dataset_collection)
+    #_id = str(dataset['_id'])
+
+    #mp = MongoHelper().getCollection(str(dataset['_id']))
 
     if current is None and limit_to is None:
         p = [i for i in mp.find()]
+        print(p)
     else:
         
         if current == 1:

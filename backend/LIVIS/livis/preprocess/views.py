@@ -9,6 +9,26 @@ from django.http import HttpResponse,StreamingHttpResponse
 
 
 
+
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+#@check_group(['admin'])
+def set_policy(data):
+    data = json.loads(data.body)
+    from preprocess.utils import set_policy_util
+    message,status_code = set_policy_util(data)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'Message' : 'Success!', 'data' : message}, cls=Encoder), content_type="application/json")
+    else:
+        return HttpResponse( {message}, status=status_code)
+        
+        
+        
+        
+        
+
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt

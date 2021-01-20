@@ -77,8 +77,11 @@ def submit_annotations(request):
 @api_view(['GET'])
 @csrf_exempt
 #@check_group(['admin' , 'operator'])
-def fetch_data(data):
+def fetch_data(request):
     from annotate.utils import fetch_data_util
+    print(request.body)
+    data = json.loads(request.body)
+    print(data)
     total,current,limit,message,status_code = fetch_data_util(data)
     if status_code == 200:
         return HttpResponse(json.dumps({'message' : 'Success!', 'data' : message,'total' : total,'current' : current,'limit' : limit}, cls=Encoder), content_type="application/json")

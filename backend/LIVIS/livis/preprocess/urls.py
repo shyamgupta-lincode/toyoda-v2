@@ -20,8 +20,10 @@ urlpatterns = [
                        re_path(r'^capture_util/$', views.capture_util),
                        re_path(r'^change_img/$', views.change_img),
                        re_path(r'^final_capture/$', views.final_capture),
-                       #re_path(r'^capture_part_image/$', views.capture_part_image),
-                       #re_path(r'^start_capture_camera/$', views.start_camera),
-                       #re_path(r'^stop_capture_camera/$', views.stop_camera)
+                       
+                       #for livis v2
+                       re_path(r'^set_policy/$', views.set_policy),
+
+                       
                        
 ]
