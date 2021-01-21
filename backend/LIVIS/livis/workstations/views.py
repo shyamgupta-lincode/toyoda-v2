@@ -24,7 +24,8 @@ from logs.utils import add_logs_util
         'workstation_ip': openapi.Schema(type=openapi.TYPE_STRING, example='1.1.1.1'),
         'workstation_port' : openapi.Schema(type=openapi.TYPE_STRING, example='8888'),
         'workstation_status': openapi.Schema(type=openapi.TYPE_BOOLEAN, example='true'),
-        'cameras' : openapi.Schema(type=openapi.TYPE_OBJECT, example=[{'camera_id' : '0','camera_name' : 'hey'},{'camera_id' : '1','camera_name' : 'hi'}]), 
+        'cameras' : openapi.Schema(type=openapi.TYPE_OBJECT, example=[{'camera_id' : '0','camera_name' : 'hey'},\
+                                                                      {'camera_id' : '1','camera_name' : 'hi'}]),
         'isdeleted' : openapi.Schema(type=openapi.TYPE_BOOLEAN, example='true')
     }
 ))
@@ -43,7 +44,8 @@ def add_workstation(request):
     data = json.loads(request.body)
     from workstations.utils import add_workstation_task
     added_workstation_id = add_workstation_task(data)
-    return HttpResponse(json.dumps({'message' : 'Workstation added Successfully!', 'added_workstation_id' : added_workstation_id}, cls=Encoder), content_type="application/json")
+    return HttpResponse(json.dumps({'message' : 'Workstation added Successfully!', 'added_workstation_id' : \
+        added_workstation_id}, cls=Encoder), content_type="application/json")
 
 
 @api_view(['DELETE'])
@@ -57,7 +59,8 @@ def delete_workstation(request, wid):
     add_logs_util(token_user_id,operation_type,notes)
     from workstations.utils import delete_workstation_task
     deleted_workstation_id = delete_workstation_task(wid)
-    return HttpResponse(json.dumps({'message' : 'Workstation deleted Successfully!', 'deleted_workstation_id' : deleted_workstation_id}, cls=Encoder), content_type="application/json")
+    return HttpResponse(json.dumps({'message' : 'Workstation deleted Successfully!', 'deleted_workstation_id' : \
+        deleted_workstation_id}, cls=Encoder), content_type="application/json")
 
 
 @swagger_auto_schema(method='patch', request_body=openapi.Schema(

@@ -1,0 +1,13 @@
+[{
+  "_id": {
+    "$oid": "5f3e6bdb16eb06dc4df2b0b2"
+  },
+  "part_number": "622120K180B0",
+  "isdeleted": false,
+  "meta": {
+    "model": "CA9",
+    "part_description": "FR PILLAR LH WITH SRS"
+  },
+  "kanban": null
+}
+]

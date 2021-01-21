@@ -240,10 +240,6 @@ def get_img_util(data):
 
     return message,status_code
 
-
-
-
-
 def get_dataset_list_util(skip=0, limit=100):
 
     try:
@@ -269,9 +265,6 @@ def get_dataset_list_util(skip=0, limit=100):
 
     return message,status_code
     
-
-
-
 #upload zip functionality
 def create_dataset_util(data):
 
@@ -294,7 +287,7 @@ def create_dataset_util(data):
 
     #get data from form to variables
 
-    # error handle zip file
+    # error handle zip file [extracts zip content in predefined constant path]
     file = data.FILES.get('myfile')
     if file is None:
         message = "No zip file provided"
@@ -312,7 +305,7 @@ def create_dataset_util(data):
         status_code = 415
         return message,status_code
     
-    # error handle db connectivity
+    # error handle db connectivity [Retrieving parts-collection]
     try:
         mp = MongoHelper().getCollection(PARTS_COLLECTION)
     except:
@@ -322,7 +315,7 @@ def create_dataset_util(data):
         #error connecting to db
 
 
-    # error handle part_id
+    # error handle part_id [Getting part ID]
     part_id =  data.POST.get('part_id')
     if part_id is None:
         message = "PartId not provided"

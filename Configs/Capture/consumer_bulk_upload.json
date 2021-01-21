@@ -1,0 +1,8 @@
+[
+  {
+    "broker_server": "broker:9092",
+    "mongo_host": "mongodb",
+    "mongo_port": 27017,
+    "topic_for_inference_results": "part_a"
+  }
+]

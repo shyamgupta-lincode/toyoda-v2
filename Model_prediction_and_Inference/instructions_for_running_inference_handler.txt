@@ -1,0 +1,15 @@
+To run Inference handler:
+docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ inference_img_2
+cd /apps/Model_prediction_and_Inference/
+python3 inference_handler.py broker_server mongo_host mongo_port part_name saved_model_path \
+ label_path topic_to_camera_service_for_results
+eg:
+python3 inference_handler.py "broker:9092" "mongodb" 27017 "part_a" "saved_model" "labels.txt" "topic1"
+
+
+To run consumer for inference results:
+docker run --network kafka-network -it -v ~/Documents/LincodeLabs/Livis_product/Republic/:/apps/ consumer
+cd /apps/Model_prediction_and_Inference/
+python3 consumer_for_inference_results.py topic_for_inference_results
+eg:
+python3 consumer_for_inference_results.py "topic1"

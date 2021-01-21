@@ -1,0 +1,149 @@
+[{
+  "_id": {
+    "$oid": "5f0e8454578a96b642f556a2"
+  },
+  "part_number": "ZE-383M",
+  "model": "CA9",
+  "bath_number_denominator": 5,
+  "isdeleted": false,
+  "kanban": {
+    "defect_list": [
+      "damaged_cell",
+      "mantle_dent",
+      "misalignment_edge",
+      "model_no_double_marking",
+      "yellow_dot_double_marking",
+      "white_dot_double_marking",
+      "innershell_bad",
+      "coilcore_absent",
+      "abnormal_coating",
+      "Plugged_cells"
+    ],
+    "feature_list": [
+      "white_dot",
+      "white",
+      "model_no",
+      "arrow",
+      "lotmark"
+    ],
+    "plugged_cell": 3,
+    "model_no": "ca9"
+  }
+},{
+  "_id": {
+    "$oid": "5f0eaecb5fd3c8ea95da37f2"
+  },
+  "part_number": "ZE-382M",
+  "model": "CA8",
+  "bath_number_denominator": 8,
+  "isdeleted": false,
+  "kanban": {
+    "defect_list": [
+      "misalignment",
+      "slurry_stick",
+      "plugged_cell"
+    ],
+    "feature_list": [
+      "yellow_dot",
+      "brown",
+      "lotmark",
+      "arrow",
+      "model_no"
+    ],
+    "plugged_cell": 3,
+    "model_no": "ca8"
+  }
+},{
+  "_id": {
+    "$oid": "5f16e2afb27341ef97cd7ef9"
+  },
+  "part_number": "ZE-387M",
+  "model": "CA11",
+  "bath_number_denominator": 8,
+  "isdeleted": false,
+  "kanban": {
+    "defect_list": [
+      "misalignment",
+      "slurry_stick",
+      "plugged_cell"
+    ],
+    "feature_list": [
+      "white",
+      "lotmark",
+      "arrow",
+      "model_no",
+      "white_dot"
+    ],
+    "plugged_cell": 3,
+    "model_no": "ca11"
+  }
+},{
+  "_id": {
+    "$oid": "5f1ff702b43c5e436f8c1fba"
+  },
+  "part_number": "ZE-386M",
+  "model": "CA10",
+  "bath_number_denominator": 8,
+  "isdeleted": false,
+  "kanban": {
+    "defect_list": [
+      "misalignment",
+      "slurry_stick",
+      "plugged_cell",
+      "coil_absent"
+    ],
+    "feature_list": [
+      "white",
+      "lotmark",
+      "arrow",
+      "model_no",
+      "yellow_dot"
+    ],
+    "plugged_cell": 3,
+    "model_no": "ca10"
+  }
+},{
+  "_id": {
+    "$oid": "5f9185c7697f01a998c9b377"
+  },
+  "part_number": "ZE-397M",
+  "model": "CA14",
+  "bath_number_denominator": "8",
+  "isdeleted": false,
+  "kanban": {
+    "defect_list": [
+      "misalignment_edge"
+    ],
+    "feature_list": [
+      "lotmark",
+      "white_dot",
+      "model_no",
+      "arrow",
+      "white"
+    ],
+    "plugged_cell": 3,
+    "model_no": "ca14"
+  }
+},{
+  "_id": {
+    "$oid": "5f9188a7bda35cbcd48ebb17"
+  },
+  "part_number": "ZE-396M",
+  "model": "CA13",
+  "bath_number_denominator": "8",
+  "isdeleted": false,
+  "kanban": {
+    "defect_list": [
+      "misalignment_edge"
+    ],
+    "feature_list": [
+      "lotmark",
+      "yellow_dot",
+      "model_no",
+      "arrow",
+      "white"
+    ],
+    "plugged_cell": 3,
+    "model_no": "ca13"
+  }
+}]

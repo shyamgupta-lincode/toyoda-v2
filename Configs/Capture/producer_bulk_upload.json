@@ -1,0 +1,10 @@
+[
+  {
+    "zip_file_path": "part_a.zip",
+    "archive_format": "zip",
+    "part_name": "part_a",
+    "topic": "topic1",
+    "broker_server": "broker:9092",
+    "file_format": "jpg"
+  }
+]

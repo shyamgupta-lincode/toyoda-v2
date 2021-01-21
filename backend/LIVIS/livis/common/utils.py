@@ -61,7 +61,8 @@ class MongoHelper:
             return DB[s.MONGO_COLLECTIONS[cname]]
         else:
             return DB[cname]
-  
+
+
 class Encoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, ObjectId):
