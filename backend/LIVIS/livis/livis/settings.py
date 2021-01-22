@@ -183,6 +183,7 @@ PARTS_COLLECTION = 'parts'
 SHIFT_COLLECTION = 'shift'
 PLAN_COLLECTION = 'plan'
 LOGS_COLLECTION = 'logs'
+MODEL_COLLECTION = 'model_collections'
 
 
 
