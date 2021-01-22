@@ -12,6 +12,7 @@ from pymongo import MongoClient
 from common.utils import MongoHelper
 from bson import ObjectId
 
+consumer_mount_path = "/apps/Livis"
 
 class Consumer():
     """
@@ -29,6 +30,7 @@ class Consumer():
         """
         self.obj = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL,
         value_deserializer=lambda value: json.loads(value), auto_offset_reset=auto_offset_reset_value,)
+        
         self.topic = topic
 
     def apply_crops(img, x,y,w,h):
@@ -53,6 +55,7 @@ class Consumer():
         frame_iter_ = 0
         for message in self.obj:
             # Decoding the image stream
+            print("Consuming the value")
             im_b64_str = message.value["frame"]
             im_b64 = bytes(im_b64_str[2:], 'utf-8')
             im_binary = base64.b64decode(im_b64)
@@ -97,7 +100,11 @@ class Consumer():
             logging.info('Received frame %s of part %s', frame_iter_, part_id)
         return 1
 
+
+
+
     def collect_stream_for_preview(self, part_id, workstation_id):
+        print("called1")
         """"
         Receives the encoded image frames from the prescribed topic
 
@@ -106,16 +113,26 @@ class Consumer():
             part_id: part name/id being captured in the image frames
 
         """
-        for message in self.obj:
-            # Decoding the image stream
-            im_b64_str = message.value["frame"]
-            im_b64 = bytes(im_b64_str[2:], 'utf-8')
-            im_binary = base64.b64decode(im_b64)
+        
+            
+        while True:
+            
+            for message in self.obj:
+                print("called2")
 
-            im_arr = np.frombuffer(im_binary, dtype=np.uint8)
-            img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
+                im_b64_str = message.value["frame"]
+                im_b64 = bytes(im_b64_str[2:], 'utf-8')
+                im_binary = base64.b64decode(im_b64)
 
-            ret, jpeg = cv2.imencode('.jpg', img)
-            frame = jpeg.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+                im_arr = np.frombuffer(im_binary, dtype=np.uint8)
+                img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
+            
+
+                ret, jpeg = cv2.imencode('.jpg', img)
+                print(jpeg)
+                cv2.imshow("frane",jpeg)
+                cv2.waitKey(0)
+            
+                frame = jpeg.tobytes()
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')

@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'parts.apps.PartsConfig',
     'shifts.apps.ShiftsConfig',
     'reports.apps.ReportsConfig',
+    'capture.apps.CaptureConfig',
     'workstations.apps.WorkstationsConfig',
     'annotate.apps.AnnotateConfig',
     'plan.apps.PlanConfig',

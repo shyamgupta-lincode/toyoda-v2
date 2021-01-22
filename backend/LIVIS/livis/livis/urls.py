@@ -43,6 +43,7 @@ urlpatterns = [
     re_path(r'livis/v1/accounts/', include("accounts.urls")),
     #re_path(r'livis/v1/accounts/', include('django.contrib.auth.urls')),
     re_path(r'livis/v1/parts/', include("parts.urls")),
+    re_path(r'livis/v1/capture/', include("capture.urls")),
     re_path(r'livis/v1/shifts/', include("shifts.urls")),
     re_path(r'livis/v1/reports/', include("reports.urls")),
     re_path(r'livis/v1/workstations/', include("workstations.urls")),
