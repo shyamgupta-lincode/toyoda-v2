@@ -22,9 +22,6 @@ consumer_mount_path = "/apps/Livis"
 
 
 
-
-
-
 def get_camera_feed_urls():
 
     try:
@@ -42,6 +39,7 @@ def get_camera_feed_urls():
     workstation_id = p['_id']
 
     feed_urls = []
+    dummmy_dct = {}
     
     
     workstation_id = ObjectId(workstation_id)
@@ -51,8 +49,10 @@ def get_camera_feed_urls():
     print(ws_camera_dict)
     
     for i in ws_camera_dict:
+        
         url = "http://127.0.0.1:8000/livis/v1/capture/consumer_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
-        feed_urls.append(url)
+        dummmy_dct = {"camera_name":i['camera_name'] , "camera_url":url}
+        feed_urls.append(dummmy_dct)
     if feed_urls:
         return feed_urls
     else:
