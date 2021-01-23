@@ -671,7 +671,7 @@ def submit_annotations_util(data):
         return message,status_code
 
     try:
-        file_id = data.get('id')
+        file_id = data.get('file_id')
     except:
         message = "FileId not provided"
         status_code = 400
@@ -685,14 +685,16 @@ def submit_annotations_util(data):
         return message,status_code
 
     try:
-        regions = data.get('regions')
+        regions = data.get('annotation_detection')
     except:
         message = "regions not provided"
         status_code = 400
         return message,status_code
 
 
-    classifier_label = data.get('classifier_label')
+    classifier_label = data.get('annotation_classification')
+    
+    
     
     #wandh = pixelSize["pixelSize"]
     width = pixelSize["w"]

@@ -49,6 +49,7 @@ def consumer_camera_preview(request,wid,cameraname):
 @permission_classes((AllowAny,))
 def camera_selection(data):
     data = json.loads(data.body)
+    print(data)
     message, status_code = start_camera_selection(data)
     if status_code == 200:
         return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")

@@ -60,11 +60,7 @@ def add_user_account(request):
 @csrf_exempt
 def get_user_account(request,client_id):
 
-    token_user_id = request.user.user_id
-    operation_type = "accounts"
-    notes = "get user account"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+
     
     
     from accounts.utils import get_user_account_util
@@ -128,11 +124,7 @@ def delete_user_account(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_all_user_accounts(request):
-    token_user_id = request.user.user_id
-    operation_type = "accounts"
-    notes = "get all user"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+
     token_user_id = request.user.user_id
     token_user_email = request.user.email
     print("user email:::",token_user_email)
@@ -225,11 +217,7 @@ def delete_user_si(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_si(request,client_id):
-    token_user_id = request.user.user_id
-    operation_type = "accounts"
-    notes = "get si user"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+
     from accounts.utils import get_user_si_util
     response = get_user_si_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -239,11 +227,7 @@ def get_user_si(request,client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_sis(request):
-    token_user_id = request.user.user_id
-    operation_type = "accounts"
-    notes = "get user sis"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+
     from accounts.utils import get_user_sis_util
     response = get_user_sis_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 
@@ -337,11 +321,7 @@ def delete_user_client(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_client(request,client_id):
-    token_user_id = request.user.user_id
-    operation_type = "accounts"
-    notes = "get user client"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+
     from accounts.utils import get_user_client_util
     response = get_user_client_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -352,11 +332,7 @@ def get_user_client(request,client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_list_client(request,client_id):
-    token_user_id = request.user.user_id
-    operation_type = "accounts"
-    notes = "get user client"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+
     from accounts.utils import get_list_client_util
     response = get_list_client_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -369,11 +345,7 @@ def get_list_client(request,client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_clients(request):
-    token_user_id = request.user.user_id
-    operation_type = "accounts"
-    notes = "get user clients"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+
     from accounts.utils import get_user_clients_util
     response = get_user_clients_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 
@@ -412,11 +384,7 @@ def add_client_account(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_client_account(request,client_id):
-    token_user_id = request.user.user_id
-    operation_type = "accounts"
-    notes = "get client account"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+
     from accounts.utils import get_client_account_util
     response = get_client_account_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -466,11 +434,7 @@ def delete_client_account(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_all_client_accounts(request):
-    token_user_id = request.user.user_id
-    operation_type = "accounts"
-    notes = "get all client account"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+
     from accounts.utils import get_all_client_accounts_util
     response = get_all_client_accounts_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 
@@ -511,11 +475,7 @@ def add_si_account(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_si_account(request,client_id):
-    token_user_id = request.user.user_id
-    operation_type = "accounts"
-    notes = "get si account"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+
     from accounts.utils import get_si_account_util
     response = get_si_account_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -567,11 +527,7 @@ def delete_si_account(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_all_si_accounts(request):
-    token_user_id = request.user.user_id
-    operation_type = "accounts"
-    notes = "get all si account"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+
     from accounts.utils import get_all_si_accounts_util
     response = get_all_si_accounts_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 

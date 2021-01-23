@@ -23,7 +23,8 @@ def add_part_details_task(data):
            'part_description' : part_description,
            'isdeleted' : isdeleted,
            'kanban' : kanban,
-           'created_at': createdAt
+           'created_at': createdAt,
+           'camera_selected':{}
         }
         _id = mp.insert(collection_obj)
         return _id

@@ -289,8 +289,11 @@ def start_camera_selection(data):
     part_id = ObjectId(part_id_json)
     mp = MongoHelper().getCollection(PARTS_COLLECTION)
     part_row = mp.find_one({'_id': part_id})
-    parts_camera_dict = part_row.get('camera_selected')
-    
+    parts_camera_dict = None
+    try:
+        parts_camera_dict = part_row.get('camera_selected')
+    except:
+        pass
     print("var is")
     print(parts_camera_dict)
 
@@ -305,7 +308,7 @@ def start_camera_selection(data):
         new1['camera_selected'] = new
         #part_row['camera_selected'] = parts_camera_dict
         
-        
+
         mp.update({'_id': part_row['_id']}, {'$set': new1})
         message = "Camera selected list updated successfully"
         status_code = 200
@@ -317,8 +320,8 @@ def start_camera_selection(data):
                 if key == workstation_id:
                     parts_camera_dict[key] = camera_select_list_from_post
                     new = {}
-                    new['camera_selected'] = camera_select_list_from_post
-                    part_row['camera_selected'] = parts_camera_dict
+                    new = {workstation_id:camera_select_list_from_post}
+                    #part_row['camera_selected'] = parts_camera_dict
                     
                     new1 = {}
                     new1['camera_selected'] = new
@@ -347,8 +350,14 @@ def start_camera_selection(data):
                         if new_ not in existing_camera_list:
                             existing_camera_list.append(new_)
                     parts_camera_dict[key] = existing_camera_list
-                    part_row['camera_selected'] = parts_camera_dict
-                    mp.update({'_id': part_row['_id']}, {'$set': part_row})
+                    new = {}
+                    new = {workstation_id:camera_select_list_from_post}
+                    #part_row['camera_selected'] = parts_camera_dict
+                    
+                    new1 = {}
+                    new1['camera_selected'] = new
+                    print(new1)
+                    mp.update({'_id': part_row['_id']}, {'$set': new1})
                     message = "Camera selection updated"
                     status_code = 200
                     return message, status_code
