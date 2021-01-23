@@ -31,7 +31,7 @@ def get_model_data(request,experiment_type):
 def create_experiment_modified(request):
     config = json.loads(request.body)
     from training.tasks import add_experiment_modified
-    experiment_id_ = add_experiment_modified(config)
+    experiment_id_= add_experiment_modified(config)
     experiment_id_ = str(experiment_id_)
     response = {'experiment_id': experiment_id_}
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
