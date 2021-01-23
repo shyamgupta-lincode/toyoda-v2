@@ -23,6 +23,7 @@ urlpatterns = [
                        
                        #for livis v2
                        re_path(r'^set_policy/$', views.set_policy),
+                       re_path(r'^get_policy/$', views.get_policy),
 
                        
                        

@@ -52,6 +52,8 @@ def set_policy_util(data):
 
           
     camera_id = data['camera_id']
+    
+    
 
     try:
         mp = MongoHelper().getCollection(PARTS_COLLECTION)
@@ -128,7 +130,113 @@ def set_policy_util(data):
         
 
     
+
+def get_policy_util(data):
+
+    message = None
+    status_code = None
+    regions = None
+    brightness = None
+    hue = None
+
+   
+    try:
+        part_id_json = data['part_id']
+    except:
+        message = "part id not provided"
+        status_code = 400
+        return message, status_code
+
+    try:
+        workstation_id = data['workstation_id']
+    except:
+        message = "workstation id not provided"
+        status_code = 400
+        return message, status_code
+
+    try:
+        camera_id = data['camera_id']
+    except:
+        message = "camera_id not provided"
+        status_code = 400
+        return message, status_code
+
+
+
+    try:
+        mp = MongoHelper().getCollection(PARTS_COLLECTION)
+    except Exception as e:
+        message = "Cannot connect to db"
+        status_code = 500
+        return message,status_code
+
+    part_id =  data['part_id']
+    if part_id is None:
+        message = "part id not provided"
+        status_code = 400
+        return message,status_code
+
+    try:
+        dataset = mp.find_one({'_id' : ObjectId(part_id)})
+        if dataset is None:
+            message = "Part not found in Parts collection"
+            status_code = 404
+            return message,status_code
+
+    except Exception as e:
+        message = "Invalid PartId"
+        status_code = 400
+        return message,status_code
+       
+       
+    try:
+        mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
+    except Exception as e:
+        message = "Cannot connect to db"
+        status_code = 500
+        return message,status_code
+
+    workstation_id =  data['workstation_id']
+    if workstation_id is None:
+        message = "workstation_id not provided"
+        status_code = 400
+        return message,status_code
+
+    try:
+        dataset = mp.find_one({'_id' : ObjectId(workstation_id)})
+        if dataset is None:
+            message = "workstation not found in workstation collection"
+            status_code = 404
+            return message,status_code
+
+    except Exception as e:
+        message = "Invalid workstationid "
+        status_code = 400
+        return message,status_code 
+        
+    preprocessing_coll = str(part_id)+"_preprocessingpolicy"
+    mp = MongoHelper().getCollection(preprocessing_coll)
     
+    rp = [p for p in mp.find(  {"$and" : [ {"workstation_id": workstation_id }, { "camera_id" : camera_id } ] } )]
+    
+    """
+    if len(rp) == 0:
+        #record not found - insert
+        if regions is not None:
+            sc = {"workstation_id": workstation_id, "camera_id" : camera_id , "policy": {"crop":regions} }
+            _id = mp.insert(sc)
+
+         
+    else:
+
+        #record dound - update
+        _id = rp[0]['_id']
+        if regions is not None:
+            sc = {"workstation_id": workstation_id, "camera_id" : camera_id , "policy": {"crop":regions} }
+            mp.update({'_id' : rp[0]['_id']}, {'$set' :  sc})    
+    """
+    
+    return rp,200 
 
 
 
