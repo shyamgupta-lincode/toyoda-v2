@@ -1,0 +1,39 @@
+[{
+  
+    "type": "range",
+    "key": "batch_size",
+    "default_value": 2,
+    "label_name": "batch_size",
+    "value" : ""
+},
+{
+  
+  "type": "text",
+  "key": "no_of_steps",
+  "default_value": 10000,
+  "label_name": "no_of_steps",
+  "value" : ""
+},
+{
+  
+  "type": "text",
+  "key": "learning_rate",
+  "default_value": 0.04,
+  "label_name": "learning_rate",
+  "value" : ""
+},
+{
+  
+    "type": "radio",
+    "key": "SGD",
+    "default_value": "SGD",
+    "label_name": "optimizer",
+    "value": "",
+    "options": [
+      {"value": "SGD", "label": "SGD_optimizer"},
+      {"value": "RMS", "label": "RMS_optimizer"}
+    ]
+
+  
+}
+]

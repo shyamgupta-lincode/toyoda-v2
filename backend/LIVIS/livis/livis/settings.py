@@ -187,6 +187,7 @@ SHIFT_COLLECTION = 'shift'
 PLAN_COLLECTION = 'plan'
 LOGS_COLLECTION = 'logs'
 ASSECTS_COLLECTION = 'assects'
+MODEL_COLLECTION = 'model_collections'
 
 
 

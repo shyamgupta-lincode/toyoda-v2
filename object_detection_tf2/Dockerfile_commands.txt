@@ -1,0 +1,21 @@
+python generate_tfrecords.py -x /media/snehal/2c6e57b3-ed0c-4926-a4e1-fca4d64a4386/snehal/models/research/object_detection/images/train -l /media/snehal/2c6e57b3-ed0c-4926-a4e1-fca4d64a4386/snehal/models/research/object_detection/training/label_map.pbtxt -o /media/snehal/2c6e57b3-ed0c-4926-a4e1-fca4d64a4386/snehal/models/research/object_detection/train.record
+
+
+sudo docker run  --gpus all -v '/media/snehal/2c6e57b3-ed0c-4926-a4e1-fca4d64a4386/snehal/mount_directory':'/var_data2' -p 3000:6006 --network host -ti object_detection_v1  
+
+
+
+
+######### Traial command for linking DB to code container ########################
+#starting object detection container
+sudo docker run  --gpus all -v '/media/snehal/2c6e57b3-ed0c-4926-a4e1-fca4d64a4386/snehal/mount_directory':'/var_data2'  -ti ob1 /bin/bash
+
+#link containers
+sudo docker run  --gpus all   -v '/media/snehal/2c6e57b3-ed0c-4926-a4e1-fca4d64a4386/snehal/mount_directory':'/data' -p 27018:27017   --link mongodb:0bee07580f07  -ti ob1 /bin/bash
+
+# starting mongodb service
+sudo docker run -v '/media/snehal/2c6e57b3-ed0c-4926-a4e1-fca4d64a4386/snehal/mongo_data':'/data' --name mongodb mongo
+
+##################################################################################
+
+

@@ -11,6 +11,41 @@ from drf_yasg import openapi
 from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
 from drf_yasg.utils import swagger_auto_schema
 
+@api_view(['GET'])
+@csrf_exempt
+def get_model_data(request,experiment_type):
+    #config = json.loads(request.body)
+    from training.tasks import get_model,create_model_collections
+    # client =MongoClient('localhost', 27017)
+    # mp = client.Model_Collection
+    # para = mp.model_collection.find({"model_type":config["model_type"]})
+    create_collection = create_model_collections()
+    para = get_model(experiment_type)
+    
+    # print(para)
+    return HttpResponse(json.dumps(para, cls=Encoder), content_type="application/json")
+
+
+@api_view(['POST'])
+@csrf_exempt
+def create_experiment_modified(request):
+    config = json.loads(request.body)
+    from training.tasks import add_experiment_modified
+    experiment_id_= add_experiment_modified(config)
+    experiment_id_ = str(experiment_id_)
+    response = {'experiment_id': experiment_id_}
+    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+@api_view(['POST'])
+@csrf_exempt
+def create_retrain_experiment(request):
+    config = json.loads(request.body)
+    from training.tasks import add_retrain_experiment
+    status = add_retrain_experiment(config)
+    response = {"status":status}
+    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+
 
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT, 
@@ -21,6 +56,10 @@ from drf_yasg.utils import swagger_auto_schema
         'type' : openapi.Schema(type=openapi.TYPE_STRING, example='tf'),
     }
 ))
+
+
+
+
 @api_view(['POST'])
 @csrf_exempt
 def create_experiment(request):
@@ -31,6 +70,8 @@ def create_experiment(request):
     process_job_request.delay(config, experiment_id)
     response = {'experiment_id': experiment_id}
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+
 
 @api_view(['GET'])
 @csrf_exempt

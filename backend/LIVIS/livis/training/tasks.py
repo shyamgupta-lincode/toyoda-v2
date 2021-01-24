@@ -18,10 +18,39 @@ from fastai.vision.all import *
 from fastai.callback.all import *
 from fastai.vision import *
 from livis.settings import *
-
+import datetime
+import json
 MODEL_MAP = {"resnet34" : models.resnet34}
 
+def create_model_collections():
+    json_file_path = os.path.join(os.getcwd(),"training","pipeline.json")
+    parameter_path = os.path.join(os.getcwd(),"training","parameter.json")
+    with open(json_file_path) as f:
+        data = json.load(f)
+    with open(parameter_path) as f1:
+        para_data = json.load(f1)
 
+    mp = MongoHelper().getCollection("model_collections")
+    collection_object = {
+    "checkpoint_path" : "/PATH/TO/CHECKPOINTS",
+    "model_name" : "faster_rcnn_resnet50",
+    "model_type" : "detection",
+    "config" : data,
+    "editable_parameters" :para_data}
+# print(collection_object)
+    # if not mp.countDocuments ==0:
+    #     pass
+    # else:
+    model_collection = mp.insert_one(collection_object)    
+    return model_collection 
+
+def get_model(experiment_type):
+    mp = MongoHelper().getCollection("model_collections")
+    para = mp.find({"model_type":experiment_type})
+    # list_ed_para = []
+    for doc in para:
+        values = [{ "id" :doc["_id"],"ckpt_path" :doc["checkpoint_path"],"model_name" :doc["model_name"],"editable_para" : doc["editable_parameters"]}]    
+        return values
 
 def test_fastai():
     config =  {"opt": "radam", "status": "initialized", "img_size": 224, "augmentations": {"flip_horizontly": True, "do_flip": True, "zoom": 0.2},
@@ -48,6 +77,46 @@ def add_experiment(config):
     }
     experiment_id = mp.insert(collection_obj)
     return experiment_id
+
+def add_experiment_modified(config):
+    part_id = config.get('part_id')
+    experiment_name = config.get('experiment_name', None)
+    experiment_type = config.get('experiment_type', None)
+    hyperparameters = config.get('hyperparameters',None)
+    model_id = config.get('model_id',None)
+    mp = MongoHelper().getCollection(str(part_id) + '_experiment')
+    collection_obj = {
+            'status' : 'Initialized',
+            'created_at':datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+            'experiment_name' : experiment_name,
+            'experiment_type' : experiment_type,
+            'hyperparameters' : hyperparameters,
+            'part_id' : part_id,
+            'model_id':model_id
+    }
+    experiment_id_ = mp.insert(collection_obj)
+    return experiment_id_
+    
+def add_retrain_experiment(config):
+    experiment_id = config.get('experiment_id') 
+    retrain_status = config.get('retrain_status')
+    part_id = config.get('part_id')
+    # mp =  MongoHelper().getCollection(str(experiment_id))
+    mp =MongoHelper().getCollection(str(part_id) + '_experiment') 
+    status = "Success" 
+    # # default_data.update({'item3': 3})
+    # collection_obj.update({'retrain_status' : retrain_status})
+    # collection_obj.update({'original_exp_id' : experiment_id})
+    # collection_obj.update({ 'status' : status})
+    mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'retrain': retrain_status}}, upsert=False, full_response= True)
+
+    # collection_ob = {
+    #     'retrain_status' : retrain_status,
+    #     'original_exp_id' : experiment_id,
+    #     'status' :status
+    # }
+    # retrain_exp_id = mp.insert_one(collection_ob)
+    return status
 
 
 def train_fastai(config, experiment_id):
@@ -311,7 +380,8 @@ def deploy_experiment_util(data):
                     'deployed_on_workstations': workstation_ids
                 }
                 mp.update({'_id' : ObjectId(i['_id'])}, {'$set' : collection_obj})
-                return i       
+                return i  
+                # return mp.find_one({'_id' : ObjectId(i['_id'])})     
     except Exception as e:   
         print(e)     
         return {}

@@ -193,3 +193,7 @@ Thumbs.db
 
 
 /backend/LIVIS/livis/training/image_data/*
+
+
+object_detection_tf2/models/research/object_detection/training/faster_rcnn_resnet50_v1_1024x1024_coco17_tpu-8/checkpoint
+object_detection_tf2/models/research/object_detection/training/faster_rcnn_resnet50_v1_1024x1024_coco17_tpu-8/saved_model
