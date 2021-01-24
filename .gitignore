@@ -110,6 +110,9 @@ ENV/
 env.bak/
 venv.bak/
 
+.png
+.jpg
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -187,3 +190,6 @@ testem.log
 # System Files
 Thumbs.db
 /Capture/mongo_collections/
+
+
+/backend/LIVIS/livis/training/image_data/*
