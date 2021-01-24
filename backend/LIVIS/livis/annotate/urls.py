@@ -9,6 +9,7 @@ urlpatterns = [
                        re_path(r'^next_img/$', views.next_img),
                        re_path(r'^prev_img/$', views.prev_img),
                        re_path(r'^get_img/$', views.get_img),
+                       re_path(r'^delete_img/$', views.delete_img),
                        re_path(r'^get_dataset/$', views.get_dataset_list),
                        re_path(r'^create_dataset/$', views.create_dataset),
                        re_path(r'^get_data_for_histogram/$', views.get_data_for_histogram),

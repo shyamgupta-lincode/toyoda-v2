@@ -58,7 +58,7 @@ def next_img_util(data):
 
         
     try:   
-        mp = MongoHelper().getCollection(str(dataset['_id']))
+        mp = MongoHelper().getCollection(str(dataset['_id']+"_dataset"))
     except:
         message = "Cannot connect to db"
         status_code = 500
@@ -135,7 +135,7 @@ def prev_img_util(data):
 
         
     try:   
-        mp = MongoHelper().getCollection(str(dataset['_id']))
+        mp = MongoHelper().getCollection(str(dataset['_id']+"_dataset"))
     except:
         message = "Cannot connect to db"
         status_code = 500
@@ -215,7 +215,7 @@ def get_img_util(data):
 
         
     try:   
-        mp = MongoHelper().getCollection(str(dataset['_id']))
+        mp = MongoHelper().getCollection(str(dataset['_id'])+"_dataset")
     except:
         message = "Cannot connect to db"
         status_code = 500
@@ -614,6 +614,91 @@ def fetch_image_url_util(data):
 
     return message,status_code
 
+def delete_img_util(data):
+
+    message = None
+    status_code = None
+
+    part_id = data.GET['part_id']
+    if part_id is None:
+        message = "PartId not provided"
+        status_code = 400
+        return message,status_code
+
+    try:
+        mp = MongoHelper().getCollection(PARTS_COLLECTION)
+    except:
+        message = "Cannot connect to db"
+        status_code = 500
+        return message,status_code
+
+    try:
+        dataset = mp.find_one({'_id' : ObjectId(part_id)})
+        if dataset is None:
+            message = "Part not found in Parts collection"
+            status_code = 404
+            return message,status_code
+
+    except Exception as e:
+        message = "Invalid partID"
+        status_code = 400
+        return message,status_code
+
+    file_id = data.GET['file_id']
+    if file_id is None:
+        message = "FileId not provided"
+        status_code = 400
+        return message,status_code
+
+        
+    try:   
+        mp = MongoHelper().getCollection(str(dataset['_id']+"_dataset"))
+    except:
+        message = "Cannot connect to db"
+        status_code = 500
+        return message,status_code
+    
+    try:
+        dataset = mp.find_one({'_id' : ObjectId(str(file_id))})
+        if dataset is None:
+            message = "File not found in Parts collection"
+            status_code = 404
+            return message,status_code
+        
+    except Exception as e:
+        message = "Invalid FileID"
+        status_code = 400
+        return message,status_code
+    
+    #p = [i for i in mp.find()]
+    file_path = dataset['file_path']
+    if os.path.exists(file_path): 
+        os.remove(file_path)
+
+    #_id = dataset['_id']
+
+    try:
+
+        import pymongo
+        myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+
+        mydb = myclient["LIVIS"]
+        mycol = mydb[str(jig_id)]
+
+        result = mycol.delete_one({'_id': ObjectId(file_id)})
+
+    except Exception as e:
+        print(e)
+        message = "error while deleting from db"
+        status_code = 500
+
+    message = dataset
+    status_code = 200
+
+    return message,status_code
+
+
+
 def submit_annotations_util(data):
     """
     usage : POST REQUEST JSON
@@ -771,6 +856,7 @@ def submit_annotations_util(data):
 
 #getdata
 def fetch_data_util(data):
+    print(data)
     """
     usage : GET REQUEST JSON
     {
@@ -783,18 +869,18 @@ def fetch_data_util(data):
                     returns json containing list of images and its annotation data.
     """
     
-    part_id = data['part_id']
+    part_id = data.GET['part_id']
     parts_dataset_collection = str(part_id) + "_dataset"
     current  = None
     limit_to = None
     total = None
 
     try:
-        current = data['current']
+        current = data.GET['current']
     except:
         pass
     try:
-        limit_to = data['limit']
+        limit_to = data.GET['limit']
     except:
         pass
         

@@ -53,7 +53,7 @@ if workstations:
         wids = w_s['_id']
         for c in cameras:
             camera_ids = c['camera_id']
-            list_of_topics.append(str(wids)+"_"+str(camera_ids))
+            list_of_topics.append(str(wids)+"_"+str(camera_ids)+"_input")
 
 
 jobs = []

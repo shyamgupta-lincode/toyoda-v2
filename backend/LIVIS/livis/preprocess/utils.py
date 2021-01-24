@@ -113,7 +113,7 @@ def set_policy_util(data):
     
     if len(rp) == 0:
         #record not found - insert
-        if regions is not None:
+        if regions is not None and regions != '' and len(regions) > 0:
             sc = {"workstation_id": workstation_id, "camera_id" : camera_id , "policy": {"crop":regions} }
             _id = mp.insert(sc)
 

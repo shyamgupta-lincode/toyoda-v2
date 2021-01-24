@@ -20,7 +20,14 @@ def get_capture_feed_url(request):
     from capture.utils import get_camera_feed_urls
     url = get_camera_feed_urls()
     return HttpResponse(json.dumps({'data': url}), content_type="application/json")
-    
+
+@api_view(['GET'])
+@csrf_exempt
+@permission_classes((AllowAny,))
+def get_inference_feed_url(request):
+    from capture.utils import get_inference_feed_url_util
+    url = get_inference_feed_url_util()
+    return HttpResponse(json.dumps({'data': url}), content_type="application/json")
     
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,))
@@ -42,6 +49,12 @@ def capture_image(request):
 def consumer_camera_preview(request,wid,cameraname):
     return StreamingHttpResponse(start_camera_preview(wid,cameraname), content_type='multipart/x-mixed-replace; boundary=frame')
 
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+@permission_classes((AllowAny,))
+def inference_feed(request,wid,cameraname):
+    return StreamingHttpResponse(start_inference(wid,cameraname), content_type='multipart/x-mixed-replace; boundary=frame')
 
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,))

@@ -9,6 +9,21 @@ import json
 
 ##########
 
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+#@check_group(['admin'])
+def delete_img(data):
+    data = json.loads(data.body)
+    from annotate.utils import delete_img_util
+    message,status_code = delete_img_util(data)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'Message' : 'Success!', 'data' : message}, cls=Encoder), content_type="application/json")
+    else:
+        return HttpResponse( {message}, status=status_code)
+        
+        
 @api_view(['GET'])
 @renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
@@ -77,11 +92,11 @@ def submit_annotations(request):
 @api_view(['GET'])
 @csrf_exempt
 #@check_group(['admin' , 'operator'])
-def fetch_data(request):
+def fetch_data(data):
     from annotate.utils import fetch_data_util
-    print(request.body)
-    data = json.loads(request.body)
-    print(data)
+    #print(request.body)
+    #data = json.loads(request.body)
+    #print(data)
     total,current,limit,message,status_code = fetch_data_util(data)
     if status_code == 200:
         return HttpResponse(json.dumps({'message' : 'Success!', 'data' : message,'total' : total,'current' : current,'limit' : limit}, cls=Encoder), content_type="application/json")
@@ -130,7 +145,11 @@ def prev_img(data):
 @api_view(['GET'])                                                                                                                    
 @csrf_exempt
 #@check_group(['admin' , 'operator'])
-def get_img(data):                                                                                                                                                       
+def get_img(data):     
+    part_id = data.GET['part_id']
+    file_id = data.GET['file_id']
+    print("@@@@@@@@@@@@@@@@@@@@@")
+    print(part_id)                                                                                                                        
     from annotate.utils import get_img_util
     message,status_code = get_img_util(data)
     if status_code == 200:

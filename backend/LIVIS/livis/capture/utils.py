@@ -24,6 +24,46 @@ consumer_mount_path = "/apps/Livis"
 consumer_mount_path = TRAIN_DATA_STATIC
 
 
+
+
+
+def get_inference_feed_url_util():
+
+    try:
+        mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
+    except:
+        message = "Cannot connect to db"
+        status_code = 500
+        return message,status_code
+
+
+    p = [p for p in mp.find()]
+
+    p=p[0]
+
+    workstation_id = p['_id']
+
+    feed_urls = []
+    dummmy_dct = {}
+    
+    
+    workstation_id = ObjectId(workstation_id)
+    mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
+    ws_row = mp.find_one({'_id': workstation_id})
+    ws_camera_dict = ws_row.get('cameras')
+    print(ws_camera_dict)
+    
+    for i in ws_camera_dict:
+        
+        url = "http://127.0.0.1:8000/livis/v1/capture/inference_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
+        dummmy_dct = {"camera_name":i['camera_name'] , "camera_url":url}
+        feed_urls.append(dummmy_dct)
+    if feed_urls:
+        return feed_urls
+    else:
+        return {}
+
+
 def get_camera_feed_urls():
 
     try:
@@ -72,7 +112,7 @@ def apply_crops(img, x,y,w,h):
     
     
 def capture_image_util(data):
-
+    print("in capture@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     try:
         part_id = data['part_id']
     except:
@@ -93,7 +133,7 @@ def capture_image_util(data):
         message = "camera_id not provided"
         status_code = 400
         return message, status_code   
-
+    print("in capture abc   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     # access the workstation table
     workstation_id = ObjectId(workstation_id)
     mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
@@ -106,26 +146,26 @@ def capture_image_util(data):
     #    if camera_name1 == camera_name:
     #        break
 
-    topic = str(workstation_id) + "_" + str(camera_id)
+    topic = str(workstation_id) + "_" + str(camera_id) + "_input"
 
     consumer = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL, auto_offset_reset='latest')
-
+    print("Consumer initialized")
     for message in consumer:
+        print("checking for msg")
         a = message.value.decode('utf-8')
         b = json.loads(a)
-
         im_b64_str = b["frame"]
         im_b64 = bytes(im_b64_str[2:], 'utf-8')
         im_binary = base64.b64decode(im_b64)
 
         im_arr = np.frombuffer(im_binary, dtype=np.uint8)
         frame = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
-
+        height, width, _ = frame.shape
 
         print(frame.shape)
         preprocessing_list = MongoHelper().getCollection(str(part_id) + "_preprocessingpolicy")
         p = [p for p in preprocessing_list.find()]
-
+        print(p)
         if len(p) == 0:
             # no preprocessing policy set - use image as is
 
@@ -133,7 +173,7 @@ def capture_image_util(data):
             img_name = consumer_mount_path+"/"+str(uuid_str)+".png"
             cv2.imwrite(img_name,frame)
             
-            http_name = "http//0.0.0.0:3306/" +str(uuid_str)+".png"
+            http_name = "http://10.60.60.112:3306/" +str(uuid_str)+".png"
             capture_doc = {
                 "file_path": img_name,
                 "file_url": http_name,
@@ -154,13 +194,12 @@ def capture_image_util(data):
             regions = None
         
             try:
-                regions = policy['regions']
+                regions = p['policy']['crop']
             except:
                 pass
                 
 
             policy_crop = []
-
             for j in regions:
 
                 x = j["x"]
@@ -173,30 +212,32 @@ def capture_image_util(data):
                 x1 = ((x+w) * width)
                 y1 = ((y+h) * height)
 
-                label = j["cls"]
+                #label = j["cls"]
                 cords = [x0,y0,x1,y1]
 
-                policy_crop.append({label:cords})
+                policy_crop.append(cords)
 
 
-
+            print(policy_crop)
             for pol in policy_crop:
-                cords=pol.values()
-                for i in cords:
-                    x0 = int(i[0])
-                    y0 = int(i[1])
-                    x1 = int(i[2])
-                    y1 = int(i[3])
+                cords=pol
+                print(cords)
+                #for i in cords:
+                x0 = int(cords[0])
+                y0 = int(cords[1])
+                x1 = int(cords[2])
+                y1 = int(cords[3])
 
-                    crop = frame[y0:y1,x0:x1].copy()
+                crop = frame[y0:y1,x0:x1].copy()
                 
                     #crop = resize_pad(crop)
-                    id_uuid = str(uuid.uuid4())+'.png'
-                    img_name = consumer_mount_path+"/"+str(uuid_str)+".png"
-                    cv2.imwrite(img_name,crop)
+                id_uuid = str(uuid.uuid4())+'.png'
+                uuid_str = str(uuid.uuid4()) 
+                img_name = consumer_mount_path+"/"+str(uuid_str)+".png"
+                cv2.imwrite(img_name,crop)
             
-                    http_name = "http//0.0.0.0:3306/" +str(uuid_str)+".png"
-                    capture_doc = {
+                http_name = "http://10.60.60.112:3306/" +str(uuid_str)+".png"
+                capture_doc = {
                         "file_path": img_name,
                         "file_url": http_name,
                         "state": "untagged",
@@ -206,8 +247,8 @@ def capture_image_util(data):
                         "annotation_classification_history": [],
                         "annotator": ""}
                 
-                    mp = MongoHelper().getCollection(part_id + "_dataset")
-                    mp.insert(capture_doc)
+                mp = MongoHelper().getCollection(part_id + "_dataset")
+                mp.insert(capture_doc)
         
         break
         
@@ -229,7 +270,7 @@ def start_camera_preview(workstation_id,camera_name):
         if camera_name1 ==  camera_name:
             break
     
-    topic = str(workstation_id) + "_" + str(camera_id)
+    topic = str(workstation_id) + "_" + str(camera_id) + "_input"
     
     consumer = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL, auto_offset_reset='latest')
         
@@ -252,6 +293,43 @@ def start_camera_preview(workstation_id,camera_name):
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
+
+
+def start_inference(workstation_id,camera_name):
+    # access the workstation table
+    workstation_id = ObjectId(workstation_id)
+    mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
+    ws_row = mp.find_one({'_id': workstation_id})
+    ws_camera_dict = ws_row.get('cameras')
+    
+    for i in ws_camera_dict:
+        camera_id = i['camera_id']
+        camera_name1 = i['camera_name']
+        if camera_name1 ==  camera_name:
+            break
+    
+    topic = str(workstation_id) + "_" + str(camera_id) + "_output"
+    
+    consumer = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL, auto_offset_reset='latest')
+        
+    for message in consumer:
+        a = message.value.decode('utf-8')
+        b = json.loads(a)
+        
+        im_b64_str = b["frame"]
+        im_b64 = bytes(im_b64_str[2:], 'utf-8')
+        im_binary = base64.b64decode(im_b64)
+
+        im_arr = np.frombuffer(im_binary, dtype=np.uint8)
+        img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
+            
+
+        ret, jpeg = cv2.imencode('.jpg', img)
+        #cv2.imwrite("frame.jpg", jpeg)
+        
+        frame = jpeg.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 def start_camera_selection(data):
     # get data from the JSON POST object
