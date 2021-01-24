@@ -652,7 +652,7 @@ def delete_img_util(data):
 
         
     try:   
-        mp = MongoHelper().getCollection(str(dataset['_id']+"_dataset"))
+        mp = MongoHelper().getCollection(str(dataset['_id'])+"_dataset")
     except:
         message = "Cannot connect to db"
         status_code = 500
