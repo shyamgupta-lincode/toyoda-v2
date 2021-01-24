@@ -683,7 +683,7 @@ def delete_img_util(data):
         myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
         mydb = myclient["LIVIS"]
-        mycol = mydb[str(jig_id)]
+        mycol = mydb[str(part_id)+"_dataset"]
 
         result = mycol.delete_one({'_id': ObjectId(file_id)})
 
@@ -691,6 +691,7 @@ def delete_img_util(data):
         print(e)
         message = "error while deleting from db"
         status_code = 500
+        return message,status_code
 
     message = dataset
     status_code = 200
