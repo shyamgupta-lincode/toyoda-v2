@@ -619,7 +619,7 @@ def delete_img_util(data):
     message = None
     status_code = None
 
-    part_id = data.GET['part_id']
+    part_id = data['part_id']
     if part_id is None:
         message = "PartId not provided"
         status_code = 400
@@ -644,7 +644,7 @@ def delete_img_util(data):
         status_code = 400
         return message,status_code
 
-    file_id = data.GET['file_id']
+    file_id = data['file_id']
     if file_id is None:
         message = "FileId not provided"
         status_code = 400
