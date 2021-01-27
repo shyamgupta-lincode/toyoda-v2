@@ -97,8 +97,10 @@ def get_parts_task(skip=0, limit=100):
     for i in parts:
         data = {}
         part_obj_id = i["_id"]
-        mp = MongoHelper().getCollection(str(part_obj_id) + '_experiment')
-        i["experiments"] = [i for i in mp.find()]
+        part_obj_id =  str(part_obj_id)
+        mp1 = MongoHelper().getCollection('experiment')
+        i["experiments"] = [i for i in mp1.find({'part_id' : part_obj_id})]
+        print(i["experiments"])
         info = GetLabelData(part_obj_id).get_metrics()
         i["label_info"] = info
     if parts:

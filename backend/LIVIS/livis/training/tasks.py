@@ -84,7 +84,7 @@ def add_experiment_modified(config):
     experiment_type = config.get('experiment_type', None)
     hyperparameters = config.get('hyperparameters',None)
     model_id = config.get('model_id',None)
-    mp = MongoHelper().getCollection(str(part_id) + '_experiment')
+    mp = MongoHelper().getCollection('experiment')
     collection_obj = {
             'status' : 'Initialized',
             'created_at':datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
@@ -356,10 +356,11 @@ def get_all_running_experiments_status():
     list_of_running = []
     for i in parts:
         part_obj_id = i["_id"]
-        mp = MongoHelper().getCollection(str(part_obj_id) + '_experiment')
-        exp = [i for i in mp.find()]
+        mp = MongoHelper().getCollection('experiment')
+        exp = [i for i in mp.find({'part_id' : str(part_obj_id)})]
+        print(exp)
         for i in exp:
-            if i["status"] in ['started',"running"]:
+            if i["status"].lower() in ['initialized','started',"running"]:
                 list_of_running.append(i)
     data={}
     data["running_experiments"] = list_of_running
@@ -371,7 +372,7 @@ def deploy_experiment_util(data):
     experiment_id = data["experiment_id"]
     workstation_ids = data["workstation_ids"]
     try:
-        mp = MongoHelper().getCollection(str(part_id) + '_experiment')
+        mp = MongoHelper().getCollection('experiment')
         exp = [i for i in mp.find()]
         for i in exp:
             if str(ObjectId(i['_id']))==str(experiment_id):
@@ -390,27 +391,35 @@ def deploy_experiment_util(data):
 
 def get_deployment_list_util():
     return_list = []
+    from capture.utils import get_inference_feed_url_util
     part_collection = MongoHelper().getCollection(settings.PARTS_COLLECTION)
     workstation_collection = MongoHelper().getCollection(settings.WORKSTATION_COLLECTION)
     parts = [p for p in part_collection.find({"$and" : [{"isdeleted": False}, { "isdeleted" : {"$exists" : True}}]}).sort( "$natural", -1 )]
     for part in parts:
         part_id = part['_id']
-        mp = MongoHelper().getCollection(str(part_id) + '_experiment')
+        mp = MongoHelper().getCollection('experiment')
         exp = [i for i in mp.find()]
         for experiment in exp:
-            print(experiment)
+            #print(experiment)
             try:
                 if 'deployed' in experiment and experiment['deployed']:
                     for dw in experiment['deployed_on_workstations']:
-                        ws_name = workstation_collection.find_one({'_id' : ObjectId(dw)})['workstation_name']
+                        #print(dw)
+                        ws = workstation_collection.find_one({'_id' : ObjectId(dw)})
+                        ws_name = ws['workstation_name']
+                        print(ws_name)
+                        print(experiment)
                         resp = {
                             "experiment_name" : experiment['experiment_name'],
                             "part_number" : part['part_number'],
                             "experiment_type" : experiment['experiment_type'],
-                            "workstation" : ws_name
+                            "workstation" : ws_name,
+                            "inference_urls" :  get_inference_feed_url_util(ws["_id"] , part_id)
                         }
-                        return_list.append(resp)
-            except:
-                pass
+                        print(resp)
+                        if str(part_id) == experiment['part_id']:
+                            return_list.append(resp)
+            except Exception as e:
+                print(e)
     return return_list
 

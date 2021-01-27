@@ -173,7 +173,7 @@ class GetLabelData():
         mp = MongoHelper().getCollection(PARTS_COLLECTION)
         self.part_id_collection = mp.find_one({'_id' : ObjectId(part_id)})
         _id = str(self.part_id_collection['_id'])
-        mp = MongoHelper().getCollection(str(self.part_id_collection['_id']))
+        mp = MongoHelper().getCollection(str(self.part_id_collection['_id'])+"_dataset")
         self.p = [i for i in mp.find()]
 
 
@@ -207,12 +207,12 @@ class GetLabelData():
                 data['total_unlabeled_images'] += 1
         
 
-            if i['classifier_label'] != "":
-                classifier_labels.append(i['classifier_label'])
+            if i['annotation_classification'] != "":
+                classifier_labels.append(i['annotation_classification'])
 
             
-            if i['regions'] !=[] :
-                for j in i['regions']:
+            if i['annotation_detection'] !=[] :
+                for j in i['annotation_detection']:
                     detector_labels.append(j["cls"])
 
         classifier_label_obj = getDuplicatesWithCount(classifier_labels)

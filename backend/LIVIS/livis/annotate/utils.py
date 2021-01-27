@@ -492,8 +492,9 @@ def get_data_for_histogram_util(data):
     #p = [i for i in mp.find()]
 
     _id = str(dataset['_id'])
-    mp = MongoHelper().getCollection(str(dataset['_id']))
+    mp = MongoHelper().getCollection(str(dataset['_id'])+"_dataset")
     p = [i for i in mp.find()]
+    
 
     def get_metrics(mp):
         data = {}

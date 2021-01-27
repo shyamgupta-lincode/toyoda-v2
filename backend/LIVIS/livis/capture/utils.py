@@ -27,7 +27,7 @@ consumer_mount_path = TRAIN_DATA_STATIC
 
 
 
-def get_inference_feed_url_util():
+def get_inference_feed_url_util(wsid , partid):
 
     try:
         mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
@@ -36,26 +36,21 @@ def get_inference_feed_url_util():
         status_code = 500
         return message,status_code
 
-
-    p = [p for p in mp.find()]
-
-    p=p[0]
-
-    workstation_id = p['_id']
+    workstation_id = wsid
 
     feed_urls = []
     dummmy_dct = {}
     
     
-    workstation_id = ObjectId(workstation_id)
+    workstation_id = ObjectId(wsid)
     mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
     ws_row = mp.find_one({'_id': workstation_id})
     ws_camera_dict = ws_row.get('cameras')
     print(ws_camera_dict)
     
     for i in ws_camera_dict:
-        
-        url = "http://127.0.0.1:8000/livis/v1/capture/inference_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
+        ## check camera in preprocess table for the part
+        url = "http://127.0.0.1:8000/livis/v1/capture/inference_camera_preview/{}/{}/{}/".format(workstation_id,i['camera_name'], partid)
         dummmy_dct = {"camera_name":i['camera_name'] , "camera_url":url}
         feed_urls.append(dummmy_dct)
     if feed_urls:
@@ -173,7 +168,7 @@ def capture_image_util(data):
             img_name = consumer_mount_path+"/"+str(uuid_str)+".png"
             cv2.imwrite(img_name,frame)
             
-            http_name = "http://10.60.60.112:3306/" +str(uuid_str)+".png"
+            http_name = "http://0.0.0.0:3306/" +str(uuid_str)+".png"
             capture_doc = {
                 "file_path": img_name,
                 "file_url": http_name,
@@ -236,7 +231,7 @@ def capture_image_util(data):
                 img_name = consumer_mount_path+"/"+str(uuid_str)+".png"
                 cv2.imwrite(img_name,crop)
             
-                http_name = "http://10.60.60.112:3306/" +str(uuid_str)+".png"
+                http_name = "http://0.0.0.0:3306/" +str(uuid_str)+".png"
                 capture_doc = {
                         "file_path": img_name,
                         "file_url": http_name,

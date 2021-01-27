@@ -24,9 +24,9 @@ def get_capture_feed_url(request):
 @api_view(['GET'])
 @csrf_exempt
 @permission_classes((AllowAny,))
-def get_inference_feed_url(request):
+def get_inference_feed_url(request, wsid, partid):
     from capture.utils import get_inference_feed_url_util
-    url = get_inference_feed_url_util()
+    url = get_inference_feed_url_util(wsid , partid)
     return HttpResponse(json.dumps({'data': url}), content_type="application/json")
     
 @api_view(['POST'])
