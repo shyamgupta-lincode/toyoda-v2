@@ -10,6 +10,7 @@ import logging
 import pandas as pd
 from pymongo import MongoClient
 from common.utils import MongoHelper
+from django.utils import timezone
 from bson import ObjectId
 import multiprocessing
 from .consumer import *
@@ -17,14 +18,7 @@ from livis.settings import *
 import uuid 
 
 
-
-KAFKA_BROKER_URL = "127.0.0.1:9092"
-consumer_mount_path = "/apps/Livis"
-
 consumer_mount_path = TRAIN_DATA_STATIC
-
-
-
 
 
 def get_inference_feed_url_util(wsid , partid):
@@ -50,7 +44,8 @@ def get_inference_feed_url_util(wsid , partid):
     
     for i in ws_camera_dict:
         ## check camera in preprocess table for the part
-        url = "http://127.0.0.1:8000/livis/v1/capture/inference_camera_preview/{}/{}/{}/".format(workstation_id,i['camera_name'], partid)
+        #url = "http://127.0.0.1:8000/livis/v1/capture/inference_camera_preview/{}/{}/{}/".format(workstation_id,i['camera_name'], partid)
+        url = "http://"+BASE_URL+":8000/livis/v1/capture/inference_camera_preview/{}/{}/{}/".format(workstation_id,i['camera_name'], partid)
         dummmy_dct = {"camera_name":i['camera_name'] , "camera_url":url}
         feed_urls.append(dummmy_dct)
     if feed_urls:
@@ -87,7 +82,8 @@ def get_camera_feed_urls():
     
     for i in ws_camera_dict:
         
-        url = "http://127.0.0.1:8000/livis/v1/capture/consumer_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
+        #url = "http://127.0.0.1:8000/livis/v1/capture/consumer_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
+        url = "http://"+BASE_URL+":8000/livis/v1/capture/consumer_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
         dummmy_dct = {"camera_name":i['camera_name'] , "camera_url":url}
         feed_urls.append(dummmy_dct)
     if feed_urls:
@@ -160,15 +156,20 @@ def capture_image_util(data):
         print(frame.shape)
         preprocessing_list = MongoHelper().getCollection(str(part_id) + "_preprocessingpolicy")
         p = [p for p in preprocessing_list.find()]
+        print("p is")
         print(p)
-        if len(p) == 0:
+        if len(p) == 0 or p[0]['policy']['crop'] == "":
+            print("i am here ... ")
             # no preprocessing policy set - use image as is
 
             uuid_str = str(uuid.uuid4()) 
             img_name = consumer_mount_path+"/"+str(uuid_str)+".png"
+            print(img_name)
             cv2.imwrite(img_name,frame)
             
-            http_name = "http://0.0.0.0:3306/" +str(uuid_str)+".png"
+            #http_name = "http://0.0.0.0:3306/" +str(uuid_str)+".png"
+            http_name = "http://"+BASE_URL+":3306/"+str(uuid_str)+".png"
+
             capture_doc = {
                 "file_path": img_name,
                 "file_url": http_name,
@@ -177,12 +178,14 @@ def capture_image_util(data):
                 "annotation_detection_history": [],
                 "annotation_classification": "",
                 "annotation_classification_history": [],
-                "annotator": ""}
+                "annotator": "",
+                "date_added":timezone.now()}
                 
             mp = MongoHelper().getCollection(part_id + "_dataset")
             mp.insert(capture_doc)
             
         else:
+            print("in else blok")
             #preprocessing exists
             #check if regions exists 
             p = p[0]
@@ -214,6 +217,8 @@ def capture_image_util(data):
 
 
             print(policy_crop)
+
+            
             for pol in policy_crop:
                 cords=pol
                 print(cords)
@@ -231,7 +236,8 @@ def capture_image_util(data):
                 img_name = consumer_mount_path+"/"+str(uuid_str)+".png"
                 cv2.imwrite(img_name,crop)
             
-                http_name = "http://0.0.0.0:3306/" +str(uuid_str)+".png"
+                #http_name = "http://0.0.0.0:3306/" +str(uuid_str)+".png"
+                http_name = "http://"+BASE_URL+":3306/"+str(uuid_str)+".png"
                 capture_doc = {
                         "file_path": img_name,
                         "file_url": http_name,
@@ -240,7 +246,8 @@ def capture_image_util(data):
                         "annotation_detection_history": [],
                         "annotation_classification": "",
                         "annotation_classification_history": [],
-                        "annotator": ""}
+                        "annotator": "",
+                        "date_added":timezone.now()}
                 
                 mp = MongoHelper().getCollection(part_id + "_dataset")
                 mp.insert(capture_doc)
@@ -290,7 +297,7 @@ def start_camera_preview(workstation_id,camera_name):
 
 
 
-def start_inference(workstation_id,camera_name):
+def start_inference(workstation_id,camera_name,partid):
     # access the workstation table
     workstation_id = ObjectId(workstation_id)
     mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
@@ -306,8 +313,11 @@ def start_inference(workstation_id,camera_name):
     topic = str(workstation_id) + "_" + str(camera_id) + "_output"
     
     consumer = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL, auto_offset_reset='latest')
+    #consumer.poll()
+    #consumer.seek_to_end()
         
     for message in consumer:
+        #print(consumer.committed())
         a = message.value.decode('utf-8')
         b = json.loads(a)
         
@@ -434,7 +444,3 @@ def start_camera_selection(data):
                     message = "Camera selection updated"
                     status_code = 200
                     return message, status_code
-
-
-
-

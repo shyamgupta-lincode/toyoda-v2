@@ -53,8 +53,8 @@ def consumer_camera_preview(request,wid,cameraname):
 @renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 @permission_classes((AllowAny,))
-def inference_feed(request,wid,cameraname):
-    return StreamingHttpResponse(start_inference(wid,cameraname), content_type='multipart/x-mixed-replace; boundary=frame')
+def inference_feed(request,wid,cameraname,partid):
+    return StreamingHttpResponse(start_inference(wid,cameraname,partid), content_type='multipart/x-mixed-replace; boundary=frame')
 
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,))

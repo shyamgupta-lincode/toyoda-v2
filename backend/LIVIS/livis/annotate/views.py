@@ -243,3 +243,45 @@ def stop_camera(request):
     from annotate.capture import stop_camera
     resp = stop_camera()
     return HttpResponse(json.dumps( resp , cls=Encoder), content_type="application/json")
+
+@api_view(['POST'])
+@csrf_exempt
+def get_feature(request):
+    data = json.loads(request.body)
+    from annotate.utils import get_feature_util
+    resp = get_feature_util(data)
+    return HttpResponse(json.dumps( {'message' : resp} , cls=Encoder), content_type="application/json")
+    #part_id = data.get('part_id')
+    # print(part_id)
+    # if part_id:
+    #     resp = get_feature_util(part_id)
+    #     return HttpResponse(json.dumps( resp , cls=Encoder), content_type="application/json")
+    # return HttpResponse(json.dumps( {'message' : "Failed"} , cls=Encoder), content_type="application/json")
+
+@api_view(['POST'])
+@csrf_exempt
+def update_feature(request):
+    data = json.loads(request.body)
+    from annotate.utils import update_feature_util
+    resp = update_feature_util(data)
+    return HttpResponse(json.dumps( {'message' : resp} , cls=Encoder), content_type="application/json")
+
+@api_view(['POST'])
+@csrf_exempt
+def bulk_upload(data):
+    #data = json.loads(request.body)
+    from annotate.utils import bulk_upload_util
+    resp = bulk_upload_util(data)
+    return HttpResponse(json.dumps( {'message' : resp} , cls=Encoder), content_type="application/json")
+
+@api_view(['POST'])
+@csrf_exempt
+#@check_group(['admin' , 'operator'])
+def sort_data(request):
+    data = json.loads(request.body)
+    from annotate.utils import sort_data_util
+    resp = sort_data_util(data)
+    return HttpResponse(json.dumps({'data' : resp}, cls=Encoder), content_type="application/json")
+
+
+

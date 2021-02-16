@@ -7,6 +7,7 @@ from preprocess import views
 urlpatterns = [
 
                        re_path(r'^set_crop/$', views.set_crop),
+                       re_path(r'^set_cam_part/$', views.set_cam_part),
 
 
 

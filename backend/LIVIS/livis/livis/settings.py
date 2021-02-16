@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'logs.apps.LogsConfig',
     'assects.apps.AssectsConfig',
     'preprocess.apps.PreprocessConfig',
+    'inspection.apps.InspectionConfig',
     'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
@@ -157,6 +158,8 @@ LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 
+TIME_ZONE = 'Asia/Kolkata'
+
 USE_I18N = True
 
 USE_L10N = True
@@ -188,6 +191,10 @@ PLAN_COLLECTION = 'plan'
 LOGS_COLLECTION = 'logs'
 ASSECTS_COLLECTION = 'assects'
 MODEL_COLLECTION = 'model_collections'
+INSPECTION_COLLECTION = 'inspection'
+EXPERIMENT_COLLECTION = 'experiment'
+KANBAN_COLLECTION = 'kanban_collection'
+PREPROCESSING_COLLECTION = '{}_preprocessingpolicy'
 
 
 
@@ -210,8 +217,15 @@ print("AREEEEE: : : : :   " , TRAIN_DATA_STATIC)
 if not os.path.exists(TRAIN_DATA_STATIC):
     os.makedirs(TRAIN_DATA_STATIC)
 
+BASE_URL = '10.60.60.112'
+
 # For Capture service
-KAFKA_BROKER_URL = "broker:9092"
+KAFKA_BROKER_URL = BASE_URL+":9092"
 consumer_mount_path = "/Livis"
 mongo_host = "mongodb"
 mongo_port = 27017
+
+
+# List of Avalaible ports for Tensprbaords
+TF_PORTS = [4200,3306,4400,3000,9092,2181,37685,33253]
+

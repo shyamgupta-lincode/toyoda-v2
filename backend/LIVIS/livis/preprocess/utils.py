@@ -28,9 +28,13 @@ def set_policy_util(data):
 
     message = None
     status_code = None
-    regions = None
-    brightness = None
+    regions = []
+
+    brightness = 0
     hue = None
+    contrast = 0
+    saturation = None
+
 
    
     try:
@@ -47,6 +51,16 @@ def set_policy_util(data):
         hue = data['hue']
     except:
         pass  
+
+    try:
+        contrast = data['contrast']
+    except:
+        pass
+        
+    try:
+        saturation = data['saturation']
+    except:
+        pass 
     
 
 
@@ -109,24 +123,28 @@ def set_policy_util(data):
     preprocessing_coll = str(part_id)+"_preprocessingpolicy"
     mp = MongoHelper().getCollection(preprocessing_coll)
     
-    rp = [p for p in mp.find(  {"$and" : [ {"workstation_id": workstation_id }, { "camera_id" : camera_id } ] } )]
+    rp = [p for p in mp.find(  {"$and" : [ {"workstation_id": workstation_id }, { "camera_id" : str(camera_id) } ] } )]
+    print(rp)
     
     if len(rp) == 0:
         #record not found - insert
-        if regions is not None and regions != '' and len(regions) > 0:
-            sc = {"workstation_id": workstation_id, "camera_id" : camera_id , "policy": {"crop":regions} }
-            _id = mp.insert(sc)
+        #if regions is not None and regions != '' and len(regions) > 0:
+        sc = {"workstation_id": workstation_id, "camera_id" : str(camera_id) , "policy": {"crop":regions,"brightness":brightness,"contrast":contrast} }
+        _id = mp.insert(sc)
+        print("inserted")
+        print(_id)
 
-         
     else:
 
         #record dound - update
         _id = rp[0]['_id']
-        if regions is not None:
-            sc = {"workstation_id": workstation_id, "camera_id" : camera_id , "policy": {"crop":regions} }
-            mp.update({'_id' : rp[0]['_id']}, {'$set' :  sc})    
+        #if regions is not None:
+            #print()
+        sc = {"workstation_id": workstation_id, "camera_id" : str(camera_id) , "policy": {"crop":regions,"brightness":brightness,"contrast":contrast} }
+        mp.update({'_id' : ObjectId(_id)}, {'$set' :  sc})    
+        print("updated")
 
-    return "policy set",200 
+    return sc,200 
         
 
     
@@ -241,17 +259,29 @@ def get_policy_util(data):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+def set_cam_part_util(data):
+    workstation_id = data['workstation_id']
+    camera_id = data['camera_id']
+    part_id = data['part_id']
+    
+    mp = MongoHelper().getCollection("cam_to_part")
+    
+    rp = [p for p in mp.find()]
+    
+    rp = rp[0]
+    _id = rp['_id']
+    
+    
+    rp['camera_id'] = camera_id
+    rp['part_id'] = part_id
+    
+    
+    mp.update({'_id' : ObjectId(_id)}, {'$set' :  rp})
+    
+    return "success",200
+    
+    
+  
 
 
 #just a util for crop/padding to 600x600 for ssd mobilenet - used in final_capture_util

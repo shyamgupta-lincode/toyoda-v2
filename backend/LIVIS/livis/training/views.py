@@ -25,7 +25,15 @@ def get_model_data(request,experiment_type):
     # print(para)
     return HttpResponse(json.dumps(para, cls=Encoder), content_type="application/json")
 
-
+@api_view(['POST'])
+@csrf_exempt
+def set_threshold(request):
+    config = json.loads(request.body)
+    from training.tasks import set_threshold_util
+    message= set_threshold_util(config)
+    return HttpResponse(json.dumps(message, cls=Encoder), content_type="application/json")
+    
+    
 @api_view(['POST'])
 @csrf_exempt
 def create_experiment_modified(request):

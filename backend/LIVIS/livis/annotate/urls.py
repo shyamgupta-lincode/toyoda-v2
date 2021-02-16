@@ -28,6 +28,13 @@ urlpatterns = [
                        re_path(r'^get_capture_feed_url/$', views.get_capture_feed_url),
                        re_path(r'^capture_part_image/$', views.capture_part_image),
                        re_path(r'^start_capture_camera/$', views.start_camera),
-                       re_path(r'^stop_capture_camera/$', views.stop_camera)
-                       
+                       re_path(r'^stop_capture_camera/$', views.stop_camera),
+
+                       ## for feature list
+                     #   re_path(r'^get_feature/(?P<part_id>[A-Za-z0-9-_.]+)/$', views.get_feature),
+                       re_path(r'^get_feature/$', views.get_feature),
+                       re_path(r'^update_feature/$', views.update_feature),
+                       #bulk
+                       re_path(r'^bulk_upload/$', views.bulk_upload),
+                       re_path(r'^sort_data/$', views.sort_data)
 ]

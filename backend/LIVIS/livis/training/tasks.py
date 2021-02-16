@@ -91,8 +91,10 @@ def add_experiment_modified(config):
             'experiment_name' : experiment_name,
             'experiment_type' : experiment_type,
             'hyperparameters' : hyperparameters,
+            'retrain': False,
             'part_id' : part_id,
-            'model_id':model_id
+            'model_id':model_id,
+            'threshold':"0"
     }
     experiment_id_ = mp.insert(collection_obj)
     return experiment_id_
@@ -100,22 +102,16 @@ def add_experiment_modified(config):
 def add_retrain_experiment(config):
     experiment_id = config.get('experiment_id') 
     retrain_status = config.get('retrain_status')
-    part_id = config.get('part_id')
-    # mp =  MongoHelper().getCollection(str(experiment_id))
-    mp =MongoHelper().getCollection(str(part_id) + '_experiment') 
+    no_of_steps = config.get('no_of_steps')
+    # print(retrain_status)
+    mp =MongoHelper().getCollection('experiment') 
+    curser = mp.find({'_id' : ObjectId(experiment_id)})
+    for val in curser:
+        updated_no_steps = int(val["hyperparameters"]["no_of_steps"]) + int(no_of_steps)
     status = "Success" 
-    # # default_data.update({'item3': 3})
-    # collection_obj.update({'retrain_status' : retrain_status})
-    # collection_obj.update({'original_exp_id' : experiment_id})
-    # collection_obj.update({ 'status' : status})
     mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'retrain': retrain_status}}, upsert=False, full_response= True)
-
-    # collection_ob = {
-    #     'retrain_status' : retrain_status,
-    #     'original_exp_id' : experiment_id,
-    #     'status' :status
-    # }
-    # retrain_exp_id = mp.insert_one(collection_ob)
+    mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'hyperparameters.no_of_steps': updated_no_steps}}, upsert=False, full_response= True)
+    mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'status': 'Initialized'}}, upsert=False, full_response= True)
     return status
 
 
@@ -367,7 +363,52 @@ def get_all_running_experiments_status():
     return data
 
 
+def set_threshold_util(data):
+
+    experiment_id = data["experiment_id"]
+    threshold = data["threshold"]
+    mp = MongoHelper().getCollection('experiment')
+    
+    collection_obj = {'threshold':threshold}
+    
+    mp.update({'_id' : ObjectId(experiment_id)}, {'$set' : collection_obj})
+    
+    #p = [ p for p in mp.find({"_id":experiment_id})]
+    
+    exp = [i for i in mp.find({'_id' : ObjectId(experiment_id)})]
+    
+    return exp[0]
+    
+
 def deploy_experiment_util(data):
+
+    
+    part_id = data["part_id"]
+    experiment_id = data["experiment_id"]
+    workstation_ids = data["workstation_ids"]
+    #try:
+    mp = MongoHelper().getCollection('experiment')
+    #parts = [p for p in mp.find({"$and" : [{"isdeleted": False}, { "isdeleted" : {"$exists" : True}}]})]
+    exp = [i for i in mp.find({"$and" : [{"part_id":part_id}, { "deployed_on_workstations" : {"$exists" : True} }]})]
+    print("LENGTH OF EXP",len(exp))
+    for i in exp:
+       #print("chayaaaa")
+        #if 'deployed_on_workstations' in i.keys() and workstation_ids in i['deployed_on_workstations']:
+            
+        #if str(ObjectId(i['_id']))==str(experiment_id):
+       collection_obj = {
+                'deployed':False,
+                'deployed_on_workstations': [],
+                'container_deployed':False
+            }
+       mp.update({'_id' : ObjectId(i['_id'])}, {'$set' : collection_obj})
+       #return i  
+       # return mp.find_one({'_id' : ObjectId(i['_id'])})     
+    #except Exception as e:   
+    #   print(e)     
+    #    #return {}
+    #    pass
+
     part_id = data["part_id"]
     experiment_id = data["experiment_id"]
     workstation_ids = data["workstation_ids"]
@@ -378,6 +419,8 @@ def deploy_experiment_util(data):
             if str(ObjectId(i['_id']))==str(experiment_id):
                 collection_obj = {
                     'deployed':True,
+                    'container_deployed':False,
+                    # 'deployed_at':datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
                     'deployed_on_workstations': workstation_ids
                 }
                 mp.update({'_id' : ObjectId(i['_id'])}, {'$set' : collection_obj})
@@ -414,8 +457,14 @@ def get_deployment_list_util():
                             "part_number" : part['part_number'],
                             "experiment_type" : experiment['experiment_type'],
                             "workstation" : ws_name,
-                            "inference_urls" :  get_inference_feed_url_util(ws["_id"] , part_id)
+                            "inference_urls" :  get_inference_feed_url_util(ws["_id"] , part_id),
+                            "experiment_id" : experiment['_id']
                         }
+                        try:
+                            threshold =  experiment['threshold']
+                            resp['threshold'] = threshold
+                        except:
+                            pass
                         print(resp)
                         if str(part_id) == experiment['part_id']:
                             return_list.append(resp)

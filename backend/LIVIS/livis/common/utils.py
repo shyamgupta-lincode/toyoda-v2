@@ -425,6 +425,8 @@ def generate_xml(exp_id,part_id,list_of_selected_lables,export_type):
                             ET.SubElement(size, 'depth').text = str(depth)
 
                             ET.SubElement(annotation, 'segmented').text = '0'
+                            
+                            
                     
                             for j in regions:
 

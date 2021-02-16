@@ -33,6 +33,23 @@ def get_last_defect_list(request, inspectionid):
     print(resp)
     return HttpResponse(json.dumps(resp, cls=Encoder), content_type="application/json")
 
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def edit_remark(request):
+    from reports.utils import edit_remark_util
+    data = json.loads(request.body)
+    response = edit_remark_util(data)
+    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def edit_remark(request):
+    from reports.utils import edit_remark_util
+    data = json.loads(request.body)
+    response = edit_remark_util(data)
+    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
@@ -61,10 +78,10 @@ def get_accepted_rejected_parts_list(request):
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
-def get_defect_list_report(request):
-    from reports.utils import get_defect_list_report_util
+def get_mega_report(request):
+    from reports.utils import get_mega_report_util
     data = json.loads(request.body)
-    response = get_defect_list_report_util(data)
+    response = get_mega_report_util(data)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
 
@@ -101,3 +118,31 @@ def get_master_feature_list(request):
     from reports.utils import get_master_features
     resp = get_master_features()
     return HttpResponse(json.dumps(resp, cls=Encoder), content_type="application/json")
+    
+
+@api_view(['GET'])
+@csrf_exempt
+def get_defect_report(request):
+    from report.utils import get_defect_report_util
+    resp = get_defect_report_util()
+    return HttpResponse(json.dumps(resp , cls=Encoder), content_type="application/json")
+    
+    
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def post_report(request):
+    from reports.utils import post_report_util
+    data = json.loads(request.body)
+    response = post_report_util(data)
+    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+    
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def post_remark(request):
+    from reports.utils import post_remark_util
+    data = json.loads(request.body)
+    response = post_remark_util(data)
+    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+

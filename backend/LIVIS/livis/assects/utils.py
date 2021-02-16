@@ -22,8 +22,8 @@ def add_assects_util(data):
     sidenav_img = TRAIN_DATA_STATIC + "/side.png"
     login_img = TRAIN_DATA_STATIC + "/main.png"
     
-    side_nav_pth = "http://0.0.0.0:3306/side.png"
-    login_img_pth = "http://0.0.0.0:3306/main.png"
+    side_nav_pth = "http://"+BASE_URL+":3306/side.png"
+    login_img_pth = "http://"+BASE_URL+":3306/main.png"
     
     with open(sidenav_img, "wb") as fh:
         fh.write(base64.decodebytes(side_nav))
@@ -94,8 +94,8 @@ def update_assect_util(data):
     sidenav_img = TRAIN_DATA_STATIC + "/side.png"
     login_img = TRAIN_DATA_STATIC + "/main.png"
     
-    side_nav_pth = "http://0.0.0.0:3306/side.png"
-    login_img_pth = "http://0.0.0.0:3306/main.png"
+    side_nav_pth = "http://"+BASE_URL+":3306/side.png"
+    login_img_pth = "http://"+BASE_URL+":3306/main.png"
     
     if side_nav is not None:
         side_nav = str.encode(side_nav)

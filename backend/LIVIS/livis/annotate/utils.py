@@ -18,6 +18,7 @@ import shutil
 import imutils
 import random
 from django.conf import settings
+from django.utils import timezone
 ########## manual annotation api ##########
 
 def next_img_util(data):
@@ -838,7 +839,8 @@ def submit_annotations_util(data):
         'annotation_classification' : classifier_label,
         'annotation_detection' : regions,
         'annotation_classification_history' : classifier_label_history,
-        'annotation_detection_history' : regions_history
+        'annotation_detection_history' : regions_history,
+        'date_modified':timezone.now()
     }
 
 
@@ -1341,4 +1343,440 @@ def auto_color_annotations_util(data):
             cords_list.append([x1,y1,x2,y2])
 
     return cords_list
+
+def update_feature_util(data):
+
+    try:
+        part_id = data.get('part_id')
+    except:
+        message = "PartId not provided"
+        status_code = 400
+        return message,status_code
+
+    try:
+        annotation_detection = data.get('annotation_detection')
+    except:
+        message = "annotation detection not provided"
+        status_code = 400
+        return message,status_code
+
+
+    try:
+        ws_id = data.get('workstation_id')
+    except:
+        message = "workstation_id not provided"
+        status_code = 400
+        return message,status_code 
+
+
+    try:
+        camera_id = data.get('camera_id')
+    except:
+        message = "camera not provided"
+        status_code = 400
+        return message,status_code 
+
+
+    # annotation_detection: [
+    #     {
+    #         "type": "box",
+    #         "x": 0.7077966462792163,
+    #         "y": 0.07719735621521336,
+    #         "w": 0.0955783792420839,
+    #         "h": 0.19109461966604824,
+    #         "highlighted": true,
+    #         "editingLabels": false,
+    #         "color": "#f44336",
+    #         "cls": "region1",
+    #         "id": "6598853119342383"
+    #     },
+    #     {
+    #         "type": "box",
+    #         "x": 0.7077966462792163,
+    #         "y": 0.07719735621521336,
+    #         "w": 0.0955783792420839,
+    #         "h": 0.19109461966604824,
+    #         "highlighted": true,
+    #         "editingLabels": false,
+    #         "color": "#f44336",
+    #         "cls": "region1",
+    #         "id": "6598853119342383"
+    #     }
+    # ]
+
+    # access the parts table
+
+    part_id = ObjectId(part_id)
+    mp = MongoHelper().getCollection(PARTS_COLLECTION)
+    part_row = mp.find_one({"_id": part_id})
+    # print(part_row)
+    feature = part_row["kanban"]["features"]
+    defects = part_row["kanban"]["defects"]
+    feature_metadata = {}
+    for element in annotation_detection:
+        y = element["x"]
+        x = element["y"]
+        w = element["w"]
+        h = element["h"]
+        cls_ = element["cls"]
+
+        centroid_x = (w/2) + x
+        centroid_y = (h/2) + y
+
+        meta = {}
+        meta["x"] = y
+        meta["y"] = x
+        meta["w"] = w
+        meta["h"] = h
+        meta["cls"] = cls_
+        meta["centroid"] = (centroid_x, centroid_y)
+        meta["type"] = element["type"]
+        meta["highlighted"] = element["highlighted"]
+        meta["editingLabels"] = element["editingLabels"]
+        meta["color"] = element["color"]
+        meta["id"] = element["id"]
+        
+        if cls_ not in feature_metadata:
+            feature_metadata[cls_] = []
+            
+        
+            feature_metadata[cls_].append(meta)
+        else:
+            feature_metadata[cls_].append(meta)
+
+    # access the parts table
+    part_id = ObjectId(part_id)
+    mp = MongoHelper().getCollection(PARTS_COLLECTION)
+    part_row = mp.find_one({"_id": part_id})
+    
+    part_row["kanban"]["kanban_details"] = feature_metadata 
+    part_row["workstation_id"] = ws_id
+    # part_row["annotation_detection"]=annotation_detection
+    part_row["camera_id"] = camera_id
+
+    
+    
+    mp.update({'_id': part_row['_id']}, {'$set': part_row})
+
+    ########Update#######
+    # new_coll = MongoHelper().getCollection(str(part_id) + "_feature")
+    # data ={"part_id" : str(part_id),
+    #        "workstation_id":ws_id,
+    #        "camera_id" :camera_id,
+    #     "annotation_detection":annotation_detection
+    #         } 
+    # mp = new_coll.find()        
+    # if mp.count() == 0:
+    #     new_coll.insert(data)
+
+    # else:   
+    #     cursor = new_coll.find()
+    #     for document in cursor:
+    #         print(document)
+    #         feature_coll_id = document['_id']
+    #         # print(feature_coll_id)
+    #     # if new_coll.countDocuments==1:
+    #     #     # new_coll.update(data)
+
+    #         new_coll.update({'_id':feature_coll_id}, {'$set': data})  
+
+
+    status_code = 200
+    message = "Success"
+    return message, status_code
+
+def get_feature_util(data):
+
+    try:
+        ws_id = data.get('workstation_id')
+    except:
+        message = "workstation_id not provided"
+        status_code = 400
+        return message,status_code 
+
+
+    try:
+        camera_id = data.get('camera_id')
+    except:
+        message = "camera not provided"
+        status_code = 400
+        return message,status_code
+
+
+    try:
+        part_id = data.get('part_id')
+    except:
+        message = "PartId not provided"
+        status_code = 400
+        return message,status_code    
+
+    part_id = ObjectId(part_id)
+    camera_id =camera_id
+    ws_id = ObjectId(ws_id)
+    # dataset_list = MongoHelper().getCollection(str(part_id) + "_feature")
+    dataset_list = MongoHelper().getCollection(PARTS_COLLECTION)
+    # mp1 = dataset_list.find()
+    mp = dataset_list.find_one({"_id": part_id})
+    # print(mp["annotation_detection"])
+    annotation_dict = []
+    # for doc in mp:
+    #     print(doc)
+    # if mp.count != 0:
+    try:
+        if mp["camera_id"] == camera_id and mp["workstation_id"]== str(ws_id):
+        
+                annotation_dict.append(mp["kanban"]["kanban_details"])
+    except Exception as e :
+        print(e)
+        pass
+    # ###Update###
+    # p = [p for p in dataset_list.find()]
+    # annotation_detection = []
+    # # print(p)
+    # # for row in p:
+    #     #print(row)
+    #     # annotation_detection.append(row["annotation_detection"])
+
+    # print(annotation_dict)
+    return annotation_dict
+
+def bulk_upload_util(data):
+    try:
+        file_ = data.FILES.get('zip_file')
+    except:
+        message = "zip file path not provided"
+        status_code = 400
+        return message,status_code
+
+    try:
+        ext=str(file_).split('.')[-1]
+        if ext != 'zip':
+            message = "Not a zip file"
+            status_code = 415
+            return message,status_code
+    except:
+        message = "Not a zip file"
+        status_code = 415
+        return message,status_code
+
+    try:
+        part_id = data.POST.get("part_id")
+    except:
+        message = "part ID not provided"
+        status_code = 400
+        return message, status_code
+
+    try:
+        workstation_id = data.POST.get("workstation_id")
+    except:
+        message = "workstation id not provided"
+        status_code = 400
+        return message, status_code
+        
+    try:
+        camera_id = data.POST.get("camera_id")
+    except:
+        message = "camera_id not provided"
+        status_code = 400
+        return message, status_code   
+    
+    # access the workstation table
+    print(part_id)
+    print(workstation_id)
+    workstation_id = ObjectId(workstation_id)
+    mp = MongoHelper().getCollection('workstations')
+    
+    ws_row = mp.find_one({'_id':  ObjectId(workstation_id)})
+    # print(ws_row)
+    # ws_camera_dict = ws_row.get('cameras')
+    ws_camera_dict = ws_row["cameras"]
+    #extract
+    with ZipFile(file_) as zip_file:
+        names = zip_file.namelist()
+        for name in names:
+            if 'jpg' in name or 'png' in name:    
+                 # copy file (taken from zipfile's extract)
+                filename = os.path.basename(name)
+                source = zip_file.open(name)
+                target = open(os.path.join(settings.TRAIN_DATA_STATIC, filename), "wb")
+                
+                with source, target:
+                    shutil.copyfileobj(source, target)
+                    
+    
+    #remove all non image from list
+    new1 = [x for x in names if "." in str(x)]
+    new = [x for x in new1 if x.split('.')[1] == 'png' or x.split('.')[1] == 'jpg']
+
+    if new == []:
+        #no images found in zip
+        message = "Could not find any images in zip"
+        status_code = 404
+        return message,status_code
+
+    for i in new:
+
+        head_tail = os.path.split(i)
+
+        other_path = head_tail[0]
+        name_of_img = head_tail[1]
+        
+        
+        preprocessing_list = MongoHelper().getCollection(str(part_id) + "_preprocessingpolicy")
+        p = [p for p in preprocessing_list.find()]
+        print(p)
+        if len(p) == 0:
+
+            capture_doc = {
+                "file_path": os.path.join(settings.TRAIN_DATA_STATIC,name_of_img),
+                "file_url": "http://"+settings.BASE_URL+":3306/" + name_of_img,
+                "state": "untagged",
+                "annotation_detection": [],
+                "annotation_detection_history": [],
+                "annotation_classification": "",
+                "annotation_classification_history": [],
+                "annotator": "",
+                "date_added":timezone.now()}
+                
+            mp = MongoHelper().getCollection(part_id + "_dataset")
+            mp.insert(capture_doc)
+            
+        else:
+            #preprocessing exists
+            #check if regions exists 
+            p = p[0]
+            regions = None
+        
+            try:
+                regions = p['policy']['crop']
+            except:
+                pass
+                
+
+            policy_crop = []
+            for j in regions:
+
+                x = j["x"]
+                y = j["y"]
+                w = j["w"]
+                h = j["h"]
+
+                x0 = x * width
+                y0 = y * height
+                x1 = ((x+w) * width)
+                y1 = ((y+h) * height)
+
+                #label = j["cls"]
+                cords = [x0,y0,x1,y1]
+
+                policy_crop.append(cords)
+
+
+            print(policy_crop)
+            for pol in policy_crop:
+                cords=pol
+                print(cords)
+                #for i in cords:
+                x0 = int(cords[0])
+                y0 = int(cords[1])
+                x1 = int(cords[2])
+                y1 = int(cords[3])
+
+                frame = cv2.imread(os.path.join(settings.TRAIN_DATA_STATIC,name_of_img))
+
+                crop = frame[y0:y1,x0:x1].copy()
+                
+                cv2.imwrite(os.path.join(settings.TRAIN_DATA_STATIC,name_of_img),crop)
+            
+                
+                
+                capture_doc = {
+                        "file_path": os.path.join(settings.TRAIN_DATA_STATIC,name_of_img),
+                         "file_url": "http://"+settings.BASE_URL+":3306/" + name_of_img,
+                        "state": "untagged",
+                        "annotation_detection": [],
+                        "annotation_detection_history": [],
+                        "annotation_classification": "",
+                        "annotation_classification_history": [],
+                        "annotator": "",
+                        "date_added":timezone.now()}
+                
+                mp = MongoHelper().getCollection(part_id + "_dataset")
+                mp.insert(capture_doc)
+        
+        
+        
+    return "success",200
+
+
+def sort_data_util(data):
+    # date_added or date_modified
+    
+    try:
+        sort_by = data["sort_by"]
+    except:
+        message = "sort by not provided"
+        status_code = 400
+        return message, status_code
+
+    #  tagged or untagged
+    try:
+        tag = data["tag"]
+    except:
+        message = "tag not provided"
+        status_code = 400
+        return message, status_code
+
+
+    try:
+        part_id = data["part_id"]
+    except:
+        message = "part ID not provided"
+        status_code = 400
+        return message, status_code
+    
+    try:
+        order = data["order"]
+    except:
+        message = "order not provided"
+        status_code = 400
+        return message, status_code
+
+    
+
+    dataset_list = MongoHelper().getCollection(str(part_id) + "_dataset")
+    #dataset = dataset_list.find()
+
+    if tag != "":
+        dataset = [p for p in dataset_list.find({"state":tag})]
+    else:
+        dataset = [p for p in dataset_list.find()]
+
+    if sort_by != "":
+        date_sorted = sorted(dataset, key = lambda x: x[sort_by].date())
+
+        if order.find("descending") != -1:
+            date_sorted = date_sorted[::-1]
+
+        return date_sorted
+    else:
+        return dataset
+
+
+               
+
+    
+
+
+
+
+    
+
+
+
+
+
+
+
+
 

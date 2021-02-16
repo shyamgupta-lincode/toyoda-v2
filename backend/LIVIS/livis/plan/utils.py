@@ -22,6 +22,7 @@ def add_plan(data):
         start_time = data.get('start_time')
         end_time = data.get('end_time')
         part_number = data.get('part_number')
+        part_id = data.get('part_id')
 
         planned_production_count = data.get('planned_production_count')
         is_deleted = False
@@ -32,6 +33,7 @@ def add_plan(data):
             'start_time' : start_time,
             'end_time' : end_time,
             'part_number' : part_number,
+            'part_id':part_id,
             'is_deleted' : is_deleted,
             'planned_production_count' : planned_production_count
         }
@@ -86,6 +88,15 @@ def delete_plan(plan_id):
 def plan_list(skip, limit):
     mp = MongoHelper().getCollection(settings.PLAN_COLLECTION)
     resp = [p for p in mp.find({"$and" : [{"is_deleted": False}, { "is_deleted" : {"$exists" : True}}]}).skip(skip).limit(limit)]
+    #if len(resp)>0:
+
+    #    for r in resp:
+    #        mp = MongoHelper().getCollection(settings.PARTS_COLLECTION)
+    #        part_id = r['part_number']
+
+    #        res = [p for p in mp.find({'part_id':part_id}) ]
+    #        part_number = res['part_number']
+    
     if resp:
         return resp
     else:
