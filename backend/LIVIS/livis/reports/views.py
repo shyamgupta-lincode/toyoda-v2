@@ -45,10 +45,10 @@ def edit_remark(request):
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
-def edit_remark(request):
-    from reports.utils import edit_remark_util
+def set_flag(request):
+    from reports.utils import set_flag_util
     data = json.loads(request.body)
-    response = edit_remark_util(data)
+    response = set_flag_util(data)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
 @api_view(['POST'])

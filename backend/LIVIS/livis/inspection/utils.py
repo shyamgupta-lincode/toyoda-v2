@@ -58,7 +58,7 @@ def report_process_util(data,operator_id):
         #write the original image on disk and get http path
         uuid_str = str(uuid.uuid4()) 
         img_name_original = TRAIN_DATA_STATIC+"/"+str(uuid_str)+".png"
-        img_name_original_http = "http://0.0.0.0:3306/"+str(uuid_str)+".png"
+        img_name_original_http = "http://"+BASE_URL+":3306/"+str(uuid_str)+".png"
         cv2.imwrite(img_name_original,img_original)
         
         
@@ -86,7 +86,7 @@ def report_process_util(data,operator_id):
         #write the inference image on disk and get http path
         uuid_str = str(uuid.uuid4()) 
         img_name_pred = TRAIN_DATA_STATIC+"/"+str(uuid_str)+".png"
-        img_name_pred_http = "http://0.0.0.0:3306/"+str(uuid_str)+".png"
+        img_name_pred_http = "http://"+BASE_URL+":3306/"+str(uuid_str)+".png"
         cv2.imwrite(img_name_pred,img_inference)
         
         break
@@ -485,10 +485,10 @@ def get_virtual_button_util(data):
     saved_images_original_http = []
     saved_images_inference_http = []
     for orig in saved_images_original:
-        http_pth = "http://0.0.0.0:3306/"+orig.split(TRAIN_DATA_STATIC)[1]
+        http_pth = "http://"+BASE_URL+":3306/"+orig.split(TRAIN_DATA_STATIC)[1]
         saved_images_original_http.append(http_pth)
     for inf in saved_images_inference:
-        http_pth = "http://0.0.0.0:3306/"+inf.split(TRAIN_DATA_STATIC)[1]
+        http_pth = "http://"+BASE_URL+":3306/"+inf.split(TRAIN_DATA_STATIC)[1]
         saved_images_inference_http.append(http_pth)
     colle = {
     "detections_missed" : detection_cleaned,

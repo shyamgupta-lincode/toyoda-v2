@@ -386,10 +386,11 @@ def deploy_experiment_util(data):
     part_id = data["part_id"]
     experiment_id = data["experiment_id"]
     workstation_ids = data["workstation_ids"]
+    
     #try:
     mp = MongoHelper().getCollection('experiment')
     #parts = [p for p in mp.find({"$and" : [{"isdeleted": False}, { "isdeleted" : {"$exists" : True}}]})]
-    exp = [i for i in mp.find({"$and" : [{"part_id":part_id}, { "deployed_on_workstations" : {"$exists" : True} }]})]
+    exp = [i for i in mp.find({"$and" : [{"part_id":part_id}]})]
     print("LENGTH OF EXP",len(exp))
     for i in exp:
        #print("chayaaaa")

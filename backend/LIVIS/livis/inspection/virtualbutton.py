@@ -61,7 +61,7 @@ class VirtualButton():
         self.arucoParams = cv2.aruco.DetectorParameters_create()
         # initialize the video stream and allow the camera sensor to warm up
         print("[INFO] starting video stream...")
-        vs = VideoStream(src=2).start()
+        vs = VideoStream(src=4).start()
         time.sleep(2.0)
         return vs
     

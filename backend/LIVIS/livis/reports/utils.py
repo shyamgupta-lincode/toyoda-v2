@@ -7,6 +7,7 @@ from copy import deepcopy
 from livis.settings import *
 import sqlite3
 from xlsxwriter import Workbook
+from django.utils import timezone
 
 
 def get_last_defect_list_util(inspection_id,skip=0, limit=20):
@@ -174,7 +175,44 @@ def get_mega_report_util(data):
     return all_defects_list
     """
 
-        
+def set_flag_util(data):
+    master_obj_id = data['master_obj_id']
+    slave_obj_id = data['slave_obj_id']
+    remark = data['remark']
+
+    mp = MongoHelper().getCollection(master_obj_id+"_log")
+
+    process_attributes = mp.find_one({'_id' : ObjectId(slave_obj_id)})
+
+    process_attributes['remarks']= remark
+    process_attributes['flagged']= True
+    print(process_attributes)
+    mp.update({'_id' : ObjectId(slave_obj_id) }, {'$set' :  process_attributes})
+    process_attributes = mp.find_one({'_id' : ObjectId(slave_obj_id)})
+    
+    #goto annotation and set as untagged
+    part_id = process_attributes['part_id']
+    captured_original_frame_http = process_attributes['captured_original_frame_http']
+    captured_original_frame = process_attributes['captured_original_frame']
+    
+    mp = MongoHelper().getCollection(str(part_id)+"_dataset")
+    
+    capture_doc = {
+                        "file_path": captured_original_frame,
+                        "file_url": captured_original_frame_http,
+                        "state": "untagged",
+                        "annotation_detection": [],
+                        "annotation_detection_history": [],
+                        "annotation_classification": "",
+                        "annotation_classification_history": [],
+                        "annotator": "",
+                        "date_added":timezone.now()}
+                        
+    
+    mp.insert(capture_doc)
+    
+
+    return process_attributes  
 
 def edit_remark_util(data):
     master_obj_id = data['master_obj_id']
@@ -190,6 +228,7 @@ def edit_remark_util(data):
     mp.update({'_id' : ObjectId(slave_obj_id) }, {'$set' :  process_attributes})
     process_attributes = mp.find_one({'_id' : ObjectId(slave_obj_id)})
 
+    
     return process_attributes
 
 
