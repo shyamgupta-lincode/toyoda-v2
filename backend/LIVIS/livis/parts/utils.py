@@ -149,8 +149,9 @@ def read_tf_events_util(experiment_id):
                 time = time.time()
                 mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'current_steps': current_step}}, upsert=False, full_response= True)
                 
-        except:
-            current_step = 0
+        except Exception as e:
+            print(e)
+            # current_step = 0
             mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'current_steps': current_step}}, upsert=False, full_response= True)
 
         return current_step
