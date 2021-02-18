@@ -16,6 +16,13 @@ from drf_yasg.utils import swagger_auto_schema
 from logs.utils import add_logs_util
 
 
+@api_view(['POST'])
+@csrf_exempt
+def experiment_status(request):
+    config = json.loads(request.body)
+    from parts.utils import read_tf_events
+    message= read_tf_events(config)
+    return HttpResponse(json.dumps(message, cls=Encoder), content_type="application/json") 
 
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT, 

@@ -19,6 +19,7 @@ from fastai.callback.all import *
 from fastai.vision import *
 from livis.settings import *
 import datetime
+
 import json
 MODEL_MAP = {"resnet34" : models.resnet34}
 
@@ -77,6 +78,8 @@ def add_experiment(config):
     }
     experiment_id = mp.insert(collection_obj)
     return experiment_id
+
+
 
 def add_experiment_modified(config):
     part_id = config.get('part_id')
