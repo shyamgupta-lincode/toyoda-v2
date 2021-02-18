@@ -127,7 +127,6 @@ def read_tf_events_util(experiment_id):
     tf_events_path = os.path.join(directory_path,"training_volume","train")
     # print(tf_events_path)
     current_step = 0
-    # current_time = 0
     while current_step < no_of_steps:
     # if time.time()
         try:
