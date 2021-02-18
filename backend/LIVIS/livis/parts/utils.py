@@ -122,15 +122,16 @@ def read_tf_events_util(experiment_id):
         no_of_steps =  int(val["hyperparameters"]["no_of_steps"]) 
 
     static_path = TRAIN_DATA_STATIC.split('/image_data')[0]
+    # static_path = "/home/lincode/Desktop/livis_v2/republic/backend/LIVIS/livis/training"
     directory_path = os.path.join(static_path,"models","experiments",str(experiment_id))
     tf_events_path = os.path.join(directory_path,"training_volume","train")
+    # print(tf_events_path)
     current_step = 0
     # current_time = 0
     while current_step < no_of_steps:
     # if time.time()
         try:
             if os.path.exists(tf_events_path):
-                # import os
                 steps_list = []
 
                 for file_ in os.listdir(tf_events_path):
