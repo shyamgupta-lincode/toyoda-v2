@@ -281,7 +281,8 @@ def sort_data(request):
     data = json.loads(request.body)
     from annotate.utils import sort_data_util
     resp = sort_data_util(data)
-    return HttpResponse(json.dumps({'data' : resp}, cls=Encoder), content_type="application/json")
+    print(resp)
+    return HttpResponse(json.dumps(resp, cls=Encoder), content_type="application/json")
 
 
 
