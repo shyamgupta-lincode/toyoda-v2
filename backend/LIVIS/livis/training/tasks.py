@@ -462,7 +462,8 @@ def get_deployment_list_util():
                             "experiment_type" : experiment['experiment_type'],
                             "workstation" : ws_name,
                             "inference_urls" :  get_inference_feed_url_util(ws["_id"] , part_id),
-                            "experiment_id" : experiment['_id']
+                            "experiment_id" : experiment['_id'],
+                            "container_state" : experiment['container_state']
                         }
                         try:
                             threshold =  experiment['threshold']
