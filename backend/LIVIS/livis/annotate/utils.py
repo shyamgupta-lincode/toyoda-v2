@@ -1522,10 +1522,12 @@ def get_feature_util(data):
     # for doc in mp:
     #     print(doc)
     # if mp.count != 0:
+
     try:
+        if mp.find({ "kanban.kanban_details": { '$exists': True, '$eq':None } }):
+            return annotation_dict
         if mp["camera_id"] == camera_id and mp["workstation_id"]== str(ws_id):
-                if mp["kanban"]["kanban_details"] =="null":
-                    return annotation_dict    
+                
         
                 annotation_dict.append(mp["kanban"]["kanban_details"])
     except Exception as e :
