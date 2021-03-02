@@ -1524,6 +1524,8 @@ def get_feature_util(data):
     # if mp.count != 0:
     try:
         if mp["camera_id"] == camera_id and mp["workstation_id"]== str(ws_id):
+                if mp["kanban"]["kanban_details"] =="null":
+                    return annotation_dict    
         
                 annotation_dict.append(mp["kanban"]["kanban_details"])
     except Exception as e :
