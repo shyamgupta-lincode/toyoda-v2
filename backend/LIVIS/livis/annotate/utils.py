@@ -547,9 +547,14 @@ def card_flip_random_image_util(part_id):
     
     ret_pth = []
     
-
-    for i in p:
-        ret_pth.append(i['file_url'])
+    if len(p)>5:
+        for i in p:
+           ret_pth.append(i['file_url'])
+           if len(ret_pth) == 5:
+               break
+    else:
+        for i in p:
+            ret_pth.append(i['file_url'])
             
     #p = random.choice(p)
 
