@@ -535,35 +535,31 @@ def card_flip_random_image_util(data):
         status_code = 400
         return message,status_code
 
-    try:
-        dataset = mp.find_one({'_id' : ObjectId(part_id.replace('"',''))})
-        if dataset is None:
-            message = "Part not found in Parts collection"
-            status_code = 404
-            return message,status_code
-
-    except Exception as e:
-        message = "Invalid partID"
-        status_code = 400
-        return message,status_code
 
     #p = [i for i in mp.find()]
-
+    
     _id = str(dataset['_id'])
-    mp = MongoHelper().getCollection(str(dataset['_id']))
+    mp = MongoHelper().getCollection(str(part_id)+"_dataset")
+
+
     p = [i for i in mp.find()]
+    
+    ret_pth = []
+    
 
-    p = random.choice(p)
+    for i in p:
+        ret_pth.append(i['file_url'])
+            
+    #p = random.choice(p)
 
-    semi_path = (str(p['file_path']).replace(IMAGE_DATASET_SAVE_PATH,""))
-    semi_path = semi_path.replace('\\','')
-    resp =  "http://localhost"  + semi_path 
+    #semi_path = (str(p['file_path']).replace(IMAGE_DATASET_SAVE_PATH,""))
+    #semi_path = semi_path.replace('\\','')
+    #resp =  "http://localhost"  + semi_path 
 
-    message = resp
+    message = ret_pth
     status_code = 200
 
     return message,status_code
-
 
 
 def fetch_image_url_util(data):
