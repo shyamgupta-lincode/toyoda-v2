@@ -3,6 +3,9 @@ from livis.settings import *
 from bson import ObjectId
 from plan.utils import get_todays_planned_production_util
 from common.utils import GetLabelData
+
+import tensorflow as tf 
+from tensorflow.python.summary.summary_iterator import summary_iterator
 #######################################################################PART CRUDS#######################################################
 def add_part_details_task(data):
     """
@@ -111,6 +114,60 @@ def get_part_details_task(part_id):
         return {}
 
 
+
+def read_tf_events_util(experiment_id):
+    mp =MongoHelper().getCollection('experiment') 
+    curser = mp.find({'_id' : ObjectId(experiment_id)})  
+    for val in curser:
+        no_of_steps =  int(val["hyperparameters"]["no_of_steps"]) 
+
+    static_path = TRAIN_DATA_STATIC.split('/image_data')[0]
+    # static_path = "/home/lincode/Desktop/livis_v2/republic/backend/LIVIS/livis/training"
+    directory_path = os.path.join(static_path,"models","experiments",str(experiment_id))
+    tf_events_path = os.path.join(directory_path,"training_volume","train")
+    # print(tf_events_path)
+    current_step = 0
+    while current_step < no_of_steps:
+    # if time.time()
+        try:
+            if os.path.exists(tf_events_path):
+                steps_list = []
+
+                for file_ in os.listdir(tf_events_path):
+                    print(file_)
+                    summary_events = []
+                    summ_ = os.path.join(tf_events_path,file_)
+                    summary_events.append(summ_)
+                    for file_2 in summary_events:
+                        summary_obj = summary_iterator(file_2)
+                        for val in summary_obj:
+                            steps_list.append(val.step)
+                            
+        # 
+                steps_list.sort()
+                current_step = steps_list[-1]
+                time = time.time()
+                mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'current_steps': current_step}}, upsert=False, full_response= True)
+                
+        except Exception as e:
+            print(e)
+            # current_step = 0
+            mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'current_steps': current_step}}, upsert=False, full_response= True)
+
+        return current_step
+
+
+def read_tf_events(config):
+    experiment_id = config.get('experiment_id')
+    current_step = read_tf_events_util(experiment_id)
+
+    return current_step
+
+
+
+
+
+
 def get_parts_task(skip=0, limit=100):
     mp = MongoHelper().getCollection(PARTS_COLLECTION)
     
@@ -123,6 +180,8 @@ def get_parts_task(skip=0, limit=100):
         part_obj_id = i["_id"]
         mp = MongoHelper().getCollection('experiment')
         i["experiments"] = [i for i in mp.find({'part_id' : str(part_obj_id)})]
+        # cursor = mp.find({"$and" : [{'part_id' : str(part_obj_id)}, { "status" :"Running" }]})
+        # current_step = read_tf_events(experiment_id)
         info = GetLabelData(part_obj_id).get_metrics()
         i["label_info"] = info
     if parts:

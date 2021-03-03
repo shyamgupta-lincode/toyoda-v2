@@ -32,7 +32,8 @@ def set_threshold(request):
     from training.tasks import set_threshold_util
     message= set_threshold_util(config)
     return HttpResponse(json.dumps(message, cls=Encoder), content_type="application/json")
-    
+
+   
     
 @api_view(['POST'])
 @csrf_exempt

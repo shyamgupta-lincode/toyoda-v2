@@ -19,6 +19,7 @@ from fastai.callback.all import *
 from fastai.vision import *
 from livis.settings import *
 import datetime
+
 import json
 MODEL_MAP = {"resnet34" : models.resnet34}
 
@@ -78,6 +79,8 @@ def add_experiment(config):
     experiment_id = mp.insert(collection_obj)
     return experiment_id
 
+
+
 def add_experiment_modified(config):
     part_id = config.get('part_id')
     experiment_name = config.get('experiment_name', None)
@@ -94,6 +97,7 @@ def add_experiment_modified(config):
             'retrain': False,
             'part_id' : part_id,
             'model_id':model_id,
+            'image_data_path' : settings.TRAIN_DATA_STATIC,
             'threshold':"0"
     }
     experiment_id_ = mp.insert(collection_obj)
@@ -459,7 +463,8 @@ def get_deployment_list_util():
                             "experiment_type" : experiment['experiment_type'],
                             "workstation" : ws_name,
                             "inference_urls" :  get_inference_feed_url_util(ws["_id"] , part_id),
-                            "experiment_id" : experiment['_id']
+                            "experiment_id" : experiment['_id'],
+                            "container_state" : experiment['container_state']
                         }
                         try:
                             threshold =  experiment['threshold']
