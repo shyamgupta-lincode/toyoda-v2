@@ -323,28 +323,4 @@ def get_master_features():
     master_feature_list = ['PPWOSRSRH','PPWOSRSLH','Felt_Presence','Clip_Presence']
     return master_feature_list
     
-def get_defect_report_util():
-    payload = {}
-    return payload
-    
-def post_report_util():
-    date_from = ""
-    date_to = ""
-    operator_id = ""
-    shift_id = ""
-    w_id = ""
-    status = ""
-    current = 0
-    limit = 0
-    ###  logic to update mongo
-    return resp
-    
-def post_remark_util():
-    _id = ""
-    remark = ""
-    status = 200
-    message = "Success"
-    return message, status
-
-
 

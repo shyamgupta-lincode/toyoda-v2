@@ -119,30 +119,3 @@ def get_master_feature_list(request):
     resp = get_master_features()
     return HttpResponse(json.dumps(resp, cls=Encoder), content_type="application/json")
     
-
-@api_view(['GET'])
-@csrf_exempt
-def get_defect_report(request):
-    from report.utils import get_defect_report_util
-    resp = get_defect_report_util()
-    return HttpResponse(json.dumps(resp , cls=Encoder), content_type="application/json")
-    
-    
-@api_view(['POST'])
-@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
-@csrf_exempt
-def post_report(request):
-    from reports.utils import post_report_util
-    data = json.loads(request.body)
-    response = post_report_util(data)
-    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
-    
-@api_view(['POST'])
-@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
-@csrf_exempt
-def post_remark(request):
-    from reports.utils import post_remark_util
-    data = json.loads(request.body)
-    response = post_remark_util(data)
-    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
-

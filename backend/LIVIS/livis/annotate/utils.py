@@ -34,7 +34,8 @@ def next_img_util(data):
 
     try:
         mp = MongoHelper().getCollection(PARTS_COLLECTION)
-    except:
+    except Exception as e:
+        print(e)
         message = "Cannot connect to db"
         status_code = 500
         return message,status_code
@@ -59,7 +60,7 @@ def next_img_util(data):
 
         
     try:   
-        mp = MongoHelper().getCollection(str(dataset['_id']+"_dataset"))
+        mp = MongoHelper().getCollection(str(dataset['_id'])+"_dataset")
     except:
         message = "Cannot connect to db"
         status_code = 500
@@ -136,7 +137,7 @@ def prev_img_util(data):
 
         
     try:   
-        mp = MongoHelper().getCollection(str(dataset['_id']+"_dataset"))
+        mp = MongoHelper().getCollection(str(dataset['_id'])+"_dataset")
     except:
         message = "Cannot connect to db"
         status_code = 500
@@ -1599,7 +1600,7 @@ def bulk_upload_util(data):
                 filename = os.path.basename(name)
                 source = zip_file.open(name)
                 target = open(os.path.join(settings.TRAIN_DATA_STATIC, filename), "wb")
-                
+                print('target!!!!!! ', target)
                 with source, target:
                     shutil.copyfileobj(source, target)
                     
@@ -1607,7 +1608,7 @@ def bulk_upload_util(data):
     #remove all non image from list
     new1 = [x for x in names if "." in str(x)]
     new = [x for x in new1 if x.split('.')[1] == 'png' or x.split('.')[1] == 'jpg']
-
+    print("NEW!! : : " , new)
     if new == []:
         #no images found in zip
         message = "Could not find any images in zip"
@@ -1639,6 +1640,7 @@ def bulk_upload_util(data):
                 "date_added":timezone.now()}
                 
             mp = MongoHelper().getCollection(part_id + "_dataset")
+            print("CAPTURE DOC : : : : : : :" , capture_doc)
             mp.insert(capture_doc)
             
         else:
@@ -1690,19 +1692,20 @@ def bulk_upload_util(data):
             
                 
                 
-                capture_doc = {
-                        "file_path": os.path.join(settings.TRAIN_DATA_STATIC,name_of_img),
-                         "file_url": "http://"+settings.BASE_URL+":3306/" + name_of_img,
-                        "state": "untagged",
-                        "annotation_detection": [],
-                        "annotation_detection_history": [],
-                        "annotation_classification": "",
-                        "annotation_classification_history": [],
-                        "annotator": "",
-                        "date_added":timezone.now()}
-                
-                mp = MongoHelper().getCollection(part_id + "_dataset")
-                mp.insert(capture_doc)
+            capture_doc = {
+                    "file_path": os.path.join(settings.TRAIN_DATA_STATIC,name_of_img),
+                     "file_url": "http://"+settings.BASE_URL+":3306/" + name_of_img,
+                    "state": "untagged",
+                    "annotation_detection": [],
+                    "annotation_detection_history": [],
+                    "annotation_classification": "",
+                    "annotation_classification_history": [],
+                    "annotator": "",
+                    "date_added":timezone.now()}
+            
+            mp = MongoHelper().getCollection(part_id + "_dataset")
+            print("CAPTURE DOC 2 : : : : ", capture_doc)
+            mp.insert(capture_doc)
         
         
         
@@ -1742,15 +1745,39 @@ def sort_data_util(data):
         status_code = 400
         return message, status_code
 
-    
+    try:
+        current = data['current']
+        current = int(current)
+    except:
+        current = 0
 
-    dataset_list = MongoHelper().getCollection(str(part_id) + "_dataset")
-    #dataset = dataset_list.find()
+    try:
+        limit_to = data['limit']
+        limit_to = int(limit_to)
+    except:
+        limit_to = 0
+
+    skip_from = ((current*limit_to)-limit_to)
+
+    mp = MongoHelper().getCollection(str(part_id) + "_dataset")
+
+    count_tagged = mp.find({"state":"tagged"}).count()
+    print("count tag "+str(count_tagged))
+
+    count_untagged = mp.find({"state":"untagged"}).count()
+    print("count untagged "+str(count_untagged))
+
 
     if tag != "":
-        dataset = [p for p in dataset_list.find({"state":tag})]
+        dataset = [p for p in mp.find({"state":tag})]
     else:
-        dataset = [p for p in dataset_list.find()]
+        dataset = [p for p in mp.find()]
+    start_idx = skip_from
+    print(start_idx)
+    print(limit_to)
+    dataset = dataset[start_idx:start_idx+limit_to]
+
+    print("Length of dataset "+str(len(dataset)))
 
     if sort_by != "":
         date_sorted = sorted(dataset, key = lambda x: x[sort_by].date())
@@ -1758,21 +1785,11 @@ def sort_data_util(data):
         if order.find("descending") != -1:
             date_sorted = date_sorted[::-1]
 
-        return date_sorted
+        payload = {'data':date_sorted,'count_tagged':count_tagged, 'count_untagged': count_untagged}
+        return payload
     else:
-        return dataset
-
-
-               
-
-    
-
-
-
-
-    
-
-
+        payload = {'data':dataset,'count_tagged':count_tagged, 'count_untagged': count_untagged}
+        return payload
 
 
 
