@@ -518,9 +518,9 @@ def get_data_for_histogram_util(data):
 
     return message,status_code
 
-def card_flip_random_image_util(data):
+def card_flip_random_image_util(part_id):
 
-
+    #print("partrtttttttttttttttttttttt",part_id)
     try:
         mp = MongoHelper().getCollection(PARTS_COLLECTION)
     except:
@@ -529,7 +529,7 @@ def card_flip_random_image_util(data):
         return message,status_code
 
     # error handle part_id
-    part_id = data.GET['part_id']
+    #part_id = data.GET['part_id']
     if part_id is None:
         message = "PartId not provided"
         status_code = 400
@@ -538,11 +538,12 @@ def card_flip_random_image_util(data):
 
     #p = [i for i in mp.find()]
     
-    _id = str(dataset['_id'])
+    #_id = str(dataset['_id'])
     mp = MongoHelper().getCollection(str(part_id)+"_dataset")
 
 
     p = [i for i in mp.find()]
+    print(p)
     
     ret_pth = []
     
