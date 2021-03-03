@@ -97,6 +97,7 @@ def add_experiment_modified(config):
             'retrain': False,
             'part_id' : part_id,
             'model_id':model_id,
+            'image_data_path' : settings.TRAIN_DATA_STATIC,
             'threshold':"0"
     }
     experiment_id_ = mp.insert(collection_obj)
