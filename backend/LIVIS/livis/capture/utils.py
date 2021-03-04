@@ -66,26 +66,27 @@ def get_camera_feed_urls():
 
     p = [p for p in mp.find()]
 
-    p=p[0]
-
-    workstation_id = p['_id']
-
     feed_urls = []
-    dummmy_dct = {}
+    for coll in p:
     
-    
-    workstation_id = ObjectId(workstation_id)
-    mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
-    ws_row = mp.find_one({'_id': workstation_id})
-    ws_camera_dict = ws_row.get('cameras')
-    print(ws_camera_dict)
-    
-    for i in ws_camera_dict:
+        workstation_id = coll['_id']
+
         
-        #url = "http://127.0.0.1:8000/livis/v1/capture/consumer_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
-        url = "http://"+BASE_URL+":8000/livis/v1/capture/consumer_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
-        dummmy_dct = {"camera_name":i['camera_name'] , "camera_url":url}
-        feed_urls.append(dummmy_dct)
+        dummmy_dct = {}
+    
+    
+        workstation_id = ObjectId(workstation_id)
+        mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
+        ws_row = mp.find_one({'_id': workstation_id})
+        ws_camera_dict = ws_row.get('cameras')
+        print(ws_camera_dict)
+    
+        for i in ws_camera_dict:
+        
+            #url = "http://127.0.0.1:8000/livis/v1/capture/consumer_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
+            url = "http://"+BASE_URL+":8000/livis/v1/capture/consumer_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
+            dummmy_dct = {"camera_name":i['camera_name'] , "camera_url":url,"workstation_id":str(workstation_id),"camera_id":str(i['camera_id'])}
+            feed_urls.append(dummmy_dct)
     if feed_urls:
         return feed_urls
     else:
@@ -138,6 +139,7 @@ def capture_image_util(data):
     #        break
 
     topic = str(workstation_id) + "_" + str(camera_id) + "_input"
+    topic = topic.replace(":","-")
 
     consumer = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL, auto_offset_reset='latest')
     print("Consumer initialized")
@@ -273,6 +275,7 @@ def start_camera_preview(workstation_id,camera_name):
             break
     
     topic = str(workstation_id) + "_" + str(camera_id) + "_input"
+    topic = topic.replace(":","-")
     
     consumer = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL, auto_offset_reset='latest')
         
@@ -311,6 +314,7 @@ def start_inference(workstation_id,camera_name,partid):
             break
     
     topic = str(workstation_id) + "_" + str(camera_id) + "_output"
+    topic = topic.replace(":","-")
     
     consumer = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL, auto_offset_reset='latest')
     #consumer.poll()

@@ -66,18 +66,23 @@ class Camera():
         self.poll_for_part_id()
 
 
-        if camera_id.find(".") > -1:
+        if str(camera_id).find(".") == -1:
             self.cap = cv2.VideoCapture(int(self.cam_id))
             self.is_ip = False
         else:
-            self.cap = IPWEBCAM(root_url=camera_id)
+            self.cap = IPWEBCAM(root_url=str(self.cam_id))
             self.is_ip = True
+            print("mobile found")
 
 
     def _poll_for_part_id(self):
         mp = MongoHelper().getCollection("cam_to_part")
         while True:
-            pr = mp.find_one({'camera_id' : int(self.cam_id)})
+            #pr = mp.find_one({'camera_id' : int(self.cam_id)})
+            if self.cam_id.find(":") != -1:
+                pr = mp.find_one({'camera_id' : self.cam_id})
+            else:
+                pr = mp.find_one({'camera_id' : int(self.cam_id)})
             if pr:
                 #print('found_part : : : ' , pr)
                 self.part_id = pr['part_id']
@@ -88,12 +93,19 @@ class Camera():
 
     def _start(self):
         while not self.killed:
+            #print(self.is_ip)
             if self.is_ip == False:
-                ret, self.frame = self.cap.read()
-            else:
-                ret, self.frame = self.cap.get_image()
+                try:
+                    ret, self.frame = self.cap.read()
+                except:
+                    continue
+            if self.is_ip == True:
+                try:
+                    self.frame = self.cap.get_image()
+                except:
+                    continue
             if self.frame is None:
-                print("None Frame Recieved!")
+                #print("None Frame Recieved!")
                 continue
             #### check tfms and apply here
             if self.part_id:
@@ -176,12 +188,18 @@ if workstations:
         wids = w_s['_id']
         for c in cameras:
             camera_ids = c['camera_id']
-            list_of_topics.append(str(wids)+"_"+str(camera_ids)+"_input")
+            topic = str(wids)+"_"+str(camera_ids)+"_input"
+            topic = topic.replace(":","-")
+            list_of_topics.append(topic)
+            topic = ""
 
-
+print(list_of_topics)
 for i in list_of_topics:
     topic = i
-    camera_id = int(topic.split('_')[1])
+    print(topic.split('_'))
+    camera_id = str(topic.split('_')[1])
+    camera_id = camera_id.replace("-",":")
+    
 
     cc = Camera(KAFKA_BROKER_URL, topic, camera_id)
     cc.start()
