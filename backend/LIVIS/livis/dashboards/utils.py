@@ -16,12 +16,9 @@ def total_production_util():
     total_production_count = 0
     for ins in objs:
             inspection_id = str(ins['_id'])
-            try:
-                mp = MongoHelper.getCollection(inspection_id+"_log")
-            except:
-                continue
+            mp = MongoHelper().getCollection(str(inspection_id)+"_"+"log")
             parts_coll = mp.find().count()
-            print(parts_coll)
+            #print("parts_coll "+str(parts_coll)+" inspection_id "+str(inspection_id))
             total_production_count = total_production_count + parts_coll
     return total_production_count
 
@@ -37,9 +34,10 @@ def production_yield_util():
     objs = [i for i in mp.find()]
     for ins in objs:
         inspection_id = str(ins['_id'])
-        mp = MongoHelper.getCollection(inspection_id+"_log")
-        parts_coll = [p for p in mp.find({"isAccepted":"True"})]
-        total_accepted = total_accepted + len(parts_coll)
+        mp = MongoHelper().getCollection(inspection_id+"_log")
+        parts_coll = mp.find({"isAccepted":True}).count()
+        #print(parts_coll)
+        total_accepted = total_accepted + parts_coll
     percent_yield = (total_accepted/total_prod_count)*100
     return percent_yield
 
@@ -59,7 +57,7 @@ def production_rate_util():
     objs = [i for i in mp.find()]
     for ins in objs:
         inspection_id = str(ins['_id'])
-        mp = MongoHelper.getCollection(inspection_id + "_log")
+        mp = MongoHelper().getCollection(inspection_id + "_log")
         insp_colls = [p for p in mp.find()]
         for i in insp_colls:
             start_time = i["inference_start_time"]
@@ -69,11 +67,12 @@ def production_rate_util():
             end_time_dt = datetime.datetime.strptime(end_time,"%Y-%m-%d %H:%M:%S")
             time_delta = end_time_dt - start_time_dt
             seconds = time_delta.total_seconds()
+            print("time delta for inspection_id "+str(inspection_id)+" seconds "+str(seconds))
             seconds_count = seconds_count + seconds
         doc_count = doc_count + len(insp_colls)
     avg_rate_secs = int(seconds_count/doc_count)
     ## logic needs to be added if time_period is hours or minutes
-    return 0
+    return avg_rate_secs
 
 def defect_count_util():
     #from inspection get part id
@@ -85,8 +84,8 @@ def defect_count_util():
     objs = [i for i in mp.find()]
     for ins in objs:
         inspection_id = str(ins['_id'])
-        mp = MongoHelper.getCollection(inspection_id+"_log")
-        parts_coll = [p for p in mp.find({"isAccepted":"False"})]
+        mp = MongoHelper().getCollection(inspection_id+"_log")
+        parts_coll = [p for p in mp.find({"isAccepted":False})]
         total_rejected = total_rejected + len(parts_coll)
     return total_rejected
 
@@ -103,14 +102,14 @@ def total_vs_planned_util():
         total_planned_count = total_planned_count + int(plan["planned_production_count"])
     return total_planned_count
 
-def defect_distribution():
+def defect_distribution_util():
     defect_count = {}
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
     pr = [i for i in mp.find()]
     for p in pr:
         inspection_id = str(p['_id'])
-        mp = MongoHelper.getCollection(inspection_id + "_log")
-        parts_coll = [p for p in mp.find({"isAccepted": "False"})]
+        mp = MongoHelper().getCollection(inspection_id + "_log")
+        parts_coll = [p for p in mp.find({"isAccepted": False})]
         for i in parts_coll:
             for j in i['detections_missed']:
                 if j in defect_count:

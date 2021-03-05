@@ -28,6 +28,14 @@ def production_yield(request):
 @api_view(['GET'])
 @csrf_exempt
 @permission_classes((AllowAny,))
+def production_rate(request):
+    data = production_rate_util()
+    return HttpResponse(json.dumps( data, cls=Encoder), content_type="application/json")
+
+
+@api_view(['GET'])
+@csrf_exempt
+@permission_classes((AllowAny,))
 def defect_count(request):
     data = defect_count_util()
     return HttpResponse(json.dumps( data , cls=Encoder), content_type="application/json")
@@ -38,3 +46,11 @@ def defect_count(request):
 def total_vs_planned(request):
     data = total_vs_planned_util()
     return HttpResponse(json.dumps( data , cls=Encoder), content_type="application/json")
+
+@api_view(['GET'])
+@csrf_exempt
+@permission_classes((AllowAny,))
+def defect_distribution(request):
+    data = defect_distribution_util()
+    return HttpResponse(json.dumps( data, cls=Encoder), content_type="application/json")
+
