@@ -478,3 +478,98 @@ def get_deployment_list_util():
                 print(e)
     return return_list
 
+
+
+#crud
+def create_model_static_util(data):
+    part_id = data['part_id']
+    
+    try:
+        batch_size = data['batch_size']
+        no_of_steps = data['no_of_steps']
+        epochs = data['epochs']
+        learning_rate = data['learning_rate']
+    except:
+        pass
+        
+    mp = MongoHelper().getCollection("experiment_settings")
+    para = mp.find({"part_id":str(part_id)})
+    
+    if len(para) == 0:
+        #create
+        pth = os.path.join(os.getcwd(),'training/expe.json')
+        with open(pth) as f:
+            collection_obj = json.loads(f)
+        
+        collection_obj['part_id'] = str(part_id)
+        
+        mp1 = MongoHelper().getCollection(PARTS_COLLECTION)
+        para1 = mp1.find({"part_id":str(part_id)})
+        part_name = para1[0]['part_name']
+        
+        
+        mp1 = MongoHelper().getCollection("experiment")
+        para1 = mp1.find({"part_id":str(part_id)})
+        
+        if len(para1) == 0:
+            #no exp found
+            collection_obj['experiment_name'] = str(part_name)+'_version_1'
+        else:
+            #exp found incr++
+            versions = []
+            for i in para1:
+                versions.append( int(str(i['experiment_name']).split('_')[-1]) )
+            versions.sort()
+            collection_obj['experiment_name'] = str(part_name)+"_version_"+str(version[-1])
+        
+        experiment_id = mp.insert(collection_obj)
+        return collection_obj
+        
+    else:
+        #update
+        pth = os.path.join(os.getcwd(),'training/expe.json')
+        with open(pth) as f:
+            collection_obj = json.loads(f)
+        
+        collection_obj['part_id'] = str(part_id)
+        
+        mp1 = MongoHelper().getCollection(PARTS_COLLECTION)
+        para1 = mp1.find({"part_id":str(part_id)})
+        part_name = para1[0]['part_name']
+        
+        
+        mp1 = MongoHelper().getCollection("experiment")
+        para1 = mp1.find({"part_id":str(part_id)})
+        
+        if len(para1) == 0:
+            #no exp found
+            collection_obj['experiment_name'] = str(part_name)+'_version_1'
+        else:
+            #exp found incr++
+            versions = []
+            for i in para1:
+                versions.append( int(str(i['experiment_name']).split('_')[-1]) )
+            versions.sort()
+            collection_obj['experiment_name'] = str(part_name)+"_version_"+str(version[-1])
+        
+        collection_obj['hyperparameters']['batch_size'] = batch_size
+        collection_obj['hyperparameters']['no_of_steps'] = no_of_steps
+        collection_obj['hyperparameters']['epochs'] = epochs
+        collection_obj['hyperparameters']['learning_rate'] = learning_rate
+        
+        
+        experiment = mp.find_one({'_id' : ObjectId(experiment_id)})
+        experiment['status'] = status
+
+        mp.update_one({'_id' : experiment['_id']}, {'$set' : experiment})
+        
+        return collection_obj
+        
+def get_model_static_util(part_id):
+    
+    mp = MongoHelper().getCollection("experiment_settings")
+    para = mp.find({"part_id":str(part_id)})
+    
+    return para
+    
+

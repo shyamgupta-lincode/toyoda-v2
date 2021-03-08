@@ -38,8 +38,42 @@ def add_part_details_task(data):
            'isdeleted' : isdeleted,
            'kanban' : kanban
         }
-        _id = mp.insert(collection_obj)
-        return _id
+        part_id = mp.insert(collection_obj)
+        
+        mp = MongoHelper().getCollection("experiment_settings")
+        para = mp.find({"part_id":str(part_id)})
+    
+        if len(para) == 0:
+            #create
+            pth = os.path.join(os.getcwd(),'training/expe.json')
+            with open(pth) as f:
+                collection_obj = json.loads(f)
+        
+            collection_obj['part_id'] = str(part_id)
+        
+            mp1 = MongoHelper().getCollection(PARTS_COLLECTION)
+            para1 = mp1.find({"part_id":str(part_id)})
+            part_name = para1[0]['part_name']
+        
+        
+            mp1 = MongoHelper().getCollection("experiment")
+            para1 = mp1.find({"part_id":str(part_id)})
+        
+            if len(para1) == 0:
+                #no exp found
+                collection_obj['experiment_name'] = str(part_name)+'_version_1'
+            else:
+                #exp found incr++
+                versions = []
+                for i in para1:
+                    versions.append( int(str(i['experiment_name']).split('_')[-1]) )
+                versions.sort()
+            
+            collection_obj['experiment_name'] = str(part_name)+"_version_"+str(version[-1])
+        
+            experiment_id = mp.insert(collection_obj)
+        
+        return part_id
     except Exception as e:
         return "Could not add part: "+str(e)
 
