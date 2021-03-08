@@ -83,10 +83,17 @@ def add_experiment(config):
 
 def add_experiment_modified(config):
     part_id = config.get('part_id')
-    experiment_name = config.get('experiment_name', None)
-    experiment_type = config.get('experiment_type', None)
-    hyperparameters = config.get('hyperparameters',None)
-    model_id = config.get('model_id',None)
+    # experiment_name = config.get('experiment_name', None)
+    # experiment_type = config.get('experiment_type', None)
+    # hyperparameters = config.get('hyperparameters',None)
+    # model_id = config.get('model_id',None)
+    exp_coll = MongoHelper().getCollection('experiment_settings')
+    obj = exp_coll.find({'part_id' : part_id})
+    for doc in obj:
+        # part_id = doc["part_id"],
+        experiment_name = doc["experiment_name"],
+        experiment_type = doc["experiment_type"],
+        hyperparameters = doc["hyperparameters"]
     mp = MongoHelper().getCollection('experiment')
     collection_obj = {
             'status' : 'Initialized',
@@ -94,14 +101,16 @@ def add_experiment_modified(config):
             'experiment_name' : experiment_name,
             'experiment_type' : experiment_type,
             'hyperparameters' : hyperparameters,
+            'mount_data_path':"null",
             'retrain': False,
             'part_id' : part_id,
-            'model_id':model_id,
-            'image_data_path' : settings.TRAIN_DATA_STATIC,
+            'model_id':"null",
             'threshold':"0"
     }
     experiment_id_ = mp.insert(collection_obj)
     return experiment_id_
+
+    
     
 def add_retrain_experiment(config):
     experiment_id = config.get('experiment_id') 
