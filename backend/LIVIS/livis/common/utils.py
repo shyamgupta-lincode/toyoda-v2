@@ -464,3 +464,22 @@ def generate_xml(exp_id,part_id,list_of_selected_lables,export_type):
         
     return xml_file_path
 
+
+from livis.settings import *
+def get_file(files):
+    tup = ()
+    if str(files).startswith('http'): #starts with
+        f_name = str(files).split('/')[-1]
+        #download wget -O /var/cache/foobar/stackexchange-site-list.txt http://url.to/stackexchange-site-list.txt
+        cmd = 'wget -P '+ TRAIN_DATA_STATIC + ' ' + str(files)
+        os.system(cmd)
+        #return the absolute path with servable path
+        abs_pth = os.path.join(TRAIN_DATA_STATIC,f_name)
+        ser_pth = os.path.join('http://0.0.0.0:3306/'+f_name)
+        return (abs_pth,ser_pth)
+    else:
+        abs_pth = os.path.join(TRAIN_DATA_STATIC,files)
+        ser_pth = os.path.join('http://0.0.0.0:3306/'+files)
+        return (abs_pth,ser_pth)
+    #tup = (abs_pth,ser_pth)
+    #return tup

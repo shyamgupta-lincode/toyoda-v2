@@ -6,6 +6,7 @@ from common.utils import GetLabelData
 
 import tensorflow as tf 
 from tensorflow.python.summary.summary_iterator import summary_iterator
+import json
 #######################################################################PART CRUDS#######################################################
 def add_part_details_task(data):
     """
@@ -38,8 +39,50 @@ def add_part_details_task(data):
            'isdeleted' : isdeleted,
            'kanban' : kanban
         }
-        _id = mp.insert(collection_obj)
-        return _id
+        part_id = mp.insert(collection_obj)
+        
+        mp = MongoHelper().getCollection("experiment_settings")
+        para = [i for i in mp.find({"part_id" : str(part_id)})]
+        print(para)
+    
+        if len(para) == 0:
+            #create
+            pth = os.path.join(os.getcwd(),'training/expe.json')
+            with open(pth) as f:
+                collection_obj = json.load(f)
+            print('1')
+            print(collection_obj)
+            collection_obj['part_id'] = str(part_id)
+        
+            #mp1 = MongoHelper().getCollection(PARTS_COLLECTION)
+            #_id = ObjectId(part_id)
+            #para1 = mp.find_one({'_id' : _id})
+            #print(para1)
+            #part_name = para1[0]['part_name']
+            
+            part_name = part_number
+        
+            print('2')
+            print(collection_obj)
+            mp1 = MongoHelper().getCollection("experiment")
+            para1 = [i for i in mp1.find({"part_id" : str(part_id)})]
+        
+            if len(para1) == 0:
+                #no exp found
+                collection_obj['experiment_name'] = str(part_name)+'_version_1'
+            else:
+                #exp found incr++
+                versions = []
+                for i in para1:
+                    versions.append( int(str(i['experiment_name']).split('_')[-1]) )
+                versions.sort()
+            
+                collection_obj['experiment_name'] = str(part_name)+"_version_"+str(versions[-1])
+                print(collection_obj)
+            
+            experiment_id = mp.insert(collection_obj)
+        
+        return part_id
     except Exception as e:
         return "Could not add part: "+str(e)
 

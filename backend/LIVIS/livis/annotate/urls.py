@@ -13,7 +13,7 @@ urlpatterns = [
                        re_path(r'^get_dataset/$', views.get_dataset_list),
                        re_path(r'^create_dataset/$', views.create_dataset),
                        re_path(r'^get_data_for_histogram/$', views.get_data_for_histogram),
-                       re_path(r'^card_flip_random_image/$', views.card_flip_random_image),
+                       re_path(r'^card_flip_random_image/(?P<part_id>[A-Za-z0-9-_]+)$', views.card_flip_random_image),
                        re_path(r'^fetch_data/$', views.fetch_data),
                        re_path(r'^submit_annotations/$', views.submit_annotations),
                        #re_path(r'^check_annotations/$', views.check_annotations),
