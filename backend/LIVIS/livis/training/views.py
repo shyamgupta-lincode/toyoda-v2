@@ -126,9 +126,10 @@ def get_deployment_list(request):
 @api_view(['GET'])
 @csrf_exempt
 def get_model_static(request,experiment_static_id):
+    print("experiment_static_id ::::::::::::::::::::",experiment_static_id)
     from training.tasks import get_model_static_util
-    response = get_model_static_util(experiment_static_id)
-    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+    response1 = get_model_static_util(experiment_static_id)
+    return HttpResponse(json.dumps({'status' : 'Success!', 'message' : response1}, cls=Encoder), content_type="application/json")
 
 @api_view(['POST'])
 @csrf_exempt
