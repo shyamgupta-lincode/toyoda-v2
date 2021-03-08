@@ -7,31 +7,37 @@ from bson.json_util import dumps
 from bson.objectid import ObjectId
 import datetime
 
-def total_production_util(workstation_id):
-    #from inspection get part id
+def total_production_util():
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    objs = [i for i in mp.find({"workstation_id": workstation_id})]
-    ### iterate through {inspection_id}_logs
-    ###increment count for every document
+    objs = [i for i in mp.find()]
     total_production_count = 0
     for ins in objs:
             inspection_id = str(ins['_id'])
             mp = MongoHelper().getCollection(str(inspection_id)+"_"+"log")
             parts_coll = mp.find().count()
-            #print("parts_coll "+str(parts_coll)+" inspection_id "+str(inspection_id))
             total_production_count = total_production_count + parts_coll
     return total_production_count, 200
 
-def production_yield_util(workstation_id):
-    #call "total_production_util"
-    #from inspection get part_id
-    #iterate through {part_id}_logs
-    ### increment count if isAccepted==True
-    #Calculate the %of total_production_accepted/total_production
-    total_prod_count = total_production_util(workstation_id)
+def total_production_by_wid_util(data):
+    mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
+    try:
+        workstation_id = data["workstation_id"]
+    except:
+        return "workstation id not provided", 400
+    objs = [i for i in mp.find({"workstation_id": workstation_id})]
+    total_production_count = 0
+    for ins in objs:
+            inspection_id = str(ins['_id'])
+            mp = MongoHelper().getCollection(str(inspection_id)+"_"+"log")
+            parts_coll = mp.find({"workstation_id": workstation_id}).count()
+            total_production_count = total_production_count + parts_coll
+    return total_production_count, 200
+
+def production_yield_util():
+    total_prod_count, status = total_production_util()
     total_accepted = 0
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    objs = [i for i in mp.find({"workstation_id": workstation_id})]
+    objs = [i for i in mp.find()]
     for ins in objs:
         inspection_id = str(ins['_id'])
         mp = MongoHelper().getCollection(inspection_id+"_log")
@@ -41,20 +47,39 @@ def production_yield_util(workstation_id):
     percent_yield = (total_accepted/total_prod_count)*100
     return percent_yield, 200
 
+def production_yield_by_wid_util(data):
+    try:
+        w_id = data['workstation_id']
+    except:
+        return "workstation id  not provided", 400
+    total_prod_count, status = total_production_by_wid_util(data)
+    total_accepted = 0
+    mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
+    objs = [i for i in mp.find({"workstation_id":w_id})]
+    for ins in objs:
+        inspection_id = str(ins['_id'])
+        mp = MongoHelper().getCollection(inspection_id+"_log")
+        #parts_coll = mp.find({"and":[{"isAccepted":True},{"workstation_id":w_id}]}).count()
+        #print(parts_coll)
+        parts_coll = mp.find({"isAccepted":True}).count()
+        total_accepted = total_accepted + parts_coll
+    percent_yield = (total_accepted/total_prod_count)*100
+    return percent_yield, 200
 
-def production_rate_util(workstation_id):
-    # get average_time_rate from front end whether secs, min, hours
-    # for every inspection_id log collection
-    ######for every document
-    ######Convert end time to start time to seconds
-    ######add to diff_secs counter
-    ######Increment doc_count for every iter
-    #### average according to time rate (diff_secs_counter)/doc_count
+
+def production_rate_util(data):
+    try:
+        w_id = data['workstation_id']
+    except:
+        return "workstation id  not provided", 400
     time_period = "secs"
     seconds_count = 0
     doc_count = 0
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    objs = [i for i in mp.find({"workstation_id": workstation_id})]
+    if w_id == "":
+        objs = [i for i in mp.find()]
+    else:
+        objs = [i for i in mp.find({"workstation_id":w_id})]
     for ins in objs:
         inspection_id = str(ins['_id'])
         mp = MongoHelper().getCollection(inspection_id + "_log")
@@ -69,18 +94,24 @@ def production_rate_util(workstation_id):
             seconds = time_delta.total_seconds()
             seconds_count = seconds_count + seconds
         doc_count = doc_count + len(insp_colls)
-    avg_rate_secs = int(seconds_count/doc_count)
+    if doc_count>0:
+        avg_rate_secs = int(seconds_count/doc_count)
+    else:
+        return "workstation id data not found", 400
     ## logic needs to be added if time_period is hours or minutes
     return avg_rate_secs, 200
 
-def defect_count_util(workstation_id):
-    #from inspection get part id
-    ### iterate through {part_id}_logs
-    ### increment count if isAccepted==False
-    # return count
+def defect_count_util(data):
+    try:
+        w_id = data['workstation_id']
+    except:
+        return "workstation id  not provided", 400
     total_rejected = 0
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    objs = [i for i in mp.find({"workstation_id": workstation_id})]
+    if w_id == "":
+        objs = [i for i in mp.find()]
+    else:
+        objs = [i for i in mp.find({"workstation_id":w_id})]
     for ins in objs:
         inspection_id = str(ins['_id'])
         mp = MongoHelper().getCollection(inspection_id+"_log")
@@ -88,25 +119,50 @@ def defect_count_util(workstation_id):
         total_rejected = total_rejected + len(parts_coll)
     return total_rejected, 200
 
-def total_vs_planned_util(workstation_id):
-    #call "total_production_util" for total_production count
-    #access plan collection
-    ###increment count of planned_production_count
-    # return (total_production_count, planned_production_count)
-    #total_production_count = total_production_util(workstation_id)
+def total_vs_planned_util(data):
+    try:
+        w_id = data['workstation_id']
+    except:
+        return "workstation id not provided", 400
+    try:
+        part_id = data['part_id']
+    except:
+        return "part id not provided", 400
+    mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
+    if w_id != "" and part_id != "":
+        objs = [i for i in mp.find({ "workstation_id": w_id, "part_id": part_id})]
+    else:
+        objs = [i for i in mp.find()]
+    total_production_count = 0
+    for ins in objs:
+            inspection_id = str(ins['_id'])
+            mp = MongoHelper().getCollection(str(inspection_id)+"_"+"log")
+            parts_coll = mp.find().count()
+            #print("parts_coll "+str(parts_coll)+" inspection_id "+str(inspection_id))
+            total_production_count = total_production_count + parts_coll
     mp = MongoHelper().getCollection(PLAN_COLLECTION)
-    plan_colls= [p for p in mp.find()]
+    if part_id != "":
+        plan_colls= [p for p in mp.find({"part_id": part_id})]
+    else:
+        plan_colls= [p for p in mp.find()]
     total_planned_count = 0
     for plan in plan_colls:
         total_planned_count = total_planned_count + int(plan["planned_production_count"])
     total_vs_planned = int(total_production_count/total_planned_count)
-    return total_planned_count
+    return total_planned_count, 200
 
-def defect_distribution_util():
+def defect_distribution_util(data):
+    try:
+        w_id = data['workstation_id']
+    except:
+        return "workstation id  not provided", 400
     defect_count = {}
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    pr = [i for i in mp.find()]
-    for p in pr:
+    if w_id == "":
+        objs = [i for i in mp.find()]
+    else:
+        objs = [i for i in mp.find({"workstation_id":w_id})]
+    for p in objs:
         inspection_id = str(p['_id'])
         mp = MongoHelper().getCollection(inspection_id + "_log")
         parts_coll = [p for p in mp.find({"isAccepted": False})]
@@ -116,4 +172,4 @@ def defect_distribution_util():
                     defect_count[j] +=1
                 else:
                     defect_count[j] = 1
-    return defect_count
+    return defect_count, 200

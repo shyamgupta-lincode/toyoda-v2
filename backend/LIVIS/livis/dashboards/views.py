@@ -14,8 +14,9 @@ from dashboards.utils import *
 @api_view(['GET'])
 @csrf_exempt
 @permission_classes((AllowAny,))
-def total_production(request, workstation_id):
-    response, status_code = total_production_util(workstation_id)
+def total_production(request):
+    #data = json.loads(request.body)
+    response, status_code = total_production_util()
     if status_code != 200:
         return HttpResponse({response}, status=status_code)
     else:
@@ -24,8 +25,19 @@ def total_production(request, workstation_id):
 @api_view(['GET'])
 @csrf_exempt
 @permission_classes((AllowAny,))
-def production_yield(request, workstation_id):
-    response, status_code = production_yield_util(workstation_id)
+def total_production_by_wid(request):
+    data = json.loads(request.body)
+    response, status_code = total_production_by_wid_util(data)
+    if status_code != 200:
+        return HttpResponse({response}, status=status_code)
+    else:
+        return HttpResponse(json.dumps({'data':response} , cls=Encoder), content_type="application/json")
+
+@api_view(['GET'])
+@csrf_exempt
+@permission_classes((AllowAny,))
+def production_yield(request):
+    response, status_code = production_yield_util()
     if status_code != 200:
         return HttpResponse({response}, status=status_code)
     else:
@@ -34,8 +46,20 @@ def production_yield(request, workstation_id):
 @api_view(['GET'])
 @csrf_exempt
 @permission_classes((AllowAny,))
-def production_rate(request, workstation_id):
-    response, status_code = production_rate_util(workstation_id)
+def production_yield_by_wid(request):
+    data = json.loads(request.body)
+    response, status_code = production_yield_by_wid_util(data)
+    if status_code != 200:
+        return HttpResponse({response}, status=status_code)
+    else:
+        return HttpResponse(json.dumps( {'data': response}, cls=Encoder), content_type="application/json")
+
+@api_view(['GET'])
+@csrf_exempt
+@permission_classes((AllowAny,))
+def production_rate(request):
+    data = json.loads(request.body)
+    response, status_code = production_rate_util(data)
     if status_code != 200:
         return HttpResponse({response}, status=status_code)
     else:
@@ -45,8 +69,9 @@ def production_rate(request, workstation_id):
 @api_view(['GET'])
 @csrf_exempt
 @permission_classes((AllowAny,))
-def defect_count(request, workstation_id):
-    response, status_code = defect_count_util(workstation_id)
+def defect_count(request):
+    data = json.loads(request.body)
+    response, status_code = defect_count_util(data)
     if status_code != 200:
         return HttpResponse({response}, status=status_code)
     else:
@@ -55,8 +80,9 @@ def defect_count(request, workstation_id):
 @api_view(['GET'])
 @csrf_exempt
 @permission_classes((AllowAny,))
-def total_vs_planned(request, workstation_id):
-    response, status_code = total_vs_planned_util(workstation_id)
+def total_vs_planned(request):
+    data = json.loads(request.body)
+    response, status_code = total_vs_planned_util(data)
     if status_code != 200:
         return HttpResponse({response}, status=status_code)
     else:
@@ -65,8 +91,9 @@ def total_vs_planned(request, workstation_id):
 @api_view(['GET'])
 @csrf_exempt
 @permission_classes((AllowAny,))
-def defect_distribution(request, workstation_id):
-    response, status_code = defect_distribution_util(workstation_id)
+def defect_distribution(request):
+    data = json.loads(request.body)
+    response, status_code = defect_distribution_util(data)
     if status_code != 200:
         return HttpResponse({response}, status=status_code)
     else:
