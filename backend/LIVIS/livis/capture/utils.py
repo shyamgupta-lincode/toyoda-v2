@@ -46,7 +46,7 @@ def get_inference_feed_url_util(wsid , partid):
         ## check camera in preprocess table for the part
         #url = "http://127.0.0.1:8000/livis/v1/capture/inference_camera_preview/{}/{}/{}/".format(workstation_id,i['camera_name'], partid)
         url = "http://"+BASE_URL+":8000/livis/v1/capture/inference_camera_preview/{}/{}/{}/".format(workstation_id,i['camera_name'], partid)
-        dummmy_dct = {"camera_name":i['camera_name'] , "camera_url":url}
+        dummmy_dct = {"camera_name":i['camera_name'] , "camera_url":url,"workstation_id":str(workstation_id),"camera_id":str(i['camera_id'])}
         feed_urls.append(dummmy_dct)
     if feed_urls:
         return feed_urls
