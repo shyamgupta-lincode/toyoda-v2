@@ -561,16 +561,16 @@ def create_model_static_util(data):
         para1 = [i for i in mp1.find({"part_id":str(part_id)})]
         #para1 = mp1.find({"part_id":str(part_id)})
         
-        if len(para1) == 0:
-            #no exp found
-            collection_obj['experiment_name'] = str(part_name)+'_version_1'
-        else:
-            #exp found incr++
-            versions = []
-            for i in para1:
-                versions.append( int(str(i['experiment_name']).split('_')[-1]) )
-            versions.sort()
-            collection_obj['experiment_name'] = str(part_name)+"_version_"+str(version[-1])
+        #if len(para1) == 0:
+        #    #no exp found
+        #    collection_obj['experiment_name'] = str(part_name)+'_version_1'
+        #else:
+        #    #exp found incr++
+        #    versions = []
+        #    for i in para1:
+        #        versions.append( int(str(i['experiment_name']).split('_')[-1]) )
+        #    versions.sort()
+        #    collection_obj['experiment_name'] = str(part_name)+"_version_"+str(version[-1])
         
         collection_obj['hyperparameters']['batch_size'] = batch_size
         collection_obj['hyperparameters']['no_of_steps'] = no_of_steps
