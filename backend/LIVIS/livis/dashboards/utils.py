@@ -7,9 +7,16 @@ from bson.json_util import dumps
 from bson.objectid import ObjectId
 import datetime
 
-def total_production_util():
+def total_production_by_wid_util(data):
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    objs = [i for i in mp.find()]
+    try:
+        workstation_id = data["workstation_id"]
+    except:
+        return "workstation id not provided", 400
+    if w_id == "":
+        objs = [i for i in mp.find()]
+    else:
+        objs = [i for i in mp.find({"workstation_id":w_id})]
     total_production_count = 0
     for ins in objs:
             inspection_id = str(ins['_id'])
@@ -18,40 +25,15 @@ def total_production_util():
             total_production_count = total_production_count + parts_coll
     return total_production_count, 200
 
-def total_production_by_wid_util(data):
-    mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    try:
-        workstation_id = data["workstation_id"]
-    except:
-        return "workstation id not provided", 400
-    objs = [i for i in mp.find({"workstation_id": workstation_id})]
-    total_production_count = 0
-    for ins in objs:
-            inspection_id = str(ins['_id'])
-            mp = MongoHelper().getCollection(str(inspection_id)+"_"+"log")
-            parts_coll = mp.find({"workstation_id": workstation_id}).count()
-            total_production_count = total_production_count + parts_coll
-    return total_production_count, 200
-
-def production_yield_util():
-    total_prod_count, status = total_production_util()
-    total_accepted = 0
-    mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    objs = [i for i in mp.find()]
-    for ins in objs:
-        inspection_id = str(ins['_id'])
-        mp = MongoHelper().getCollection(inspection_id+"_log")
-        parts_coll = mp.find({"isAccepted":True}).count()
-        #print(parts_coll)
-        total_accepted = total_accepted + parts_coll
-    percent_yield = (total_accepted/total_prod_count)*100
-    return percent_yield, 200
-
 def production_yield_by_wid_util(data):
     try:
         w_id = data['workstation_id']
     except:
         return "workstation id  not provided", 400
+    if w_id == "":
+        objs = [i for i in mp.find()]
+    else:
+        objs = [i for i in mp.find({"workstation_id":w_id})]
     total_prod_count, status = total_production_by_wid_util(data)
     total_accepted = 0
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
