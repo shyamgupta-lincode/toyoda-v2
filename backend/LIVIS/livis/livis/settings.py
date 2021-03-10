@@ -211,8 +211,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Africa/Nairobi'
 CELERYD_FORCE_EXECV = True
 
-#TRAIN_DATA_STATIC = os.path.join(BASE_DIR+  '/training/image_data/')
-TRAIN_DATA_STATIC = "/home/lincode/data_drive/image_data"
+TRAIN_DATA_STATIC = "/datadrive/image_data"
 EXPERIMENT_DATA_STATIC = '/root/experiments'
 print("AREEEEE: : : : :   " , TRAIN_DATA_STATIC)
 if not os.path.exists(TRAIN_DATA_STATIC):

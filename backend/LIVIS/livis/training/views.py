@@ -118,3 +118,23 @@ def get_deployment_list(request):
     from training.tasks import get_deployment_list_util
     response = get_deployment_list_util()
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+
+
+## crud 
+
+@api_view(['GET'])
+@csrf_exempt
+def get_model_static(request,experiment_static_id):
+    print("experiment_static_id ::::::::::::::::::::",experiment_static_id)
+    from training.tasks import get_model_static_util
+    response1 = get_model_static_util(experiment_static_id)
+    return HttpResponse(json.dumps({'status' : 'Success!', 'message' : response1}, cls=Encoder), content_type="application/json")
+
+@api_view(['POST'])
+@csrf_exempt
+def create_model_static(request):
+    deployment_task = json.loads(request.body)
+    from training.tasks import create_model_static_util
+    deployment_status = create_model_static_util(deployment_task)
+    return HttpResponse(json.dumps({'status' : 'Success!', 'message' : deployment_status}, cls=Encoder), content_type="application/json")
