@@ -83,7 +83,18 @@ def add_experiment(config):
 
 def add_experiment_modified(config):
     part_id = config.get('part_id')
-    # experiment_name = config.get('experiment_name', None)
+    experiment_name = config.get('experiment_name', None)
+
+    part_collection = MongoHelper().getCollection(settings.PARTS_COLLECTION)
+    part_obj = part_collection.find({'_id' :part_id})
+    for obj in part_obj:  
+        part_number = obj["part_number"]
+    if experiment_name == None:
+        experiment_name = str(part_number)+"_version_"+str(1)
+    else:
+        temp_name = int(experiment_name.split("_")[-1]) + 1  
+        experiment_name = str(part_number)+"_version_"+str(temp_name)
+
     # experiment_type = config.get('experiment_type', None)
     # hyperparameters = config.get('hyperparameters',None)
     # model_id = config.get('model_id',None)
@@ -91,10 +102,17 @@ def add_experiment_modified(config):
     obj = exp_coll.find({'part_id' : part_id})
     for doc in obj:
         # part_id = doc["part_id"],
-        experiment_name = doc["experiment_name"],
+        # experiment_name = doc["experiment_name"],
         experiment_type = doc["experiment_type"],
         hyperparameters = doc["hyperparameters"]
     mp = MongoHelper().getCollection('experiment')
+
+    myquery = { "part_id": part_id }
+    newvalues = { "$set": { "experiment_name": experiment_name } }
+
+    exp_coll.update_one(myquery, newvalues)
+
+    print(experiment_name)
     collection_obj = {
             'status' : 'Initialized',
             'created_at':datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
