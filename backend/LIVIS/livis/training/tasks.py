@@ -86,7 +86,11 @@ def add_experiment_modified(config):
     experiment_name = config.get('experiment_name', None)
 
     part_collection = MongoHelper().getCollection(settings.PARTS_COLLECTION)
-    part_obj = part_collection.find({'_id' :ObjectId(part_id)})
+#<<<<<<< HEAD
+    #part_obj = part_collection.find({'_id' :ObjectId(part_id)})
+#=======
+    part_obj = part_collection.find({'_id' : ObjectId(part_id)})
+#>>>>>>> 8dcb7c9f55515602e4d1796e7a9d5d6247ce0d08
     for obj in part_obj:  
         part_number = obj["part_number"]
     if experiment_name == None:

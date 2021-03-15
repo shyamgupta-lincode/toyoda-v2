@@ -72,8 +72,8 @@ def production_rate_util(data):
             start_time = i["inference_start_time"]
             end_time = i["inference_end_time"]
             ### Assuming hours is a 12 hour clock
-            start_time_dt = datetime.datetime.strptime(start_time,"%Y-%m-%d %H:%M:%S")
-            end_time_dt = datetime.datetime.strptime(end_time,"%Y-%m-%d %H:%M:%S")
+            start_time_dt = datetime.strptime(start_time,"%Y-%m-%d %H:%M:%S")
+            end_time_dt = datetime.strptime(end_time,"%Y-%m-%d %H:%M:%S")
             time_delta = end_time_dt - start_time_dt
             seconds = time_delta.total_seconds()
             seconds_count = seconds_count + seconds
@@ -97,30 +97,127 @@ def production_weekly_util(data):
         objs = [i for i in mp.find({"workstation_id":w_id})]
     date_format = "%Y-%m-%d %H:%M:%S"
     now = datetime.now().replace(microsecond=0)
+    #now = datetime(2021, 3, 5, 16, 31, 2)
+    print(now)
     toi_end = datetime.strptime(str(now), date_format)
     print(toi_end)
     prev = now - timedelta(days = 7)
     print(prev)
     toi_start = datetime.strptime(str(prev), date_format)
     print(toi_start)
-    parts = {"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
+    parts = {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
     for ins in objs:
         inspection_id = str(ins['_id'])
         mp = MongoHelper().getCollection(inspection_id + "_log")
-        insp_colls = [p for p in mp.find()]
+        insp_colls = [p for p in mp.find({"isAccepted":True})]
         for i in insp_colls:
             start_time = i["inference_start_time"]
-            print(" mongo type"+str(type(start_time)))
             start_time = datetime.strptime(start_time, date_format)
             print("start time after parsing "+str(start_time))
             end_time = i["inference_end_time"]
             end_time = datetime.strptime(end_time, date_format)
-            if end_time >= toi_start and end_time <= toi_end:
+            if end_time >= toi_start and end_time < toi_end:
                 time_delta = toi_end - end_time
                 days = time_delta.days
                 parts[str(days)] = parts[str(days)] + 1
     print(parts)
-    return parts, 200
+    defects = {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
+    for ins in objs:
+        inspection_id = str(ins['_id'])
+        mp = MongoHelper().getCollection(inspection_id + "_log")
+        insp_colls = [p for p in mp.find({"isAccepted":False})]
+        for i in insp_colls:
+            start_time = i["inference_start_time"]
+            start_time = datetime.strptime(start_time, date_format)
+            print("start time after parsing "+str(start_time))
+            end_time = i["inference_end_time"]
+            end_time = datetime.strptime(end_time, date_format)
+            if end_time >= toi_start and end_time < toi_end:
+                time_delta = toi_end - end_time
+                days = time_delta.days
+                defects[str(days)] = defects[str(days)] + 1
+    print(defects)
+    data = {"accepted_by_week": parts, "rejected_by_week":defects}
+    parts_list = []
+    for key, value in parts.items():
+        if value ==0:
+            value = None
+        parts_list.append(value)
+    defect_list = []
+    for key, value in defects.items():
+        if value ==0:
+            value = None
+        defect_list.append(value)
+    data = [{"name":"Approved", "data":parts_list},{"name":"Rejected", "data":defect_list}]
+    return data, 200
+
+def production_hourly_util(data):
+    try:
+        w_id = data['workstation_id']
+    except:
+        return "workstation id not provided", 400
+    mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
+    if w_id == "":
+        objs = [i for i in mp.find()]
+    else:
+        objs = [i for i in mp.find({"workstation_id":w_id})]
+    date_format = "%Y-%m-%d %H:%M:%S"
+    now = datetime.now().replace(microsecond=0)
+    now = datetime(2021, 3, 3, 16, 31, 2)
+    print(now)
+    toi_end = datetime.strptime(str(now), date_format)
+    print(toi_end)
+    prev = now - timedelta(days = 1)
+    print(prev)
+    toi_start = datetime.strptime(str(prev), date_format)
+    print(toi_start)
+    parts = {}
+    #parts = {"3":0,"6":0,"9":0,"12":0,"5":0,"6":0,"7":0}
+    for ins in objs:
+        inspection_id = str(ins['_id'])
+        mp = MongoHelper().getCollection(inspection_id + "_log")
+        insp_colls = [p for p in mp.find({"isAccepted":True})]
+        for i in insp_colls:
+            start_time = i["inference_start_time"]
+            start_time = datetime.strptime(start_time, date_format)
+            print("start time after parsing "+str(start_time))
+            end_time = i["inference_end_time"]
+            end_time = datetime.strptime(end_time, date_format)
+            if end_time >= toi_start and end_time < toi_end:
+                time_delta = toi_end - end_time
+                hours = time_delta.hours
+                parts[str(hours)] = parts[str(hours)] + 1
+    print(parts)
+    defects = {}
+    #defects = {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
+    for ins in objs:
+        inspection_id = str(ins['_id'])
+        mp = MongoHelper().getCollection(inspection_id + "_log")
+        insp_colls = [p for p in mp.find({"isAccepted":False})]
+        for i in insp_colls:
+            start_time = i["inference_start_time"]
+            start_time = datetime.strptime(start_time, date_format)
+            print("start time after parsing "+str(start_time))
+            end_time = i["inference_end_time"]
+            end_time = datetime.strptime(end_time, date_format)
+            if end_time >= toi_start and end_time < toi_end:
+                time_delta = toi_end - end_time
+                hours = time_delta.hours
+                defects[str(hours)] = defects[str(hours)] + 1
+    print(defects)
+    data = {"accepted_by_week": parts, "rejected_by_week":defects}
+    parts_list = []
+    for key, value in parts.items():
+        if value ==0:
+            value = None
+        parts_list.append(value)
+    defect_list = []
+    for key, value in defects.items():
+        if value ==0:
+            value = None
+        defect_list.append(value)
+    data = [{"name":"Parts", "data":parts_list},{"name":"Defect Parts", "data":defect_list}]
+    return data, 200
 
 
 def defect_count_util(data):
