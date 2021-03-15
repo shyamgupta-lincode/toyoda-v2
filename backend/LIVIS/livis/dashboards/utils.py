@@ -6,11 +6,12 @@ from common.utils import MongoHelper
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 import datetime
+from datetime import datetime, timedelta
 
 def total_production_by_wid_util(data):
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
     try:
-        workstation_id = data["workstation_id"]
+        w_id = data["workstation_id"]
     except:
         return "workstation id not provided", 400
     if w_id == "":
@@ -26,6 +27,7 @@ def total_production_by_wid_util(data):
     return total_production_count, 200
 
 def production_yield_by_wid_util(data):
+    mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
     try:
         w_id = data['workstation_id']
     except:
@@ -82,6 +84,44 @@ def production_rate_util(data):
         return "workstation id data not found", 400
     ## logic needs to be added if time_period is hours or minutes
     return avg_rate_secs, 200
+
+def production_weekly_util(data):
+    try:
+        w_id = data['workstation_id']
+    except:
+        return "workstation id not provided", 400
+    mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
+    if w_id == "":
+        objs = [i for i in mp.find()]
+    else:
+        objs = [i for i in mp.find({"workstation_id":w_id})]
+    date_format = "%Y-%m-%d %H:%M:%S"
+    now = datetime.now().replace(microsecond=0)
+    toi_end = datetime.strptime(str(now), date_format)
+    print(toi_end)
+    prev = now - timedelta(days = 7)
+    print(prev)
+    toi_start = datetime.strptime(str(prev), date_format)
+    print(toi_start)
+    parts = {"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
+    for ins in objs:
+        inspection_id = str(ins['_id'])
+        mp = MongoHelper().getCollection(inspection_id + "_log")
+        insp_colls = [p for p in mp.find()]
+        for i in insp_colls:
+            start_time = i["inference_start_time"]
+            print(" mongo type"+str(type(start_time)))
+            start_time = datetime.strptime(start_time, date_format)
+            print("start time after parsing "+str(start_time))
+            end_time = i["inference_end_time"]
+            end_time = datetime.strptime(end_time, date_format)
+            if end_time >= toi_start and end_time <= toi_end:
+                time_delta = toi_end - end_time
+                days = time_delta.days
+                parts[str(days)] = parts[str(days)] + 1
+    print(parts)
+    return parts, 200
+
 
 def defect_count_util(data):
     try:
