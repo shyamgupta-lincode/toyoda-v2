@@ -69,16 +69,16 @@ def add_part_details_task(data):
         
             if len(para1) == 0:
                 #no exp found
-                collection_obj['experiment_name'] = str(part_name)+'_version_1'
-            else:
-                #exp found incr++
-                versions = []
-                for i in para1:
-                    versions.append( int(str(i['experiment_name']).split('_')[-1]) )
-                versions.sort()
+                collection_obj['experiment_name'] = None
+            #else:
+            #    #exp found incr++
+            #    versions = []
+            #    for i in para1:
+            #        versions.append( int(str(i['experiment_name']).split('_')[-1]) )
+            #    versions.sort()
             
-                collection_obj['experiment_name'] = str(part_name)+"_version_"+str(versions[-1])
-                print(collection_obj)
+            #    collection_obj['experiment_name'] = str(part_name)+"_version_"+str(versions[-1])
+            #    print(collection_obj)
             
             experiment_id = mp.insert(collection_obj)
         

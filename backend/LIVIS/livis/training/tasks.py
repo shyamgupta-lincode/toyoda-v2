@@ -83,7 +83,22 @@ def add_experiment(config):
 
 def add_experiment_modified(config):
     part_id = config.get('part_id')
-    # experiment_name = config.get('experiment_name', None)
+    experiment_name = config.get('experiment_name', None)
+
+    part_collection = MongoHelper().getCollection(settings.PARTS_COLLECTION)
+#<<<<<<< HEAD
+    #part_obj = part_collection.find({'_id' :ObjectId(part_id)})
+#=======
+    part_obj = part_collection.find({'_id' : ObjectId(part_id)})
+#>>>>>>> 8dcb7c9f55515602e4d1796e7a9d5d6247ce0d08
+    for obj in part_obj:  
+        part_number = obj["part_number"]
+    if experiment_name == None:
+        experiment_name = str(part_number)+"_version_"+str(1)
+    else:
+        temp_name = int(experiment_name.split("_")[-1]) + 1  
+        experiment_name = str(part_number)+"_version_"+str(temp_name)
+
     # experiment_type = config.get('experiment_type', None)
     # hyperparameters = config.get('hyperparameters',None)
     # model_id = config.get('model_id',None)
@@ -91,10 +106,17 @@ def add_experiment_modified(config):
     obj = exp_coll.find({'part_id' : part_id})
     for doc in obj:
         # part_id = doc["part_id"],
-        experiment_name = doc["experiment_name"],
+        # experiment_name = doc["experiment_name"],
         experiment_type = doc["experiment_type"],
         hyperparameters = doc["hyperparameters"]
     mp = MongoHelper().getCollection('experiment')
+
+    myquery = { "part_id": part_id }
+    newvalues = { "$set": { "experiment_name": experiment_name } }
+
+    exp_coll.update_one(myquery, newvalues)
+
+    print(experiment_name)
     collection_obj = {
             'status' : 'Initialized',
             'created_at':datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
@@ -561,16 +583,16 @@ def create_model_static_util(data):
         para1 = [i for i in mp1.find({"part_id":str(part_id)})]
         #para1 = mp1.find({"part_id":str(part_id)})
         
-        if len(para1) == 0:
-            #no exp found
-            collection_obj['experiment_name'] = str(part_name)+'_version_1'
-        else:
-            #exp found incr++
-            versions = []
-            for i in para1:
-                versions.append( int(str(i['experiment_name']).split('_')[-1]) )
-            versions.sort()
-            collection_obj['experiment_name'] = str(part_name)+"_version_"+str(version[-1])
+        #if len(para1) == 0:
+        #    #no exp found
+        #    collection_obj['experiment_name'] = str(part_name)+'_version_1'
+        #else:
+        #    #exp found incr++
+        #    versions = []
+        #    for i in para1:
+        #        versions.append( int(str(i['experiment_name']).split('_')[-1]) )
+        #    versions.sort()
+        #    collection_obj['experiment_name'] = str(part_name)+"_version_"+str(version[-1])
         
         collection_obj['hyperparameters']['batch_size'] = batch_size
         collection_obj['hyperparameters']['no_of_steps'] = no_of_steps

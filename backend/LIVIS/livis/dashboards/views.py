@@ -47,6 +47,7 @@ def production_hourly(request):
         print(response)
         return HttpResponse(json.dumps({'data':response} , cls=Encoder), content_type="application/json")
 
+
 @api_view(['POST'])
 @csrf_exempt
 @permission_classes((AllowAny,))
