@@ -16,4 +16,9 @@ urlpatterns = [
                
                #url(r'^deploy_experiment/$', views.deploy_experiment)
 
+               #static exp crud api
+               url(r'^get_model_static/(?P<experiment_static_id>[A-Za-z0-9-_]+)$', views.get_model_static), #experiment_settings
+               url(r'^create_model_static/$', views.create_model_static),
+               #url(r'^delete_model_static/$', views.delete_model_static),
+
 ]

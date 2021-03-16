@@ -67,9 +67,9 @@ def get_data_for_histogram(data):
 @api_view(['GET'])
 @csrf_exempt
 #@check_group(['admin' , 'operator'])
-def card_flip_random_image(data):
+def card_flip_random_image(data,part_id):
     from annotate.utils import card_flip_random_image_util
-    message,status_code = card_flip_random_image_util(data)
+    message,status_code = card_flip_random_image_util(part_id)
     if status_code == 200:
         return HttpResponse(json.dumps({'Message' : 'Success!', 'data' : message}, cls=Encoder), content_type="application/json")
     else:
