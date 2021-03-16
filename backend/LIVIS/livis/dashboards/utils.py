@@ -163,7 +163,7 @@ def production_hourly_util(data):
         objs = [i for i in mp.find({"workstation_id":w_id})]
     date_format = "%Y-%m-%d %H:%M:%S"
     now = datetime.now().replace(microsecond=0)
-    now = datetime(2021, 3, 3, 16, 31, 2)
+
     print(now)
     toi_end = datetime.strptime(str(now), date_format)
     print(toi_end)
@@ -172,7 +172,9 @@ def production_hourly_util(data):
     toi_start = datetime.strptime(str(prev), date_format)
     print(toi_start)
     parts = {}
-    #parts = {"3":0,"6":0,"9":0,"12":0,"5":0,"6":0,"7":0}
+
+    parts = {"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
+
     for ins in objs:
         inspection_id = str(ins['_id'])
         mp = MongoHelper().getCollection(inspection_id + "_log")
@@ -185,11 +187,19 @@ def production_hourly_util(data):
             end_time = datetime.strptime(end_time, date_format)
             if end_time >= toi_start and end_time < toi_end:
                 time_delta = toi_end - end_time
-                hours = time_delta.hours
-                parts[str(hours)] = parts[str(hours)] + 1
+
+                print("toi end "+str(toi_end))
+                print("end time "+str(end_time))
+                print("Time delta is "+str(time_delta))
+                hours_ = int(time_delta.total_seconds() / 3600)
+                key_ = int(hours_ / 3)
+                parts[str(key_)] = parts[str(key_)] + 1
     print(parts)
     defects = {}
-    #defects = {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
+    defects = {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
+
+               
+
     for ins in objs:
         inspection_id = str(ins['_id'])
         mp = MongoHelper().getCollection(inspection_id + "_log")
@@ -202,8 +212,11 @@ def production_hourly_util(data):
             end_time = datetime.strptime(end_time, date_format)
             if end_time >= toi_start and end_time < toi_end:
                 time_delta = toi_end - end_time
-                hours = time_delta.hours
-                defects[str(hours)] = defects[str(hours)] + 1
+
+                hours_ = int(time_delta.total_seconds() / 3600)
+                key_ = int(hours_ / 3)
+                defects[str(key_)] = defects[str(key_)] + 1
+
     print(defects)
     data = {"accepted_by_week": parts, "rejected_by_week":defects}
     parts_list = []
@@ -216,8 +229,11 @@ def production_hourly_util(data):
         if value ==0:
             value = None
         defect_list.append(value)
-    data = [{"name":"Parts", "data":parts_list},{"name":"Defect Parts", "data":defect_list}]
+
+    data = [{"name":"Accepted", "data":parts_list},{"name":"Rejected", "data":defect_list}]
     return data, 200
+
+
 
 
 def defect_count_util(data):
