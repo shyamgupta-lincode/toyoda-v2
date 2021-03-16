@@ -221,8 +221,9 @@ def production_hourly_util(data):
         if value ==0:
             value = None
         defect_list.append(value)
-    data = [{"name":"Parts", "data":parts_list},{"name":"Defect Parts", "data":defect_list}]
+    data = [{"name":"Accepted", "data":parts_list},{"name":"Rejected", "data":defect_list}]
     return data, 200
+
 
 
 def defect_count_util(data):

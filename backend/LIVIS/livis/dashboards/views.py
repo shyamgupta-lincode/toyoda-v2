@@ -11,6 +11,7 @@ from bson.json_util import dumps
 from bson.objectid import ObjectId
 from dashboards.utils import *
 
+
 @api_view(['POST'])
 @csrf_exempt
 @permission_classes((AllowAny,))
@@ -31,6 +32,7 @@ def production_weekly(request):
     if status_code != 200:
         return HttpResponse({response}, status=status_code)
     else:
+        print(response)
         return HttpResponse(json.dumps({'data':response} , cls=Encoder), content_type="application/json")
 
 @api_view(['POST'])
@@ -42,6 +44,7 @@ def production_hourly(request):
     if status_code != 200:
         return HttpResponse({response}, status=status_code)
     else:
+        print(response)
         return HttpResponse(json.dumps({'data':response} , cls=Encoder), content_type="application/json")
 
 @api_view(['POST'])
