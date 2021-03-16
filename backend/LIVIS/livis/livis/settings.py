@@ -217,7 +217,7 @@ print("AREEEEE: : : : :   " , TRAIN_DATA_STATIC)
 if not os.path.exists(TRAIN_DATA_STATIC):
     os.makedirs(TRAIN_DATA_STATIC)
 
-BASE_URL = '10.60.60.112'
+BASE_URL = '13.234.202.181'
 
 # For Capture service
 KAFKA_BROKER_URL = BASE_URL+":9092"
