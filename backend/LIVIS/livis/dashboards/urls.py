@@ -10,5 +10,6 @@ urlpatterns = [
     re_path(r'^defect_distribution/$', views.defect_distribution),
     re_path(r'^production_weekly/$', views.production_weekly),
     re_path(r'^production_hourly/$', views.production_hourly),
-    re_path(r'^production_monthly/$', views.production_monthly)
+    re_path(r'^production_monthly/$', views.production_monthly),
+    re_path(r'^production_by_role/$', views.production_by_role)
 ]

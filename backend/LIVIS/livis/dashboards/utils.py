@@ -90,11 +90,17 @@ def production_weekly_util(data):
         w_id = data['workstation_id']
     except:
         return "workstation id not provided", 400
+    try:
+        operator_id = data['operator_id']
+    except:
+        return "operator id not provided", 400
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    if w_id == "":
+    if w_id == "" and operator_id=="":
         objs = [i for i in mp.find()]
-    else:
+    elif w_id != "":
         objs = [i for i in mp.find({"workstation_id":w_id})]
+    elif operator_id != "":
+        objs = [i for i in mp.find({"operator_id":operator_id})]
     date_format = "%Y-%m-%d %H:%M:%S"
     now = datetime.now().replace(microsecond=0)
     #now = datetime(2021, 3, 5, 16, 31, 2)
@@ -144,16 +150,58 @@ def production_weekly_util(data):
     data = [{"name":"Approved", "data":parts_list},{"name":"Rejected", "data":defect_list}]
     return data, 200
 
+def production_by_role_util(data):
+    try:
+        w_id_list = data['workstation_id_list']
+    except:
+        return "workstation id list  not provided", 400
+    try:
+        duration = data['duration']
+    except:
+        return "duration not provided", 400
+    try:
+        operator_id_list = data['operator_id_list']
+    except:
+        return "operator ID list not provided", 400
+    response = []
+    if operator_id_list == []:
+        for _id in w_id_list:
+            data_wid = {"workstation_id":_id, "operator_id":""}
+            if duration.find("weekly") != -1:
+                result, status_code = production_weekly_util(data_wid)
+            if duration.find("hourly") != -1:
+                result, status_code = production_hourly_util(data_wid)
+            if duration.find("monthly") != -1:
+                result, status_code = production_monthly_util(data_wid)
+            response.append({"w_id":_id, "data":result})
+    if w_id_list == []:
+        for _id in operator_id_list:
+            data_opid = {"workstation_id":"","operator_id":_id}
+            if duration.find("weekly") != -1:
+                result, status_code = production_weekly_util(data_opid)
+            if duration.find("hourly") != -1:
+                result, status_code = production_hourly_util(data_opid)
+            if duration.find("monthly") != -1:
+                result, status_code = production_monthly_util(data_opid)
+            response.append({"operator_id":_id, "data":result})
+    return response, 200
+
 def production_hourly_util(data):
     try:
         w_id = data['workstation_id']
     except:
         return "workstation id not provided", 400
+    try:
+        operator_id = data['operator_id']
+    except:
+        return "operator id not provided", 400
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    if w_id == "":
+    if w_id == "" and operator_id == "":
         objs = [i for i in mp.find()]
-    else:
+    elif w_id != "":
         objs = [i for i in mp.find({"workstation_id":w_id})]
+    elif operator_id != "":
+        objs = [i for i in mp.find({"operator_id":operator_id})]
     date_format = "%Y-%m-%d %H:%M:%S"
     now = datetime.now().replace(microsecond=0)
     toi_end = datetime.strptime(str(now), date_format)
@@ -210,11 +258,17 @@ def production_monthly_util(data):
         w_id = data['workstation_id']
     except:
         return "workstation id not provided", 400
+    try:
+        operator_id = data['operator_id']
+    except:
+        return "operator id not provided", 400
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    if w_id == "":
+    if w_id == "" and operator_id == "":
         objs = [i for i in mp.find()]
-    else:
+    elif w_id !="":
         objs = [i for i in mp.find({"workstation_id":w_id})]
+    elif operator_id != "":
+        objs = [i for i in mp.find({"operator_id":operator_id})]
     date_format = "%Y-%m-%d %H:%M:%S"
     now = datetime.now().replace(microsecond=0)
     toi_end = datetime.strptime(str(now), date_format)
