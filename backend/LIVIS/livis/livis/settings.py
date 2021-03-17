@@ -220,7 +220,7 @@ if not os.path.exists(TRAIN_DATA_STATIC):
 BASE_URL = '13.234.202.181'
 
 # For Capture service
-KAFKA_BROKER_URL = BASE_URL+":9092"
+KAFKA_BROKER_URL = "13.127.161.4:9092"
 consumer_mount_path = "/Livis"
 mongo_host = "mongodb"
 mongo_port = 27017

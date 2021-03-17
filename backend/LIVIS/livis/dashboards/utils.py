@@ -217,7 +217,6 @@ def production_monthly_util(data):
         objs = [i for i in mp.find({"workstation_id":w_id})]
     date_format = "%Y-%m-%d %H:%M:%S"
     now = datetime.now().replace(microsecond=0)
-    now = datetime(2021, 11, 10, 1, 0, 0)
     toi_end = datetime.strptime(str(now), date_format)
     prev = now - timedelta(days = 365)
     toi_start = datetime.strptime(str(prev), date_format)
