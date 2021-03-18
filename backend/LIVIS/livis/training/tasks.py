@@ -523,6 +523,57 @@ def get_deployment_list_util():
 
 
 
+
+
+def get_deployment_list_util_updated():
+    return_list = []
+    from capture.utils import get_inference_feed_url_util
+    part_collection = MongoHelper().getCollection(settings.PARTS_COLLECTION)
+    workstation_collection = MongoHelper().getCollection(settings.WORKSTATION_COLLECTION)
+    parts = [p for p in part_collection.find({"$and" : [{"isdeleted": False}, { "isdeleted" : {"$exists" : True}}]}).sort( "$natural", -1 )]
+    for part in parts:
+        # print(part)
+        part_id = part['_id']
+        mp = MongoHelper().getCollection('experiment')
+        exp = [i for i in mp.find({"part_id": str(part_id)})]
+
+        for experiment in exp:     
+                #print(experiment)
+                
+                    if 'deployed' in experiment and experiment['deployed']:
+                        print("in if")
+
+                        for dw in experiment['deployed_on_workstations']:    
+                            ws = workstation_collection.find_one({'_id' : ObjectId(dw)})
+                            ws_name = ws['workstation_name']
+                            resp = {
+                                "experiment_name" : experiment['experiment_name'],
+                                "part_number" : part['part_number'],
+                                "experiment_type" : experiment['experiment_type'],
+                                "workstation" : ws_name,
+                                "inference_urls" :  get_inference_feed_url_util(ws["_id"] , part_id),
+                                "experiment_id" : experiment['_id'],
+                               
+                                }
+                            try:
+                                threshold =  experiment['threshold']
+                                container_state : experiment['container_state']
+                                resp['threshold'] = threshold
+                                resp['container_state'] = container_state
+                            except Exception as e:
+                                print(" exception "+str(e))
+                                pass
+                            print("resp is"+str(resp))
+                            return_list.append(resp)
+                            resp = {}
+                            #print(return_list)
+                
+
+
+    return return_list    
+
+
+
 #crud
 def create_model_static_util(data):
     part_id = data['part_id']

@@ -120,6 +120,13 @@ def get_deployment_list(request):
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
 
+@api_view(['GET'])
+@csrf_exempt
+def get_deployment_list_updated(request):
+    from training.tasks import get_deployment_list_util_updated
+    response = get_deployment_list_util_updated()
+    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
 
 ## crud 
 
