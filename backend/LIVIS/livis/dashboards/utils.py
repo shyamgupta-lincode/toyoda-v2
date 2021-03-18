@@ -147,7 +147,7 @@ def production_weekly_util(data):
         if value ==0:
             value = None
         defect_list.append(value)
-    data = [{"name":"Approved", "data":parts_list},{"name":"Rejected", "data":defect_list}]
+    data = [{"name":"Accepted", "data":parts_list},{"name":"Rejected", "data":defect_list}]
     return data, 200
 
 def production_by_role_util(data):
@@ -317,7 +317,7 @@ def production_monthly_util(data):
         if value ==0:
             value = None
         defect_list.append(value)
-    data = [{"name":"Parts", "data":parts_list},{"name":"Defect Parts", "data":defect_list}]
+    data = [{"name":"Accepted", "data":parts_list},{"name":"Rejected", "data":defect_list}]
     return data, 200
 
 
