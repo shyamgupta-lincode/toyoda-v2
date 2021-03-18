@@ -685,12 +685,14 @@ def delete_img_util(data):
     try:
 
         import pymongo
-        myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+        myclient = pymongo.MongoClient("13.234.202.181",7778)
 
         mydb = myclient["LIVIS"]
         mycol = mydb[str(part_id)+"_dataset"]
 
         result = mycol.delete_one({'_id': ObjectId(file_id)})
+        print("deleted???????")
+        print(result)
 
     except Exception as e:
         print(e)

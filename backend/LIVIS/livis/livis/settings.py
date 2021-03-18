@@ -39,7 +39,7 @@ CORS_ORIGIN_WHITELIST = (
        'http://localhost:4200',
 )
 
-
+ENCRYPT_ID = '$pbkdf2-sha256$29000$6/3/XysF4JxT6j3H.J/Tug$uGi.a8mgaM1m5ze1mCTMNu0oljqOI78ha9TyMFtekbs'
 # Application definition
 
 INSTALLED_APPS = [
@@ -178,8 +178,8 @@ AUTH_USER_MODEL = 'accounts.User'
 
 #Settings for MongoDB
 # MONGO_SERVER_HOST = "164.52.194.78"
-MONGO_SERVER_HOST = "127.0.0.1"
-MONGO_SERVER_PORT = 27017
+MONGO_SERVER_HOST = "13.234.202.181"
+MONGO_SERVER_PORT = 7778
 MONGO_DB = "LIVIS"
 #MONGO_DB = "TOYODA"
 MONGO_COLLECTION_PARTS = "parts"
@@ -217,10 +217,10 @@ print("AREEEEE: : : : :   " , TRAIN_DATA_STATIC)
 if not os.path.exists(TRAIN_DATA_STATIC):
     os.makedirs(TRAIN_DATA_STATIC)
 
-BASE_URL = '10.60.60.112'
+BASE_URL = '13.234.202.181'
 
 # For Capture service
-KAFKA_BROKER_URL = BASE_URL+":9092"
+KAFKA_BROKER_URL = "13.127.161.4:9092"
 consumer_mount_path = "/Livis"
 mongo_host = "mongodb"
 mongo_port = 27017

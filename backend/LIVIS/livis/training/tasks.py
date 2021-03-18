@@ -460,8 +460,8 @@ def deploy_experiment_util(data):
                     'deployed_on_workstations': workstation_ids
                 }
                 mp.update({'_id' : ObjectId(i['_id'])}, {'$set' : collection_obj})
-                return i  
-                # return mp.find_one({'_id' : ObjectId(i['_id'])})     
+                #return i  
+                return mp.find_one({'_id' : ObjectId(i['_id'])})     
     except Exception as e:   
         print(e)     
         return {}
@@ -475,19 +475,24 @@ def get_deployment_list_util():
     workstation_collection = MongoHelper().getCollection(settings.WORKSTATION_COLLECTION)
     parts = [p for p in part_collection.find({"$and" : [{"isdeleted": False}, { "isdeleted" : {"$exists" : True}}]}).sort( "$natural", -1 )]
     for part in parts:
+        #print(part)
         part_id = part['_id']
         mp = MongoHelper().getCollection('experiment')
         exp = [i for i in mp.find()]
+        print("Length:",len(exp))
         for experiment in exp:
             #print(experiment)
             try:
                 if 'deployed' in experiment and experiment['deployed']:
+                    print("in if deployed is true ")
+                    print(experiment["_id"])
                     for dw in experiment['deployed_on_workstations']:
+                        print("if deployed on wk")
                         #print(dw)
                         ws = workstation_collection.find_one({'_id' : ObjectId(dw)})
                         ws_name = ws['workstation_name']
                         print(ws_name)
-                        print(experiment)
+                        #print(experiment)
                         resp = {
                             "experiment_name" : experiment['experiment_name'],
                             "part_number" : part['part_number'],
@@ -501,12 +506,19 @@ def get_deployment_list_util():
                             threshold =  experiment['threshold']
                             resp['threshold'] = threshold
                         except:
-                            pass
+                            print("Exception")
                         print(resp)
-                        if str(part_id) == experiment['part_id']:
+                        #print("PAAAAAAAA:",part_id)
+                        print("SSSSSSSS:",experiment['part_id'])
+                        #return_list.append(resp)
+                        if str(part_id) == str(experiment['part_id']):
                             return_list.append(resp)
+                            #print("in if")
             except Exception as e:
                 print(e)
+            #print("below exc")
+    	    #return return_list   
+    print(return_list)
     return return_list
 
 

@@ -220,7 +220,29 @@ def capture_image_util(data):
 
             print(policy_crop)
 
-            
+            if policy_crop == []:
+                uuid_str = str(uuid.uuid4()) 
+                img_name = consumer_mount_path+"/"+str(uuid_str)+".png"
+                print(img_name)
+                cv2.imwrite(img_name,frame)
+
+                #http_name = "http://0.0.0.0:3306/" +str(uuid_str)+".png"
+                http_name = "http://"+BASE_URL+":3306/"+str(uuid_str)+".png"
+
+                capture_doc = {
+                "file_path": img_name,
+                "file_url": http_name,
+                "state": "untagged",
+                "annotation_detection": [],
+                "annotation_detection_history": [],
+                "annotation_classification": "",
+                "annotation_classification_history": [],
+                "annotator": "",
+                "date_added":timezone.now()}
+
+                mp = MongoHelper().getCollection(part_id + "_dataset")
+                mp.insert(capture_doc)
+ 
             for pol in policy_crop:
                 cords=pol
                 print(cords)
@@ -236,6 +258,7 @@ def capture_image_util(data):
                 id_uuid = str(uuid.uuid4())+'.png'
                 uuid_str = str(uuid.uuid4()) 
                 img_name = consumer_mount_path+"/"+str(uuid_str)+".png"
+                print(img_name)
                 cv2.imwrite(img_name,crop)
             
                 #http_name = "http://0.0.0.0:3306/" +str(uuid_str)+".png"

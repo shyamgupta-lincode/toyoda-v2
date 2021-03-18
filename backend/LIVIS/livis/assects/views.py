@@ -66,3 +66,14 @@ def get_assect(request):
         return HttpResponse( {message}, status=status_code)
     else:
         return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+@permission_classes((AllowAny,))
+def validate(request):
+    response,status_code = get_validation()
+    if status_code != 200:
+        return HttpResponse( {message}, status=status_code)
+    else:
+        return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")

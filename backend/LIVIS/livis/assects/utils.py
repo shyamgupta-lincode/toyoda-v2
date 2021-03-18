@@ -1,8 +1,23 @@
-from common.utils import MongoHelper
+from common.utils import MongoHelper,getMachine_addr
 from livis.settings import *
 from bson import ObjectId
 import datetime
 import base64
+from cryptography.fernet import Fernet
+from passlib.hash import pbkdf2_sha256
+
+def get_validation():
+    #mp = MongoHelper().getCollection('private')
+    #para = [i for i in mp.find()]
+    #fernet = Fernet(para[0]['key'].encode('utf-8'))
+    #id_from_decrypt = 'abcd'
+    #id_from_device = getMachine_addr()
+    hash = ENCRYPT_ID
+    res = pbkdf2_sha256.verify(getMachine_addr(), hash)
+    if res:
+        return "valid",200
+    else:
+        return "invalid",400
 
 def add_assects_util(data):
 

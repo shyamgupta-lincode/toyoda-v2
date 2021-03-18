@@ -21,6 +21,8 @@ import pandas as pd
 import xml.etree.ElementTree as ET
 import random 
 from sklearn.model_selection import train_test_split
+from cryptography.fernet import Fernet
+
 
 
 if (os.getcwd().split('/')[-1]) == "livis":
@@ -73,6 +75,17 @@ class Encoder(json.JSONEncoder):
             return obj
 
 
+def getMachine_addr():
+    """ Find OS and run appropriate read mobo serial num command"""
+    os_type = sys.platform.lower()
+
+    if "darwin" in os_type:
+        command = "ioreg -l | grep IOPlatformSerialNumber"
+    elif "win" in os_type:
+        command = "wmic bios get serialnumber"
+    elif "linux" in os_type:
+        command = "cat /sys/devices/virtual/dmi/id/product_uuid"
+    return os.popen(command).read().replace("\n", "").replace("  ", "").replace(" ", "")
 
 def get_workstation_by_id(wid):
     mp = MongoHelper().getCollection("workstations")
