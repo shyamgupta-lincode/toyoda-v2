@@ -51,8 +51,11 @@ def add_user_account(request):
     
     data = json.loads(request.body)
     from accounts.utils import add_user_account_util
-    message = add_user_account_util(data)
-    return HttpResponse(json.dumps({'message' : message}), content_type="application/json") 
+    message,status_code = add_user_account_util(data)
+    if status_code == 400:
+        return HttpResponse( {message}, status=status_code)
+    else:    
+        return HttpResponse(json.dumps({'message' : message,'status':status_code}), content_type="application/json") 
 
 
 @api_view(['GET'])

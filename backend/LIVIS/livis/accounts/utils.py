@@ -68,10 +68,12 @@ def add_user_account_util(data):
         print("date_joined",date_joined,"\nupdated_at",updated_at)
         user_obj.save()
         resp = "User Account added successfully."
-        return resp
+        status_code = 200
+        return resp,status_code
     except Exception as e:
+        status_code = 400
         resp = "User account could not be created. "+str(e)
-        return resp
+        return resp,status_code
 
 
 def get_user_account_util(user_id):
