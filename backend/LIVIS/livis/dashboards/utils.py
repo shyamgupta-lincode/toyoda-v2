@@ -90,21 +90,23 @@ def production_weekly_util(data):
         w_id = data['workstation_id']
     except:
         return "workstation id not provided", 400
+    try:
+        operator_id = data['operator_id']
+    except:
+        return "operator id not provided", 400
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    if w_id == "":
+    if w_id == "" and operator_id=="":
         objs = [i for i in mp.find()]
-    else:
+    elif w_id != "":
         objs = [i for i in mp.find({"workstation_id":w_id})]
+    elif operator_id != "":
+        objs = [i for i in mp.find({"operator_id":operator_id})]
     date_format = "%Y-%m-%d %H:%M:%S"
     now = datetime.now().replace(microsecond=0)
     #now = datetime(2021, 3, 5, 16, 31, 2)
-    print(now)
     toi_end = datetime.strptime(str(now), date_format)
-    print(toi_end)
     prev = now - timedelta(days = 7)
-    print(prev)
     toi_start = datetime.strptime(str(prev), date_format)
-    print(toi_start)
     parts = {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
     for ins in objs:
         inspection_id = str(ins['_id'])
@@ -113,11 +115,10 @@ def production_weekly_util(data):
         for i in insp_colls:
             start_time = i["inference_start_time"]
             start_time = datetime.strptime(start_time, date_format)
-            print("start time after parsing "+str(start_time))
             end_time = i["inference_end_time"]
             end_time = datetime.strptime(end_time, date_format)
             if end_time >= toi_start and end_time < toi_end:
-                time_delta = toi_end - end_time
+                time_delta = abs(toi_end - end_time)
                 days = time_delta.days
                 parts[str(days)] = parts[str(days)] + 1
     print(parts)
@@ -129,15 +130,13 @@ def production_weekly_util(data):
         for i in insp_colls:
             start_time = i["inference_start_time"]
             start_time = datetime.strptime(start_time, date_format)
-            print("start time after parsing "+str(start_time))
             end_time = i["inference_end_time"]
             end_time = datetime.strptime(end_time, date_format)
             if end_time >= toi_start and end_time < toi_end:
-                time_delta = toi_end - end_time
+                time_delta = abs(toi_end - end_time)
                 days = time_delta.days
                 defects[str(days)] = defects[str(days)] + 1
     print(defects)
-    data = {"accepted_by_week": parts, "rejected_by_week":defects}
     parts_list = []
     for key, value in parts.items():
         if value ==0:
@@ -148,33 +147,67 @@ def production_weekly_util(data):
         if value ==0:
             value = None
         defect_list.append(value)
-    data = [{"name":"Approved", "data":parts_list},{"name":"Rejected", "data":defect_list}]
+    data = [{"name":"Accepted", "data":parts_list},{"name":"Rejected", "data":defect_list}]
     return data, 200
+
+def production_by_role_util(data):
+    try:
+        w_id_list = data['workstation_id_list']
+    except:
+        return "workstation id list  not provided", 400
+    try:
+        duration = data['duration']
+    except:
+        return "duration not provided", 400
+    try:
+        operator_id_list = data['operator_id_list']
+    except:
+        return "operator ID list not provided", 400
+    response = []
+    if operator_id_list == []:
+        for _id in w_id_list:
+            data_wid = {"workstation_id":_id, "operator_id":""}
+            if duration.find("weekly") != -1:
+                result, status_code = production_weekly_util(data_wid)
+            if duration.find("hourly") != -1:
+                result, status_code = production_hourly_util(data_wid)
+            if duration.find("monthly") != -1:
+                result, status_code = production_monthly_util(data_wid)
+            response.append({"w_id":_id, "data":result})
+    if w_id_list == []:
+        for _id in operator_id_list:
+            data_opid = {"workstation_id":"","operator_id":_id}
+            if duration.find("weekly") != -1:
+                result, status_code = production_weekly_util(data_opid)
+            if duration.find("hourly") != -1:
+                result, status_code = production_hourly_util(data_opid)
+            if duration.find("monthly") != -1:
+                result, status_code = production_monthly_util(data_opid)
+            response.append({"operator_id":_id, "data":result})
+    return response, 200
 
 def production_hourly_util(data):
     try:
         w_id = data['workstation_id']
     except:
         return "workstation id not provided", 400
+    try:
+        operator_id = data['operator_id']
+    except:
+        return "operator id not provided", 400
     mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
-    if w_id == "":
+    if w_id == "" and operator_id == "":
         objs = [i for i in mp.find()]
-    else:
+    elif w_id != "":
         objs = [i for i in mp.find({"workstation_id":w_id})]
+    elif operator_id != "":
+        objs = [i for i in mp.find({"operator_id":operator_id})]
     date_format = "%Y-%m-%d %H:%M:%S"
     now = datetime.now().replace(microsecond=0)
-
-    print(now)
     toi_end = datetime.strptime(str(now), date_format)
-    print(toi_end)
     prev = now - timedelta(days = 1)
-    print(prev)
     toi_start = datetime.strptime(str(prev), date_format)
-    print(toi_start)
-    parts = {}
-
     parts = {"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
-
     for ins in objs:
         inspection_id = str(ins['_id'])
         mp = MongoHelper().getCollection(inspection_id + "_log")
@@ -182,23 +215,15 @@ def production_hourly_util(data):
         for i in insp_colls:
             start_time = i["inference_start_time"]
             start_time = datetime.strptime(start_time, date_format)
-            print("start time after parsing "+str(start_time))
             end_time = i["inference_end_time"]
             end_time = datetime.strptime(end_time, date_format)
             if end_time >= toi_start and end_time < toi_end:
-                time_delta = toi_end - end_time
-
-                print("toi end "+str(toi_end))
-                print("end time "+str(end_time))
-                print("Time delta is "+str(time_delta))
+                time_delta = abs(toi_end - end_time)
                 hours_ = int(time_delta.total_seconds() / 3600)
                 key_ = int(hours_ / 3)
                 parts[str(key_)] = parts[str(key_)] + 1
     print(parts)
-    defects = {}
     defects = {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
-
-               
 
     for ins in objs:
         inspection_id = str(ins['_id'])
@@ -207,18 +232,14 @@ def production_hourly_util(data):
         for i in insp_colls:
             start_time = i["inference_start_time"]
             start_time = datetime.strptime(start_time, date_format)
-            print("start time after parsing "+str(start_time))
             end_time = i["inference_end_time"]
             end_time = datetime.strptime(end_time, date_format)
             if end_time >= toi_start and end_time < toi_end:
-                time_delta = toi_end - end_time
-
+                time_delta = abs(toi_end - end_time)
                 hours_ = int(time_delta.total_seconds() / 3600)
                 key_ = int(hours_ / 3)
                 defects[str(key_)] = defects[str(key_)] + 1
-
     print(defects)
-    data = {"accepted_by_week": parts, "rejected_by_week":defects}
     parts_list = []
     for key, value in parts.items():
         if value ==0:
@@ -229,11 +250,75 @@ def production_hourly_util(data):
         if value ==0:
             value = None
         defect_list.append(value)
-
     data = [{"name":"Accepted", "data":parts_list},{"name":"Rejected", "data":defect_list}]
     return data, 200
 
-
+def production_monthly_util(data):
+    try:
+        w_id = data['workstation_id']
+    except:
+        return "workstation id not provided", 400
+    try:
+        operator_id = data['operator_id']
+    except:
+        return "operator id not provided", 400
+    mp = MongoHelper().getCollection(INSPECTION_COLLECTION)
+    if w_id == "" and operator_id == "":
+        objs = [i for i in mp.find()]
+    elif w_id !="":
+        objs = [i for i in mp.find({"workstation_id":w_id})]
+    elif operator_id != "":
+        objs = [i for i in mp.find({"operator_id":operator_id})]
+    date_format = "%Y-%m-%d %H:%M:%S"
+    now = datetime.now().replace(microsecond=0)
+    toi_end = datetime.strptime(str(now), date_format)
+    prev = now - timedelta(days = 365)
+    toi_start = datetime.strptime(str(prev), date_format)
+    parts = {"0":0, "1":0, "2":0, "3":0, "4":0, "5":0, "6":0, "7":0, "8":0, "9":0, "10":0, "11":0}
+    for ins in objs:
+        inspection_id = str(ins['_id'])
+        mp = MongoHelper().getCollection(inspection_id + "_log")
+        insp_colls = [p for p in mp.find({"isAccepted":True})]
+        for i in insp_colls:
+            start_time = i["inference_start_time"]
+            start_time = datetime.strptime(start_time, date_format)
+            end_time = i["inference_end_time"]
+            end_time = datetime.strptime(end_time, date_format)
+            if end_time >= toi_start and end_time < toi_end:
+                time_delta = abs(toi_end - end_time)
+                days_ = int(time_delta.days / 30)
+                print("days diff "+str(days_))
+                parts[str(days_)] = parts[str(days_)] + 1
+    print(parts)
+    defects = {"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0, "8":0, "9":0, "10":0, "11":0}
+    for ins in objs:
+         inspection_id = str(ins['_id'])
+         mp = MongoHelper().getCollection(inspection_id + "_log")
+         insp_colls = [p for p in mp.find({"isAccepted":False})]
+         for i in insp_colls:
+             start_time = i["inference_start_time"]
+             start_time = datetime.strptime(start_time, date_format)
+             print("start time after parsing "+str(start_time))
+             end_time = i["inference_end_time"]
+             end_time = datetime.strptime(end_time, date_format)
+             if end_time >= toi_start and end_time < toi_end:
+                 time_delta = abs(toi_end - end_time)
+                 hours_ = int(time_delta.days / 30)
+                 print("days diff "+str(days_))
+                 defects[str(days_)] = defects[str(days_)] + 1
+    print(defects)
+    parts_list = []
+    for key, value in parts.items():
+        if value ==0:
+            value = None
+        parts_list.append(value)
+    defect_list = []
+    for key, value in defects.items():
+        if value ==0:
+            value = None
+        defect_list.append(value)
+    data = [{"name":"Accepted", "data":parts_list},{"name":"Rejected", "data":defect_list}]
+    return data, 200
 
 
 def defect_count_util(data):

@@ -38,6 +38,31 @@ def production_weekly(request):
 @api_view(['POST'])
 @csrf_exempt
 @permission_classes((AllowAny,))
+def production_by_role(request):
+    data = json.loads(request.body)
+    response, status_code = production_by_role_util(data)
+    if status_code != 200:
+        return HttpResponse({response}, status=status_code)
+    else:
+        print(response)
+        return HttpResponse(json.dumps({'data':response} , cls=Encoder), content_type="application/json")
+
+@api_view(['POST'])
+@csrf_exempt
+@permission_classes((AllowAny,))
+def production_monthly(request):
+    data = json.loads(request.body)
+    response, status_code = production_monthly_util(data)
+    if status_code != 200:
+        return HttpResponse({response}, status=status_code)
+    else:
+        print(response)
+        return HttpResponse(json.dumps({'data':response} , cls=Encoder), content_type="application/json")
+
+
+@api_view(['POST'])
+@csrf_exempt
+@permission_classes((AllowAny,))
 def production_hourly(request):
     data = json.loads(request.body)
     response, status_code = production_hourly_util(data)
