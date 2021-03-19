@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'training.apps.TrainingConfig',
     'logs.apps.LogsConfig',
     'assects.apps.AssectsConfig',
+    'crm.apps.CrmConfig',
     'preprocess.apps.PreprocessConfig',
     'inspection.apps.InspectionConfig',
     'drf_yasg',
