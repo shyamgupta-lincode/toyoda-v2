@@ -132,3 +132,4 @@ class SI(Client):
 class DummyInstance(models.Model):
     class Meta:
         permissions = (("edit_lead_form", "add_lead_form"),)
+        
