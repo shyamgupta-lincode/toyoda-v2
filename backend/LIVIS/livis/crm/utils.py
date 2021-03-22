@@ -97,7 +97,7 @@ def create_lead_util(data):
     return message, status_code
 
 def get_all_leads_util():
-    mp = MongoHelper.getCollection(LEADS_COLLECTION)
+    mp = MongoHelper().getCollection(LEADS_COLLECTION)
     tasks_list = [p for p in mp.find({"isdeleted":False})]
     if tasks_list:
         return tasks_list
@@ -188,7 +188,7 @@ def update_lead_util(data):
        status_code = 400
        return message, status_code
     mp = MongoHelper().getCollection(LEADS_COLLECTION')
-    lead = mp.find_one({'lead_id': ObjectId(lead_id))
+    lead = mp.find_one({'lead_id': ObjectId(lead_id)})
     lead['lead_owner'] = lead_owner
     lead['contact_person'] = contact_person
     lead['company_name'] = company_name
@@ -228,3 +228,118 @@ def check_gst_util(comapny_gst):
         message = "present"
         status_code = 200
         return message, status_code
+
+def create_task_util(data):
+    try:
+        subject = data['subject']
+    except:
+        message = "subject not provided"
+        status_code = 400
+        return message, status_code
+    try:
+        due_data = data['due_date']
+    except:
+        message = "due date not provided"
+        status_code = 400
+        return message, status_code
+    try:
+        priority = data['priority']
+    except:
+        message = "priority not provided"
+        status_code = 400
+        return message, status_code
+    try:
+        assigned_to = data['assigned_to']
+    except:
+        message = "assigned to not provided"
+        status_code = 400
+        return message, status_code
+    mp = MongoHelper().getCollection(TASKS_COLLECTION)
+    ### How to check if task already exists? Unique field
+    isdeleted = False
+    collection_obj = {
+        'subject': subject,
+        'due_date': due_date,
+        'priority': priority,
+        'assigned_to': assigned_to}
+    _id = mp.insert(collection_obj)
+    message = "added task"
+    status_code = 200
+    return message, status_code
+
+def get_all_tasks_util():
+    mp = MongoHelper().getCollection(TASKS_COLLECTION)
+    tasks_list = [p for p in mp.find({"isdeleted":False})]
+    if tasks_list:
+        return tasks_list
+    else:
+        return []
+
+def get_single_task_util(id):
+    try:
+        task_id = id
+    except:
+        message = "task ID not provided"
+        status_code = 400
+        return message, status_code
+    _id = ObjectId(task_id)
+    mp = MongoHelper().getCollection(TASKS_COLLECTION)
+    p = mp.find_one({'_id':_id})
+    if p:
+        return p
+    else:
+        return {}
+
+def update_task_util(data):
+    try:
+        subject = data['subject']
+    except:
+        message = "subject not provided"
+        status_code = 400
+        return message, status_code
+    try:
+        due_data = data['due_date']
+    except:
+        message = "due date not provided"
+        status_code = 400
+        return message, status_code
+    try:
+        priority = data['priority']
+    except:
+        message = "priority not provided"
+        status_code = 400
+        return message, status_code
+    try:
+        assigned_to = data['assigned_to']
+    except:
+        message = "assigned to not provided"
+        status_code = 400
+        return message, status_code
+    try:
+       task_id = data['task_id']
+    except:
+       message = "task ID not provided"
+       status_code = 400
+       return message, status_code
+
+    mp = MongoHelper().getCollection(TASKS_COLLECTION)
+    task = mp.find_one({'task_id': ObjectId(task_id)})
+    task['subject'] = subject
+    task['due_date'] = due_date
+    task['priority'] = priority
+    task['assigned_to'] = assigned_to
+    mp.update({'_id': task['_id']}, {'$set': task})
+    message = "Success"
+    status_code = 200
+    return message, status_code
+
+def delete_task_util(task_id):
+    mp = MongoHelper().getCollection(TASKS_COLLECTION)
+    task = mp.find_one({'_id': ObjectId(task_id)})
+    isdeleted = task.get('isdeleted')
+    if not isdeleted:
+        task['isdeleted'] = True
+    mp.update({'_id': task['_id']}, {'$set': task})
+    message = "Success"
+    status_code = 200
+    return message, status_code

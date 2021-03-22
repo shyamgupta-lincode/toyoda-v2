@@ -196,8 +196,8 @@ INSPECTION_COLLECTION = 'inspection'
 EXPERIMENT_COLLECTION = 'experiment'
 KANBAN_COLLECTION = 'kanban_collection'
 PREPROCESSING_COLLECTION = '{}_preprocessingpolicy'
-
-
+LEADS_COLLECTION = 'leads'
+TASKS_COLLECTION = 'tasks'
 
 #Settings for Redis
 REDIS_CLIENT_HOST = "localhost"

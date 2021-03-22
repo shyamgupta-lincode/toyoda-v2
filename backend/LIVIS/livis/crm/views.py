@@ -13,7 +13,7 @@ from rest_framework.permissions import AllowAny
 @api_view(['PATCH'])
 @renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
-@permission_classes((AllowAny,))
+#@permission_classes((AllowAny,))
 def update_lead(request):
     data = json.loads(request.body)
     message, status_code = update_lead_util(data)
@@ -26,9 +26,8 @@ def update_lead(request):
 @api_view(['DELETE'])
 @renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
-@permission_classes((AllowAny,))
-def delete_lead(request):
-    data = json.loads(request.body)
+#@permission_classes((AllowAny,))
+def delete_lead(request, id):
     message, status_code = delete_lead_util(id)
     if status_code == 200:
         return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
@@ -38,7 +37,7 @@ def delete_lead(request):
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
-@permission_classes((AllowAny,))
+#@permission_classes((AllowAny,))
 def create_lead(request):
     data = json.loads(request.body)
     message, status_code = create_lead_util(data)
@@ -49,7 +48,7 @@ def create_lead(request):
 
 @api_view(['GET'])
 @csrf_exempt
-@permission_classes((AllowAny,))
+#@permission_classes((AllowAny,))
 def get_all_leads(request):
     leads_list = get_all_leads_util()
     return HttpResponse(json.dumps( leads_list , cls=Encoder), content_type="application/json")
@@ -57,16 +56,63 @@ def get_all_leads(request):
 
 @api_view(['GET'])
 @csrf_exempt
-@permission_classes((AllowAny,))
+#@permission_classes((AllowAny,))
 def get_single_lead(request, id):
     leads_list = get_single_lead_util(id)
     return HttpResponse(json.dumps(leads_list , cls=Encoder), content_type="application/json")
 
 @api_view(['GET'])
 @csrf_exempt
-@permission_classes((AllowAny,))
+#@permission_classes((AllowAny,))
 def check_gst(request, gst):
     response = check_gst_util(gst)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def create_task(request):
+    data = json.loads(request.body)
+    message, status_code = create_task_util(data)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
 
+@api_view(['GET'])
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def get_all_tasks(request):
+    tasks_list = get_all_tasks_util()
+    return HttpResponse(json.dumps( leads_list , cls=Encoder), content_type="application/json")
+
+@api_view(['GET'])
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def get_single_task(request, id):
+    leads_list = get_single_task_util(id)
+    return HttpResponse(json.dumps(leads_list , cls=Encoder), content_type="application/json")
+
+@api_view(['PATCH'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def update_task(request):
+    data = json.loads(request.body)
+    message, status_code = update_task_util(data)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
+
+@api_view(['DELETE'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def delete_task(request, id):
+    message, status_code = delete_task_util(id)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
