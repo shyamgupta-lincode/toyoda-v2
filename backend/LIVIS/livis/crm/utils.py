@@ -2,6 +2,12 @@ from django.utils import timezone
 from common.utils import MongoHelper
 from bson.json_util import dumps
 from bson.objectid import ObjectId
+from common.utils import *
+from django.utils import timezone
+from bson import ObjectId
+from livis.settings import *
+import datetime
+from datetime import datetime, timedelta
 
 def create_lead_util(data):
     try:
@@ -90,7 +96,9 @@ def create_lead_util(data):
         'alt_email': alt_email,
         'address': address,
         'lead_source': lead_source,
+        'isdeleted': False,
         'notes': notes}
+
     _id = mp.insert(collection_obj)
     message = "Added new lead"
     status_code = 200
@@ -98,9 +106,9 @@ def create_lead_util(data):
 
 def get_all_leads_util():
     mp = MongoHelper().getCollection(LEADS_COLLECTION)
-    tasks_list = [p for p in mp.find({"isdeleted":False})]
-    if tasks_list:
-        return tasks_list
+    leads_list = [p for p in mp.find({"isdeleted":False})]
+    if leads_list:
+        return leads_list
     else:
         return []
 
@@ -187,8 +195,14 @@ def update_lead_util(data):
        message = "lead ID not provided"
        status_code = 400
        return message, status_code
-    mp = MongoHelper().getCollection(LEADS_COLLECTION')
-    lead = mp.find_one({'lead_id': ObjectId(lead_id)})
+    try:
+       notes = data['notes']
+    except:
+       message = "notes not provided"
+       status_code = 400
+       return message, status_code
+    mp = MongoHelper().getCollection(LEADS_COLLECTION)
+    lead = mp.find_one({"_id": ObjectId(lead_id)})
     lead['lead_owner'] = lead_owner
     lead['contact_person'] = contact_person
     lead['company_name'] = company_name
@@ -217,10 +231,10 @@ def delete_lead_util(lead_id):
     status_code = 200
     return message, status_code
 
-def check_gst_util(comapny_gst):
+def check_gst_util(company_gst):
     mp = MongoHelper().getCollection(LEADS_COLLECTION)
     lead = mp.find_one({'company_gst': company_gst})
-    if len(lead) == 0:
+    if not lead:
         message = "absent"
         status_code = 200
         return message, status_code
@@ -237,7 +251,7 @@ def create_task_util(data):
         status_code = 400
         return message, status_code
     try:
-        due_data = data['due_date']
+        due_date = data['due_date']
     except:
         message = "due date not provided"
         status_code = 400
@@ -261,13 +275,16 @@ def create_task_util(data):
         'subject': subject,
         'due_date': due_date,
         'priority': priority,
-        'assigned_to': assigned_to}
+        'assigned_to': assigned_to,
+        'isdeleted': isdeleted}
+
     _id = mp.insert(collection_obj)
     message = "added task"
     status_code = 200
     return message, status_code
 
 def get_all_tasks_util():
+    print("getting all tasks")
     mp = MongoHelper().getCollection(TASKS_COLLECTION)
     tasks_list = [p for p in mp.find({"isdeleted":False})]
     if tasks_list:
@@ -298,7 +315,7 @@ def update_task_util(data):
         status_code = 400
         return message, status_code
     try:
-        due_data = data['due_date']
+        due_date = data['due_date']
     except:
         message = "due date not provided"
         status_code = 400
@@ -323,7 +340,8 @@ def update_task_util(data):
        return message, status_code
 
     mp = MongoHelper().getCollection(TASKS_COLLECTION)
-    task = mp.find_one({'task_id': ObjectId(task_id)})
+    task = mp.find_one({'_id': ObjectId(task_id)})
+    print(task)
     task['subject'] = subject
     task['due_date'] = due_date
     task['priority'] = priority

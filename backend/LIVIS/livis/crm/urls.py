@@ -1,7 +1,6 @@
 from django.urls import path,re_path
 from crm import views
 
-
 urlpatterns = [
     re_path(r'^update_lead/$', views.update_lead),
     re_path(r'^get_all_leads/$', views.get_all_leads),

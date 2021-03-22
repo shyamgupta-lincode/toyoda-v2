@@ -20,7 +20,7 @@ def create_kanban_util(data):
         mp = MongoHelper().getCollection('kanban_collection')
 
         ### Logic to check if kanban already exists
-        if mp.find_one({"kanban_name":kanban_name}):
+        if mp.find_one({"$and":[{"kanban_name":kanban_name},{"isdeleted":true}]}):
             status_code = 400
             message = "kanban already exists"
             return message, status_code

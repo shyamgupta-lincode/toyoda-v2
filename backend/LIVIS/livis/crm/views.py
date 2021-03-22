@@ -85,14 +85,14 @@ def create_task(request):
 #@permission_classes((AllowAny,))
 def get_all_tasks(request):
     tasks_list = get_all_tasks_util()
-    return HttpResponse(json.dumps( leads_list , cls=Encoder), content_type="application/json")
+    return HttpResponse(json.dumps( tasks_list , cls=Encoder), content_type="application/json")
 
 @api_view(['GET'])
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def get_single_task(request, id):
-    leads_list = get_single_task_util(id)
-    return HttpResponse(json.dumps(leads_list , cls=Encoder), content_type="application/json")
+    tasks_list = get_single_task_util(id)
+    return HttpResponse(json.dumps(tasks_list , cls=Encoder), content_type="application/json")
 
 @api_view(['PATCH'])
 @renderer_classes((TemplateHTMLRenderer,))
