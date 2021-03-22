@@ -187,7 +187,8 @@ def update_lead_util(data):
        message = "lead ID not provided"
        status_code = 400
        return message, status_code
-    mp = MongoHelper().getCollection(LEADS_COLLECTION')
+
+    mp = MongoHelper().getCollection(LEADS_COLLECTION)
     lead = mp.find_one({'lead_id': ObjectId(lead_id)})
     lead['lead_owner'] = lead_owner
     lead['contact_person'] = contact_person
