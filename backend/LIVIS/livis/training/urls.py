@@ -7,6 +7,7 @@ urlpatterns = [
                url(r'^deploy_experiment/$', views.deploy_experiment),
                url(r'^set_threshold/$', views.set_threshold),
                url(r'^create_experiment/$', views.create_experiment_modified),
+               url(r'^interrupt_training/$', views.interrupt_training),
                url(r'^create_retrain_experiment/$', views.create_retrain_experiment),
                url(r'^get_model_data/(?P<experiment_type>[A-Za-z0-9-_]+)$', views.get_model_data),
               # url(r'^get_deployment_list/$', views.get_deployment_list),
