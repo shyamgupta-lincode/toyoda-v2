@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'training.apps.TrainingConfig',
     'logs.apps.LogsConfig',
     'assects.apps.AssectsConfig',
+    'crm.apps.CrmConfig',
     'preprocess.apps.PreprocessConfig',
     'inspection.apps.InspectionConfig',
     'drf_yasg',
@@ -177,7 +178,6 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'accounts.User'
 
 #Settings for MongoDB
-# MONGO_SERVER_HOST = "164.52.194.78"
 MONGO_SERVER_HOST = "13.234.202.181"
 MONGO_SERVER_PORT = 7778
 MONGO_DB = "LIVIS"
@@ -195,8 +195,8 @@ INSPECTION_COLLECTION = 'inspection'
 EXPERIMENT_COLLECTION = 'experiment'
 KANBAN_COLLECTION = 'kanban_collection'
 PREPROCESSING_COLLECTION = '{}_preprocessingpolicy'
-
-
+LEADS_COLLECTION = 'leads'
+TASKS_COLLECTION = 'tasks'
 
 #Settings for Redis
 REDIS_CLIENT_HOST = "localhost"

@@ -129,4 +129,7 @@ class SI(Client):
         #Add verbose name 
         verbose_name = 'Client: SI List'
 
-
+class DummyInstance(models.Model):
+    class Meta:
+        permissions = (("edit_lead_form", "add_lead_form"),)
+        
