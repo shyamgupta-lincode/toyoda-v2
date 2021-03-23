@@ -83,8 +83,8 @@ def create_task(request):
 @api_view(['GET'])
 @csrf_exempt
 #@permission_classes((AllowAny,))
-def get_all_tasks(request):
-    tasks_list = get_all_tasks_util()
+def get_all_tasks(request, lead_id):
+    tasks_list = get_all_tasks_util(lead_id)
     return HttpResponse(json.dumps( tasks_list , cls=Encoder), content_type="application/json")
 
 @api_view(['GET'])

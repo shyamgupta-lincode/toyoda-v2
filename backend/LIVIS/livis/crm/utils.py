@@ -310,10 +310,10 @@ def create_task_util(data):
     status_code = 200
     return message, status_code
 
-def get_all_tasks_util():
+def get_all_tasks_util(lead_id):
     print("getting all tasks")
     mp = MongoHelper().getCollection(TASKS_COLLECTION)
-    tasks_list = [p for p in mp.find({"isdeleted":False})]
+    tasks_list = [p for p in mp.find({"$and":[{"isdeleted":False},{"lead_id":lead_id}]})]
     if tasks_list:
         return tasks_list
     else:
