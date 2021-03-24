@@ -629,6 +629,7 @@ def create_model_static_util(data):
         with open(pth) as f:
             collection_obj = json.load(f)
         
+        del collection_obj['experiment_name']
         collection_obj['part_id'] = str(part_id)
         
         mp1 = MongoHelper().getCollection(PARTS_COLLECTION)
