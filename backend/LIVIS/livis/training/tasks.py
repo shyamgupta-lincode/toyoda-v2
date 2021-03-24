@@ -542,7 +542,7 @@ def get_deployment_list_util_updated():
                 
                     if 'deployed' in experiment and experiment['deployed']:
                         print("in if")
-
+                        
                         for dw in experiment['deployed_on_workstations']:    
                             ws = workstation_collection.find_one({'_id' : ObjectId(dw)})
                             ws_name = ws['workstation_name']
@@ -683,4 +683,20 @@ def get_model_static_util(part_id):
     
     return para
     
+
+# stop training 
+def interrupt_training_utils(config):
+
+    experiment_id = config.get('experiment_id')
+    mp = MongoHelper().getCollection('experiment')
+    # cursor = mp.find({'_id':ObjectId(experiment_id)})
+    # for ele in cursor:
+    #     part_id = ele["part_id"]
+
+    comm2 = "docker stop" + " " + str(experiment_id)   
+    import subprocess
+    process = subprocess.Popen(comm2.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()    
+    mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'status': 'Failed'}}, upsert=False, full_response= True)
+    return experiment_id 
 

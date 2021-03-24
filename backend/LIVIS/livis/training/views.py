@@ -45,6 +45,17 @@ def create_experiment_modified(request):
     response = {'experiment_id': experiment_id_}
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
+# interrupting training 
+@api_view(['POST'])
+@csrf_exempt
+def interrupt_training(request):
+    config = json.loads(request.body)
+    from training.tasks import interrupt_training_utils
+    experiment_id_= interrupt_training_utils(config)
+    experiment_id_ = str(experiment_id_)
+    response = {'experiment_id': experiment_id_}
+    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
 @api_view(['POST'])
 @csrf_exempt
 def create_retrain_experiment(request):

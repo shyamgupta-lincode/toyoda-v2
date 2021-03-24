@@ -107,7 +107,7 @@ def production_weekly_util(data):
     toi_end = datetime.strptime(str(now), date_format)
     prev = now - timedelta(days = 7)
     toi_start = datetime.strptime(str(prev), date_format)
-    parts = {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
+    parts = {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"0":0}
     for ins in objs:
         inspection_id = str(ins['_id'])
         mp = MongoHelper().getCollection(inspection_id + "_log")
@@ -117,12 +117,15 @@ def production_weekly_util(data):
             start_time = datetime.strptime(start_time, date_format)
             end_time = i["inference_end_time"]
             end_time = datetime.strptime(end_time, date_format)
+            print("toi_start "+str(toi_start))
+            print("toi_end "+str(toi_end))
+            print("end time"+str(end_time))
             if end_time >= toi_start and end_time < toi_end:
                 time_delta = abs(toi_end - end_time)
                 days = time_delta.days
                 parts[str(days)] = parts[str(days)] + 1
     print(parts)
-    defects = {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0}
+    defects = {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"0":0}
     for ins in objs:
         inspection_id = str(ins['_id'])
         mp = MongoHelper().getCollection(inspection_id + "_log")
