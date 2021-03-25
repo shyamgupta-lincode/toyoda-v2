@@ -162,15 +162,15 @@ def read_tf_events_util(experiment_id):
     mp =MongoHelper().getCollection('experiment') 
     curser = mp.find({'_id' : ObjectId(experiment_id)})  
     for val in curser:
-        no_of_steps =  int(val["hyperparameters"]["no_of_steps"]) 
+        epochs =  int(val["hyperparameters"]["epochs"]) 
 
     static_path = TRAIN_DATA_STATIC.split('/image_data')[0]
     # static_path = "/home/lincode/Desktop/livis_v2/republic/backend/LIVIS/livis/training"
     directory_path = os.path.join(static_path,"models","experiments",str(experiment_id))
-    tf_events_path = os.path.join(directory_path,"training_volume","train")
+    tf_events_path = os.path.join(directory_path,"training_volume","tensorboard")
     # print(tf_events_path)
     current_step = 0
-    while current_step < no_of_steps:
+    while current_step < epochs:
     # if time.time()
         try:
             if os.path.exists(tf_events_path):
@@ -178,20 +178,23 @@ def read_tf_events_util(experiment_id):
 
                 for file_ in os.listdir(tf_events_path):
                     print(file_)
-                    summary_events = []
-                    summ_ = os.path.join(tf_events_path,file_)
-                    summary_events.append(summ_)
-                    for file_2 in summary_events:
-                        summary_obj = summary_iterator(file_2)
-                        for val in summary_obj:
-                            steps_list.append(val.step)
+                    if file_.startswith("events"):
+                        summary_events = []
+                        summ_ = os.path.join(tf_events_path,file_)
+                        summary_events.append(summ_)
+                        for file_2 in summary_events:
+                            summary_obj = summary_iterator(file_2)
+                            for val in summary_obj:
+                                # print(val)
+                                steps_list.append(val.step)
                             
-        # 
+            # 
                 steps_list.sort()
-                current_step = steps_list[-1]
+                print(steps_list)
+                current_step = int(steps_list[-1]) + 1 #epochs starts from zero so add 1
                 time = time.time()
                 mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'current_steps': current_step}}, upsert=False, full_response= True)
-                
+                    
         except Exception as e:
             print(e)
             # current_step = 0
