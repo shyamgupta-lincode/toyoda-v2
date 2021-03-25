@@ -86,22 +86,26 @@ def add_experiment_modified(config):
     experiment_name = config.get('experiment_name', None)
 
     part_collection = MongoHelper().getCollection(settings.PARTS_COLLECTION)
-#<<<<<<< HEAD
-    #part_obj = part_collection.find({'_id' :ObjectId(part_id)})
-#=======
+
     part_obj = part_collection.find({'_id' : ObjectId(part_id)})
-#>>>>>>> 8dcb7c9f55515602e4d1796e7a9d5d6247ce0d08
+
     for obj in part_obj:  
         part_number = obj["part_number"]
+    part_name_list = part_number.split()
+    part_temp_list = []
+    for i in part_name_list:
+        val = i[0]
+        part_temp_list.append(val)  
+    seq_lett = "".join(part_temp_list)
+     
     if experiment_name == None:
         experiment_name = str(part_number)+"_version_"+str(1)
+        version  = 100000 + 1     
+        experiment_name = seq_lett + str(version)
     else:
-        temp_name = int(experiment_name.split("_")[-1]) + 1  
-        experiment_name = str(part_number)+"_version_"+str(temp_name)
+        temp_name =  int(experiment_name.split(seq_lett)[-1]) + 1 
+        experiment_name = seq_lett + str(temp_name)
 
-    # experiment_type = config.get('experiment_type', None)
-    # hyperparameters = config.get('hyperparameters',None)
-    # model_id = config.get('model_id',None)
     exp_coll = MongoHelper().getCollection('experiment_settings')
     obj = exp_coll.find({'part_id' : part_id})
     for doc in obj:
@@ -130,22 +134,22 @@ def add_experiment_modified(config):
             'threshold':"0"
     }
     experiment_id_ = mp.insert(collection_obj)
-    return experiment_id_
+    return  experiment_id_
 
     
     
 def add_retrain_experiment(config):
     experiment_id = config.get('experiment_id') 
     retrain_status = config.get('retrain_status')
-    no_of_steps = config.get('no_of_steps')
+    epochs = config.get('epochs')
     # print(retrain_status)
     mp =MongoHelper().getCollection('experiment') 
-    curser = mp.find({'_id' : ObjectId(experiment_id)})
-    for val in curser:
-        updated_no_steps = int(val["hyperparameters"]["no_of_steps"]) + int(no_of_steps)
+    # curser = mp.find({'_id' : ObjectId(experiment_id)})
+    # for val in curser:
+    #     updated_no_steps = int(val["hyperparameters"]["no_of_steps"]) + int(no_of_steps)
     status = "Success" 
     mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'retrain': retrain_status}}, upsert=False, full_response= True)
-    mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'hyperparameters.no_of_steps': updated_no_steps}}, upsert=False, full_response= True)
+    mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'hyperparameters.epochs': epochs}}, upsert=False, full_response= True)
     mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'status': 'Initialized'}}, upsert=False, full_response= True)
     return status
 

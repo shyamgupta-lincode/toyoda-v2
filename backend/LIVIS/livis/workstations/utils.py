@@ -8,6 +8,7 @@ def add_workstation_task(data):
    workstation_ip = data.get('workstation_ip')
    workstation_port = data.get('workstation_port')
    workstation_status = data.get('workstation_status')
+   workstation_location = data.get('workstation_location')
    cameras_info = data.get('cameras')
    isdeleted = False
    mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
@@ -16,6 +17,7 @@ def add_workstation_task(data):
        'workstation_ip' : workstation_ip,
        'workstation_port' : workstation_port,
        'workstation_status' : workstation_status,
+       'workstation_location':workstation_location,
        'cameras' : cameras_info,
        'isdeleted' : isdeleted
     }
@@ -42,6 +44,7 @@ def update_workstation_task(data):
         workstation_ip = data.get('edit_workstation_ip')
         workstation_port = data.get('edit_workstation_port')
         workstation_status = data.get('edit_workstation_status')
+        workstation_location = data.get('edit_workstation_location')
         cameras = data.get('camerasEdit')
         if workstation_name:
             wc['workstation_name'] = workstation_name
@@ -51,6 +54,8 @@ def update_workstation_task(data):
             wc['workstation_port'] = workstation_port
         if workstation_status:
             wc['workstation_status'] = workstation_status
+        if workstation_location:
+            wc['workstation_location'] = workstation_location    
         if cameras:
             i=0
             for camera in cameras:
