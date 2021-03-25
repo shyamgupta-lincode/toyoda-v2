@@ -83,8 +83,8 @@ def create_task(request):
 @api_view(['GET'])
 @csrf_exempt
 #@permission_classes((AllowAny,))
-def get_all_tasks(request):
-    tasks_list = get_all_tasks_util()
+def get_all_tasks(request, lead_id):
+    tasks_list = get_all_tasks_util(lead_id)
     return HttpResponse(json.dumps( tasks_list , cls=Encoder), content_type="application/json")
 
 @api_view(['GET'])
@@ -155,6 +155,56 @@ def update_todo(request):
 #@permission_classes((AllowAny,))
 def delete_todo(request, task_id, todo_id):
     message, status_code = delete_todo_util(task_id, todo_id)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
+
+@api_view(['PATCH'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def update_lead_status(request):
+    data = json.loads(request.body)
+    message, status_code = update_lead_status_util(data)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def create_lead_source(request):
+    data = json.loads(request.body)
+    message, status_code = create_lead_source_util(data)
+    if status_code == 200:
+        return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
+
+@api_view(['GET'])
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def get_all_lead_source(request):
+    leads_list = get_all_lead_source_util()
+    return HttpResponse(json.dumps( leads_list , cls=Encoder), content_type="application/json")
+
+
+@api_view(['GET'])
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def get_single_lead_source(request, id):
+    leads_list = get_single_lead_source_util(id)
+    return HttpResponse(json.dumps(leads_list , cls=Encoder), content_type="application/json")
+
+@api_view(['DELETE'])
+@renderer_classes((TemplateHTMLRenderer,))
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def delete_lead_source(request, id):
+    message, status_code = delete_lead_source_util(id)
     if status_code == 200:
         return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
     else:

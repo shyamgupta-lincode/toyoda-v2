@@ -52,13 +52,7 @@ def get_all_kanban_util():
 
 
 def get_single_kanban_util(id):
-        try:
-            kanban_id = id
-        except:
-            message = "kanban id not provided"
-            status_code = 400
-            return message, status_code
-        
+        kanban_id = id
         _id = ObjectId(kanban_id)
         mp = MongoHelper().getCollection('kanban_collection')
         p = mp.find_one({'_id' : _id})
