@@ -478,7 +478,7 @@ def get_camera_index_util(ws_id):
     consumer = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL, auto_offset_reset='latest')
     for message in consumer:
         a = message.value.decode('utf-8')
-        a = a.replace("_"," ")
+        #a = a.replace("_"," ")
         print(a)
         break
     return a, 200
