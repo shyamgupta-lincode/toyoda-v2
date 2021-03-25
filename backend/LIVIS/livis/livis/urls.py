@@ -58,4 +58,5 @@ urlpatterns = [
     re_path(r'livis/v1/inspection/', include("inspection.urls")),
     re_path(r'livis/v1/dashboards/', include("dashboards.urls")), 
     re_path(r'livis/v1/crm/', include("crm.urls")),
+    re_path(r'livis/v1/train_kpis/', include("train_kpis.urls"))
 ]
