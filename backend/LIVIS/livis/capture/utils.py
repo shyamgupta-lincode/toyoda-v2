@@ -471,3 +471,14 @@ def start_camera_selection(data):
                     message = "Camera selection updated"
                     status_code = 200
                     return message, status_code
+
+def get_camera_index_util(ws_id):
+    topic = ws_id+"_camera_indexes"
+    print("listening to topic "+str(topic))
+    consumer = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL, auto_offset_reset='latest')
+    for message in consumer:
+        a = message.value.decode('utf-8')
+        a = a.replace("_"," ")
+        print(a)
+        break
+    return a, 200
