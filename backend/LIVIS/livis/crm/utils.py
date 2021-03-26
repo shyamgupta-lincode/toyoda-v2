@@ -402,19 +402,19 @@ def create_todo_util(data):
         task_id = data['task_id']
     except:
         message = "task ID not provided"
-        staus_code = 200
+        staus_code = 400
         return message, status_code
     try:
         notes = data['notes']
     except:
         message = "notes not provided"
-        status_code = 200
+        status_code = 400
         return message, status_code
     try:
         duration = data['duration']
     except:
         message = "duration not provided"
-        status_code = 200
+        status_code = 400
         return message, status_code
     collection_obj = {
         "task_id": task_id,
@@ -439,23 +439,25 @@ def update_todo_util(data):
         task_id = data['task_id']
     except:
         message = "task ID not provided"
+        status_code = 400
+        return message, status_code
     try:
         notes = data['notes']
     except:
         message = "notes not provided "
-        status_code = 200
+        status_code = 400
         return message, status_code
     try:
         duration = data['duration']
     except:
         message = "duration not provided"
-        status_code = 200
+        status_code = 400
         return message, status_code
     try:
         todo_id = data['todo_id']
     except:
         message = "todo not provided"
-        status_code = 200
+        status_code = 400
         return message, status_code
     mp = MongoHelper().getCollection(str(task_id)+"_TodoList")
     todo = mp.find_one({'_id': ObjectId(todo_id)})
@@ -473,6 +475,74 @@ def delete_todo_util(task_id,todo_id):
     if not isdeleted:
         todo['isdeleted'] = True
     mp.update({'_id': todo['_id']}, {'$set': todo})
-    message = "Sucess"
+    message = "Success"
     status_code = 200
+    return message, status_code
+
+def update_lead_status_util(data):
+    try:
+        lead_id = data['lead_id']
+    except:
+        message = "lead ID not provided"
+        status_code = 400
+        return message, status_code
+    try:
+        status = data['status']
+    except:
+        message = "status not provided"
+        status_code = 400
+        return message, status_code
+    mp = MongoHelper().getCollection(LEADS_COLLECTION)
+    lead = mp.find_one({'_id':ObjectId(lead_id)})
+    lead['status'] = status
+    mp.update({'_id':lead['_id']}, {'$set': lead})
+    message = 'Success'
+    status_code = 200
+    return message, status_code
+
+def create_lead_source_util(data):
+    try:
+        lead_source = data['lead_source']
+    except:
+        message = "lead source not provided"
+        status_code = 400
+        return message, status_code
+    mp = MongoHelper().getCollection(LEAD_SOURCE_COLLECTION)
+    if mp.find_one({"$and":[{"lead_source":lead_source},{"isdeleted":False}]}):
+        status_code = 400
+        message = "lead source already exists"
+        return message, status_code
+
+    isdeleted = False
+    obj = {"lead_source": lead_source, "isdeleted":isdeleted}
+    _id = mp.insert(obj)
+    status_code = 200
+    message = "Added new lead source"
+    return message, status_code
+
+def get_all_lead_source_util():
+    mp = MongoHelper().getCollection(LEAD_SOURCE_COLLECTION)
+    lead_sources = [p for p in mp.find({"isdeleted":False})]
+    if lead_sources:
+        return lead_sources
+    else:
+        return []
+
+def get_single_lead_source_util(id):
+    mp = MongoHelper().getCollection(LEAD_SOURCE_COLLECTION)
+    p = mp.find_one({'_id' : ObjectId(id)})
+    if p:
+        return p
+    else:
+        return []
+
+def delete_lead_source_util(id):
+    mp = MongoHelper().getCollection(LEAD_SOURCE_COLLECTION)
+    p = mp.find_one({'_id' : ObjectId(id)})
+    isdeleted = p.get('isdeleted')
+    if not isdeleted:
+        p['isdeleted'] = True
+    mp.update({'_id' : p['_id']}, {'$set' :  p})
+    status_code = 200
+    message = "Success"
     return message, status_code
