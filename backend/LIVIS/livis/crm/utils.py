@@ -475,13 +475,30 @@ def delete_todo_util(task_id,todo_id):
     if not isdeleted:
         todo['isdeleted'] = True
     mp.update({'_id': todo['_id']}, {'$set': todo})
-    message = "Sucess"
+    message = "Success"
     status_code = 200
     return message, status_code
 
-def update_lead_status_util():
-    # to be coded
-    return 0
+def update_lead_status_util(data):
+    try:
+        lead_id = data['lead_id']
+    except:
+        message = "lead ID not provided"
+        status_code = 400
+        return message, status_code
+    try:
+        status = data['status']
+    except:
+        message = "status not provided"
+        status_code = 400
+        return message, status_code
+    mp = MongoHelper().getCollection(LEADS_COLLECTION)
+    lead = mp.find_one({'_id':ObjectId(lead_id)})
+    lead['status'] = status
+    mp.update({'_id':lead['_id']}, {'$set': lead})
+    message = 'Success'
+    status_code = 200
+    return message, status_code
 
 def create_lead_source_util(data):
     try:
