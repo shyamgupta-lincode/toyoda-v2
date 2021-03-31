@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
 @api_view(['PATCH'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def update_lead(request):
@@ -24,7 +24,7 @@ def update_lead(request):
 
 
 @api_view(['DELETE'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def delete_lead(request, id):
@@ -35,7 +35,7 @@ def delete_lead(request, id):
         return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
 
 @api_view(['POST'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def create_lead(request):
@@ -61,6 +61,15 @@ def get_single_lead(request, id):
     leads_list = get_single_lead_util(id)
     return HttpResponse(json.dumps(leads_list , cls=Encoder), content_type="application/json")
 
+
+@api_view(['GET'])
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def get_all_leads_by_status(request, status):
+    leads_list = get_all_leads_by_status_util(status)
+    return HttpResponse(json.dumps(leads_list , cls=Encoder), content_type="application/json")
+
+
 @api_view(['GET'])
 @csrf_exempt
 #@permission_classes((AllowAny,))
@@ -69,7 +78,7 @@ def check_gst(request, gst):
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
 @api_view(['POST'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def create_task(request):
@@ -95,7 +104,7 @@ def get_single_task(request, id):
     return HttpResponse(json.dumps(tasks_list , cls=Encoder), content_type="application/json")
 
 @api_view(['PATCH'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def update_task(request):
@@ -107,7 +116,7 @@ def update_task(request):
         return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
 
 @api_view(['DELETE'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def delete_task(request, id):
@@ -117,8 +126,16 @@ def delete_task(request, id):
     else:
         return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
 
+@api_view(['GET'])
+@csrf_exempt
+#@permission_classes((AllowAny,))
+def sort_tasks(request, lead_id):
+    tasks_list = sort_tasks_util(lead_id)
+    return HttpResponse(json.dumps( tasks_list , cls=Encoder), content_type="application/json")
+
+
 @api_view(['POST'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def create_todo(request):
@@ -138,7 +155,7 @@ def get_all_todo(request, task_id):
     return HttpResponse(json.dumps(leads_list , cls=Encoder), content_type="application/json")
 
 @api_view(['PATCH'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def update_todo(request):
@@ -150,7 +167,7 @@ def update_todo(request):
         return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
 
 @api_view(['DELETE'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def delete_todo(request, task_id, todo_id):
@@ -161,7 +178,7 @@ def delete_todo(request, task_id, todo_id):
         return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
 
 @api_view(['PATCH'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def update_lead_status(request):
@@ -173,7 +190,7 @@ def update_lead_status(request):
         return HttpResponse(json.dumps({'Message': 'fail!', 'data': message}), content_type="application/json")
 
 @api_view(['POST'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def create_lead_source(request):
@@ -200,7 +217,7 @@ def get_single_lead_source(request, id):
     return HttpResponse(json.dumps(leads_list , cls=Encoder), content_type="application/json")
 
 @api_view(['DELETE'])
-@renderer_classes((TemplateHTMLRenderer,))
+#@renderer_classes((TemplateHTMLRenderer,))
 @csrf_exempt
 #@permission_classes((AllowAny,))
 def delete_lead_source(request, id):
