@@ -1,5 +1,5 @@
 from accounts.views import *
-from accounts.models import User,User_Client,User_SI,Client,SI
+from accounts.models import User,User_Client,User_SI,Client,SI,User_Master
 from django.core import serializers
 from django.forms.models import model_to_dict
 import uuid
@@ -9,6 +9,8 @@ from django.contrib.auth import authenticate
 from common.utils import *
 from livis.settings import *
 from rest_framework.authtoken.models import Token
+
+
 
 ################################################################USER CRUDS################################################################
 def add_user_account_util(data):
@@ -273,6 +275,195 @@ def get_all_user_accounts_util():
         return resp
     except Exception as e:
         resp = "Could not retrieve all the existing client accounts. "+str(e)
+        return resp
+
+
+################################################################MASTER_CRUDS#####################################################################
+
+def add_user_master_util(data):
+    """
+    Usage: API to add a user master account.
+    Request Parameters: {
+	    "username" : "client_admin_poo1",
+	    "first_name" : "Pooja",
+	    "last_name" : "Kandhal",
+	    "email" : "poo@gmail.com",
+	    "is_staff" : false,
+	    "user_address" : "Mumbai",
+        "is_superuser" : false,
+        "role_name" : "438428eh32e",
+        "phone_number" : "48372924366",
+        "password" : "password",
+    }
+    Request Method: POST
+    Response: {
+        "message": "User Master Account added successfully."
+    }
+    """
+    resp = {}
+    try:
+        user_id = str(uuid.uuid4()) 
+        master_id = data.get('master_id',None)
+        #master_name = data.get('master_name',None)
+        username = data.get('username',None)
+        first_name = data.get('first_name',None)
+        last_name = data.get('last_name',None)
+        is_staff = data.get('is_staff',None)
+        email = data.get('email',None)
+        user_address = data.get('user_address',None)
+        date_joined = timezone.now()
+        updated_at = timezone.now()
+        is_deleted = False
+        is_active = True
+        is_superuser = data.get('is_superuser',None)
+        role_name = data.get('role_name',None)
+        phone_number = data.get('phone_number',None)
+        user_master_obj = User_Master(
+            user_id =  user_id,
+            master_id =  master_id,
+            #master_name = master_name,
+            first_name =  first_name,
+            last_name =  last_name,
+            username =  username,
+            email =  email,
+            user_address =  user_address,
+            date_joined =  date_joined,
+            updated_at =  updated_at,
+            is_deleted =  is_deleted,
+            is_active =  is_active,
+            is_staff =  is_staff,
+            is_superuser =  is_superuser,
+            role_name =  role_name,
+            phone_number =  phone_number
+        )
+        user_master_obj.set_password(data.get('password',None))
+        user_master_obj.save()
+        resp = "User Master Account added successfully."
+    
+        return resp
+    except Exception as e:
+        resp = "User Master account could not be created. "+str(e)
+        return resp
+
+def update_user_master_util(data):
+    """
+    Usage: API to update a user Master account.
+    Request Parameters: {
+	    "user_id": "bb98f0bb-a33e-4143-9885-5afc5342ba1d",
+	    "first_name" : "Jinta",
+	    "last_name" : "Mary Skariah",
+	    "is_staff" : false,
+	    "user_address" : "Alapuzzha",
+	    "is_active" : true,
+	    "is_superuser" : false,
+	    "role_name" : "Manager",
+	    "phone_number" : "7149383442"
+    }
+    Request Method: PATCH
+    Response: {
+        "message": "User Master Account updated successfully."
+    }
+    """
+    resp = {}
+    try:
+        user_id = data.get('user_id',None)
+        first_name = data.get('first_name',None)
+        last_name = data.get('last_name',None)
+        user_address = data.get('user_address',None)
+        updated_at = timezone.now()
+        is_active = data.get('is_active',None)
+        is_staff = data.get('is_staff',None)
+        is_superuser = data.get('is_superuser',None)
+        #role_name = data.get('role_name',None)
+        #phone_number = data.get('phone_number',None)
+        user_master_obj = User_Master.objects.get(user_id=user_id)
+        #print("-----user_si_obj: ",user_si_obj.role_name)
+        if user_master_obj:
+            if first_name :
+                user_master_obj.first_name=first_name
+            if last_name :
+                user_master_obj.last_name=last_name
+            if user_address :
+                user_master_obj.user_address=user_address
+            if updated_at :
+                user_master_obj.updated_at=updated_at
+            if is_active :
+                user_master_obj.is_active=is_active
+            if is_staff :
+                user_master_obj = user_si_obj.is_staff=is_staff
+            if is_superuser :
+                user_master_obj = user_si_obj.is_superuser=is_superuser
+            #if role_name :
+                #user_si_obj = user_si_obj.role_name=role_name    unknown error while updating the role and phonenumber
+            #if phone_number :
+                #user_si_obj = user_si_obj.phone_number=phone_number
+            user_master_obj.save()
+            resp = "User Master Account updated successfully."
+            return resp
+        else:
+            resp = "User Master account could not be updated. Master id is not specified."
+            return resp   
+    except Exception as e:
+        resp = "User Master account could not be updated. "+str(e)
+        return resp
+
+def delete_user_master_util(user_id):
+    resp = {}
+    try:
+        user_master_obj = User_Master.objects.get(user_id=user_id)
+        if user_master_obj:
+            user_master_obj.is_deleted=True
+            user_master_obj.save()
+            resp = "User master account deleted successfully."
+            return resp
+        else:
+            resp = "User master account could not be deleted. SI ID is not specified."
+            return resp 
+    except Exception as e:
+        resp = "User master account could not be deleted. "+str(e)
+        return resp
+
+def get_user_master_util(user_id):
+    resp = {}
+    try:
+        user_master_obj = User_Master.objects.filter(user_id=user_id)
+        user_master_obj_json = json.loads(serializers.serialize('json',user_master_obj))
+        resp = user_master_obj_json[0]['fields']
+        return resp
+    except Exception as e:
+        resp = "User master account could not be retrieved. "+str(e)
+        return resp
+
+def get_user_masters_util():
+    resp = []
+    user_list = []
+    user_list_details = []
+    try:
+        user_master_obj = User_Master.objects.filter(is_deleted=False)
+        for i in range(len(user_master_obj)):
+            user_master_obj_json = json.loads(serializers.serialize('json',user_master_obj))
+            
+            user_master_obj_json = user_master_obj_json[i]
+            resp.append(user_master_obj_json)
+            
+        for i in resp:
+            user_list.append(i['pk'])
+            
+        for i in user_list:
+        
+
+            user_obj = User.objects.filter(user_id=i)
+            user_obj_json = json.loads(serializers.serialize('json',user_obj))
+            resp = user_obj_json[0]['fields']
+            
+            resp['user_id'] = str(i)
+            
+            user_list_details.append(resp)
+
+
+        return user_list_details
+    except Exception as e:
+        resp = "Could not retrieve all the existing user client accounts. "+str(e)
         return resp
 
 

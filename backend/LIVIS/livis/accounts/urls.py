@@ -8,6 +8,12 @@ urlpatterns = [
     re_path(r'^delete_user_account/(?P<client_id>[A-Za-z0-9-_]+)$', views.delete_user_account),
     re_path(r'^user_accounts/$', views.get_all_user_accounts),
 
+    re_path(r'^add_user_master/$', views.add_user_master),
+    re_path(r'^get_user_master/(?P<client_id>[A-Za-z0-9-_]+)', views.get_user_master),
+    re_path(r'^update_user_master/$', views.update_user_master),
+    re_path(r'^delete_user_master/(?P<client_id>[A-Za-z0-9-_]+)$', views.delete_user_master),
+    re_path(r'^get_user_masters/$', views.get_user_masters),
+    
     re_path(r'^add_user_client/$', views.add_user_client),
     re_path(r'^get_user_client/(?P<client_id>[A-Za-z0-9-_]+)', views.get_user_client),
     re_path(r'^get_list_client/(?P<client_id>[A-Za-z0-9-_]+)', views.get_list_client),
@@ -38,5 +44,4 @@ urlpatterns = [
     re_path(r'^logout/$', views.logout_user),
     re_path(r'^change_password/$', views.change_password),
     
-
     ]
