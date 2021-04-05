@@ -56,6 +56,18 @@ def interrupt_training(request):
     response = {'experiment_id': experiment_id_}
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
+
+@api_view(['POST'])
+@csrf_exempt
+def all_experiments_filter(request):
+    config = json.loads(request.body)
+    from training.tasks import all_experiments_filter_utils
+    data= all_experiments_filter_utils(config)
+    # experiment_id_ = str(experiment_id_)
+    response = data
+    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+
 @api_view(['POST'])
 @csrf_exempt
 def create_retrain_experiment(request):
@@ -137,6 +149,19 @@ def get_deployment_list_updated(request):
     from training.tasks import get_deployment_list_util_updated
     response = get_deployment_list_util_updated()
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+# deployment list filter 
+@api_view(['POST'])
+@csrf_exempt
+def deployment_list_filter(request):
+    deployment_task = json.loads(request.body)
+    from training.tasks import deployment_list_filter_utils
+    deployment_list = deployment_list_filter_utils(deployment_task)
+    response = deployment_list
+    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+
+
 
 
 ## crud 
