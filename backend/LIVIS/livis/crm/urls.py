@@ -16,5 +16,10 @@ urlpatterns = [
     re_path(r'^create_todo/$', views.create_todo),
     re_path(r'^get_all_todo/(?P<task_id>[A-Za-z0-9-_]+)/$', views.get_all_todo),
     re_path(r'^update_todo/$', views.update_todo),
-    re_path(r'^delete_todo/(?P<task_id>[A-Za-z0-9-_]+)/(?P<todo_id>[A-Za-z0-9-_]+)/$', views.delete_todo)
+    re_path(r'^delete_todo/(?P<task_id>[A-Za-z0-9-_]+)/(?P<todo_id>[A-Za-z0-9-_]+)/$', views.delete_todo),
+    re_path(r'^update_lead_status/$', views.update_lead_status),
+    re_path(r'^create_lead_source/$', views.create_lead_source),
+    re_path(r'^get_all_lead_source/$', views.get_all_lead_source),
+    re_path(r'^get_single_lead_source/(?P<id>[A-Za-z0-9-_]+)/$', views.get_single_lead_source),
+    re_path(r'^delete_lead_source/(?P<id>[A-Za-z0-9-_]+)/$', views.delete_lead_source)
 ]

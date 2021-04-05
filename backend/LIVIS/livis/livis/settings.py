@@ -198,7 +198,7 @@ KANBAN_COLLECTION = 'kanban_collection'
 PREPROCESSING_COLLECTION = '{}_preprocessingpolicy'
 LEADS_COLLECTION = 'leads'
 TASKS_COLLECTION = 'tasks'
-
+LEAD_SOURCE_COLLECTION = 'lead_source'
 #Settings for Redis
 REDIS_CLIENT_HOST = "localhost"
 REDIS_CLIENT_PORT = 6379
