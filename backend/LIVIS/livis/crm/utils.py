@@ -81,12 +81,23 @@ def create_lead_util(data):
         status = data['status']
     except:
         message = "status not provided"
-        status = 400
+        status_code = 400
         return message, status_code
-    
+    try:
+       created_by =data['created_by']
+    except:
+       message = "created_by not provided"
+       status_code = 400
+       return message, status_code
+    try:
+       assigned_to = data['assigned_to']
+    except:
+       message = "assigned_to not provided"
+       status_code = 400
+       return message, status_code
     mp = MongoHelper().getCollection(LEADS_COLLECTION)
     ### Logic to check if kanban exists
-    if mp.find_one({"company_gst":company_gst}):
+    if mp.find_one({"$and":[{"company_gst":company_gst},{"isdeleted":False}]}):
         status_code = 400
         message = "lead already exists"
         return message, status_code
@@ -105,7 +116,9 @@ def create_lead_util(data):
         'lead_source': lead_source,
         'isdeleted': False,
         'notes': notes,
-        'status': status}
+        'status': status,
+        'created_by': created_by,
+        'assigned_to': assigned_to}
 
     _id = mp.insert(collection_obj)
     message = "Added new lead"
@@ -121,12 +134,7 @@ def get_all_leads_util():
         return []
 
 def get_single_lead_util(id):
-    try:
-        lead_id = id
-    except:
-        message = "lead ID not provided"
-        status_code = 400
-        return message, status_code
+    lead_id = id
     _id = ObjectId(lead_id)
     mp = MongoHelper().getCollection(LEADS_COLLECTION)
     p = mp.find_one({'_id': _id})
@@ -135,6 +143,14 @@ def get_single_lead_util(id):
     else:
         return {}
 
+def get_all_leads_by_status_util(status):
+    mp = MongoHelper().getCollection(LEADS_COLLECTION)
+    print("status is "+str(status))
+    leads_list = [p for p in mp.find({"$and":[{"isdeleted":False},{"status": str(status)}]})]
+    if leads_list:
+        return leads_list
+    else:
+        return {}
 
 def update_lead_util(data):
     try:
@@ -396,6 +412,15 @@ def delete_task_util(task_id):
     message = "Success"
     status_code = 200
     return message, status_code
+
+def sort_tasks_util(lead_id):
+    # sort by latest task added
+    #lead_id = ObjectId(lead_id)
+    mp = MongoHelper().getCollection(TASKS_COLLECTION)
+    tasks_list = [p for p in mp.find({"$and":[{"isdeleted":False},{"lead_id":str(lead_id)}]})]
+    print(tasks_list)
+    sorted_tasks = tasks_list[::-1]
+    return sorted_tasks
 
 def create_todo_util(data):
     try:
