@@ -72,9 +72,14 @@ def camera_selection(data):
 @api_view(['GET'])
 @csrf_exempt
 @permission_classes((AllowAny,))
-def get_camera_index(request, wid):
-    message, status_code = get_camera_index_util(wid)
-    if status_code == 200:
-        return HttpResponse(json.dumps({'Message': 'Success!', 'data': message}), content_type="application/json")
-    else:
-        return HttpResponse( {message}, status=status_code)
+def camera_select_preview(request, ws_location, cameraid):
+    return StreamingHttpResponse(get_camera_index_util(ws_location, cameraid),
+                                 content_type='multipart/x-mixed-replace; boundary=frame')
+
+@api_view(['GET'])
+@csrf_exempt
+@permission_classes((AllowAny,))
+def get_camera_select_url(request, ws_location):
+    url = get_camera_select_url_util(ws_location)
+    return HttpResponse(json.dumps({'data': url}), content_type="application/json")
+

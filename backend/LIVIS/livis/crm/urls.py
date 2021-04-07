@@ -21,5 +21,7 @@ urlpatterns = [
     re_path(r'^create_lead_source/$', views.create_lead_source),
     re_path(r'^get_all_lead_source/$', views.get_all_lead_source),
     re_path(r'^get_single_lead_source/(?P<id>[A-Za-z0-9-_]+)/$', views.get_single_lead_source),
-    re_path(r'^delete_lead_source/(?P<id>[A-Za-z0-9-_]+)/$', views.delete_lead_source)
+    re_path(r'^delete_lead_source/(?P<id>[A-Za-z0-9-_]+)/$', views.delete_lead_source),
+    re_path(r'^get_users/', views.get_users_util),
+    re_path(r'^get_tasks_by_user/(?P<user>[A-Za-z0-9-_]+)/$', views.get_tasks_by_user_util)
 ]
