@@ -19,7 +19,7 @@ from fastai.callback.all import *
 from fastai.vision import *
 from livis.settings import *
 import datetime
-
+import re
 import json
 MODEL_MAP = {"resnet34" : models.resnet34}
 
@@ -708,9 +708,9 @@ def interrupt_training_utils(config):
 #Train APIS FOR Deployment and get running experiments 
 
 def all_experiments_filter_utils(config):
-    status = config.get('status',None)
-    experiment_name= config.get('experiment_name',None)
-    created_at = config.get('created_at',None)
+    status = config.get('status')
+    experiment_name= config.get('experiment_name')
+    created_at = config.get('created_at')
     try :
         page = config.get('page')
         page = int(page)
@@ -730,19 +730,52 @@ def all_experiments_filter_utils(config):
     for i in parts:
         part_obj_id = i["_id"]
         mp = MongoHelper().getCollection('experiment')
-        exp = [i for i in mp.find({'part_id' : str(part_obj_id)})]
-        # print(exp)
-        for i in exp:   
-            if status != None and experiment_name in i["experiment_name"] and i["status"].lower() in ['initialized',"running"]:
-                list_of_running.append(i)
-            if status == None and i["status"].lower() in ['initialized',"running"]:
-                    list_of_running.append(i)    
-            if experiment_name in i["experiment_name"] and i["status"].lower() in ['initialized',"running"]:
-                list_of_running.append(i)  
-            else:
-                if i["status"].lower() in ['initialized',"running"]:
-                    list_of_running.append(i)
+        # cursor = mp.find({'part_id' : str(part_obj_id)})
+        query_ = []
 
+        if status != "" :
+            exp = '^'+status
+            print(exp)
+            # query_.append({'status':{'$regex':exp}})
+            query_.append({"status":re.compile(status, re.IGNORECASE)})
+        if experiment_name != "":
+            exp =  '^'+experiment_name 
+            print(exp)  
+            # query_.append({'experiment_name':{'$regex':exp}})
+            query_.append({"experiment_name":re.compile(experiment_name, re.IGNORECASE)})
+
+        if status == "" and experiment_name =="":
+            query_.append({})    
+
+        
+        pr_ids = [i for i in mp.find({"$and":query_})]    
+        # except:
+        #     if status == "" and experiment_name == "" :
+        #         pr_ids = [i for i in mp.find({})]
+
+        for i in pr_ids:   
+            if status in i["status"] and i["status"].lower() in ['initialized',"running"]:
+                print("1")
+                list_of_running.append(i)
+
+
+        # exp = [i for i in mp.find({'part_id' : str(part_obj_id)})]
+        # # print(exp)
+        # for i in exp:   
+        #     if status in i["status"] and i["status"].lower() in ['initialized',"running"]:
+        #         print("1")
+        #         list_of_running.append(i)
+        #     # if status == None and i["status"].lower() in ['initialized',"running"]:
+        #     #         list_of_running.append(i)    
+        #     if experiment_name in i["experiment_name"] and i["status"].lower() in ['initialized',"running"]:
+        #         print("2")
+        #         list_of_running.append(i)  
+        #     if status == "" and experiment_name == " " and created_at == "":
+        #         print("3")
+        #         if i["status"].lower() in ['initialized',"running"]:
+        #             list_of_running.append(i)
+
+    # list_of_running =pr_ids
     list_ = []
     unique_list = []
 
@@ -784,7 +817,7 @@ def all_experiments_filter_utils(config):
         # list_ = [list_[i:i+number_of_items] for i in range(0, len(list_), number_of_items)]
         # print(list_)
 
-    data={}
+    data={"count":len(list_)}
     data["running_experiments"] = list_
     return data
 
@@ -792,6 +825,18 @@ def all_experiments_filter_utils(config):
 
 
 def deployment_list_filter_utils(config):
+    """
+    payload :
+    {
+    part_number: object id of part number,
+    experiment_name: string,
+    workstation: object id of ws,
+    page: 0,
+    number_of_items: 10
+    }
+    """
+
+
     part_number = config.get('part_number',None)
     experiment_name= config.get('experiment_name',None)
     workstation = config.get('workstation',None)
@@ -810,70 +855,82 @@ def deployment_list_filter_utils(config):
     except:
         number_of_items = 0   
 
-    return_list = []
     from capture.utils import get_inference_feed_url_util
     part_collection = MongoHelper().getCollection(settings.PARTS_COLLECTION)
     workstation_collection = MongoHelper().getCollection(settings.WORKSTATION_COLLECTION)
-    parts = [p for p in part_collection.find({"$and" : [{"isdeleted": False}, { "isdeleted" : {"$exists" : True}}]}).sort( "$natural", -1 )]
-    for part in parts:
-        # print(part)
-        part_id = part['_id']
-        mp = MongoHelper().getCollection('experiment')
-        exp = [i for i in mp.find({"part_id": str(part_id)})]
 
-        for experiment in exp:     
-                #print(experiment)
-                
-                    if 'deployed' in experiment and experiment['deployed']:
-                        print("in if")
-                        
-                        for dw in experiment['deployed_on_workstations']:    
-                            ws = workstation_collection.find_one({'_id' : ObjectId(dw)})
-                            ws_name = ws['workstation_name']
-                            resp = {
-                                "experiment_name" : experiment['experiment_name'],
-                                "part_number" : part['part_number'],
-                                "experiment_type" : experiment['experiment_type'],
-                                "workstation" : ws_name,
-                                "inference_urls" :  get_inference_feed_url_util(ws["_id"] , part_id),
-                                "experiment_id" : experiment['_id'],
-                               
-                                }
-                            try:
-                                threshold =  experiment['threshold']
-                                container_state : experiment['container_state']
-                                resp['threshold'] = threshold
-                                resp['container_state'] = container_state
-                            except Exception as e:
-                                print(" exception "+str(e))
-                                pass
-                            print("resp is"+str(resp))
-                            return_list.append(resp)
-                            resp = {}
-                            #print(return_list)
-                
+    ###### filter ######
+    query_list = []
+    mp = MongoHelper().getCollection('experiment')
+    if part_number != "" :
+        print("in parts loop")
+        # exp = '^'+part_number
+        # print(exp)
+        query_list.append({'part_id':part_number})
+    if experiment_name != "":
+        exp =  '^'+experiment_name 
+        print(exp)  
+        # query_list.append({'experiment_name':{'$regex':exp}})
+        query_list.append({"experiment_name":re.compile(experiment_name, re.IGNORECASE)})
 
-    final_deployment_list = []
-    for i in return_list:
-        if part_number in i["part_number"]:
-            final_deployment_list.append(i)
-        if experiment_name in i["experiment_name"]:
-            final_deployment_list.append(i)
-        if workstation in i["workstation"]:
-            final_deployment_list.append(i)
-        try:    
-            if location in i["location"]:
-                final_deployment_list.append(i)
-        except:
-                pass        
-        if part_number == None or experiment_name ==None or workstation ==None or location==None:
-            final_deployment_list.append(i)
+    if workstation != "" :
+        # print("in workstation")
+        query_list.append({'deployed_on_workstations':workstation})     
 
+    if part_number == "" and experiment_name =="":
+        print("empty string")
+        exp =  '^true'
+        query_list.append({'deployed':True})    
+
+    mp = MongoHelper().getCollection('experiment')
+    pr_ids = [i for i in mp.find({"$and":query_list})] 
+    return_list = []
+    
+        
+
+    # parts = [p for p in part_collection.find({"$and" : [{"isdeleted": False}, { "isdeleted" : {"$exists" : True}}]}).sort( "$natural", -1 )]
+
+    for experiment in pr_ids:     
+            #print(experiment)
+            
+                if 'deployed' in experiment and experiment['deployed']:
+                    print("in if")
+                    
+                    for dw in experiment['deployed_on_workstations']:    
+                        ws = workstation_collection.find_one({'_id' : ObjectId(dw)})
+                        ws_name = ws['workstation_name']
+                        part_id = experiment["part_id"]
+                        cursor = part_collection.find({"_id":ObjectId(part_id)})
+                        for i in cursor:
+                            part_name = i["part_number"]
+                        resp = {
+                            "experiment_name" : experiment['experiment_name'],
+                            "part_number" : part_name,
+                            "experiment_type" : experiment['experiment_type'],
+                            "workstation" : ws_name,
+                            "inference_urls" :  get_inference_feed_url_util(ws["_id"] , part_id),
+                            "experiment_id" : experiment['_id'],
+                            
+                            }
+                        try:
+                            threshold =  experiment['threshold']
+                            container_state : experiment['container_state']
+                            resp['threshold'] = threshold
+                            resp['container_state'] = container_state
+                        except Exception as e:
+                            print(" exception "+str(e))
+                            pass
+                        print("resp is"+str(resp))
+                        return_list.append(resp)
+                        resp = {}
+
+
+    ####################
     list_ = []
     unique_list = []
 
-    for item in final_deployment_list:
-        print(item)
+    for item in return_list:
+        # print(item)
         id = item["experiment_id"]
         if id not in unique_list:        
             unique_list.append(id)
@@ -893,8 +950,8 @@ def deployment_list_filter_utils(config):
         # list_ = [list_[i:i+number_of_items] for i in range(0, len(list_), number_of_items)]
         # print(list_)
 
-
-    return list_   
+    out_dict = {"count":len(list_),"data" :list_}
+    return out_dict
 
 
 
