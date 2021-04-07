@@ -1,14 +1,3 @@
-from django.utils import timezone
-from common.utils import MongoHelper
-from bson.json_util import dumps
-from bson.objectid import ObjectId
-from common.utils import *
-from django.utils import timezone
-from bson import ObjectId
-from livis.settings import *
-import datetime
-from datetime import datetime, timedelta
-
 def create_lead_util(data):
     try:
         lead_owner = data['lead_owner']
@@ -83,10 +72,10 @@ def create_lead_util(data):
         message = "status not provided"
         status = 400
         return message, status_code
-    
+
     mp = MongoHelper().getCollection(LEADS_COLLECTION)
     ### Logic to check if kanban exists
-    if mp.find_one({"$and":[{"company_gst":company_gst},{"isdeleted":False}]}):
+    if mp.find_one({"$and": [{"company_gst": company_gst}, {"isdeleted": False}]}):
         status_code = 400
         message = "lead already exists"
         return message, status_code
@@ -112,13 +101,15 @@ def create_lead_util(data):
     status_code = 200
     return message, status_code
 
+
 def get_all_leads_util():
     mp = MongoHelper().getCollection(LEADS_COLLECTION)
-    leads_list = [p for p in mp.find({"isdeleted":False})]
+    leads_list = [p for p in mp.find({"isdeleted": False})]
     if leads_list:
         return leads_list
     else:
         return []
+
 
 def get_single_lead_util(id):
     try:
@@ -198,24 +189,24 @@ def update_lead_util(data):
         status_code = 400
         return message, status_code
     try:
-       lead_id = data['lead_id']
+        lead_id = data['lead_id']
     except:
-       message = "lead ID not provided"
-       status_code = 400
-       return message, status_code
+        message = "lead ID not provided"
+        status_code = 400
+        return message, status_code
     try:
-       notes = data['notes']
+        notes = data['notes']
     except:
-       message = "notes not provided"
-       status_code = 400
-       return message, status_code
+        message = "notes not provided"
+        status_code = 400
+        return message, status_code
 
     try:
-       status = data['status']
+        status = data['status']
     except:
-       message = "status not provided"
-       status_code = 400
-       return message, status_code
+        message = "status not provided"
+        status_code = 400
+        return message, status_code
 
     mp = MongoHelper().getCollection(LEADS_COLLECTION)
     lead = mp.find_one({"_id": ObjectId(lead_id)})
@@ -237,6 +228,7 @@ def update_lead_util(data):
     status_code = 200
     return message, status_code
 
+
 def delete_lead_util(lead_id):
     mp = MongoHelper().getCollection(LEADS_COLLECTION)
     lead = mp.find_one({'_id': ObjectId(lead_id)})
@@ -247,6 +239,7 @@ def delete_lead_util(lead_id):
     message = "Sucess"
     status_code = 200
     return message, status_code
+
 
 def check_gst_util(company_gst):
     mp = MongoHelper().getCollection(LEADS_COLLECTION)
@@ -259,232 +252,6 @@ def check_gst_util(company_gst):
         message = "present"
         status_code = 200
         return message, status_code
-
-def create_task_util(data):
-    try:
-        subject = data['subject']
-    except:
-        message = "subject not provided"
-        status_code = 400
-        return message, status_code
-    try:
-        due_date = data['due_date']
-    except:
-        message = "due date not provided"
-        status_code = 400
-        return message, status_code
-    try:
-        priority = data['priority']
-    except:
-        message = "priority not provided"
-        status_code = 400
-        return message, status_code
-    try:
-        assigned_to = data['assigned_to']
-    except:
-        message = "assigned to not provided"
-        status_code = 400
-        return message, status_code
-    try:
-        lead_id = data['lead_id']
-    except:
-        message = "lead id not providded"
-        status_code = 400
-        return message, status_code
-
-    mp = MongoHelper().getCollection(TASKS_COLLECTION)
-    ### How to check if task already exists? Unique field
-    isdeleted = False
-    collection_obj = {
-        'subject': subject,
-        'due_date': due_date,
-        'priority': priority,
-        'assigned_to': assigned_to,
-        'isdeleted': isdeleted,
-        'created_at': timezone.now(),
-        'closed_at': '',
-        'lead_id': lead_id}
-
-    _id = mp.insert(collection_obj)
-    message = "added task"
-    status_code = 200
-    return message, status_code
-
-def get_all_tasks_util(lead_id):
-    print("getting all tasks")
-    mp = MongoHelper().getCollection(TASKS_COLLECTION)
-    tasks_list = [p for p in mp.find({"$and":[{"isdeleted":False},{"lead_id":lead_id}]})]
-    if tasks_list:
-        return tasks_list
-    else:
-        return []
-
-def get_single_task_util(id):
-    try:
-        task_id = id
-    except:
-        message = "task ID not provided"
-        status_code = 400
-        return message, status_code
-    _id = ObjectId(task_id)
-    mp = MongoHelper().getCollection(TASKS_COLLECTION)
-    p = mp.find_one({'_id':_id})
-    if p:
-        return p
-    else:
-        return {}
-
-
-def update_task_util(data):
-    try:
-        subject = data['subject']
-    except:
-        message = "subject not provided"
-        status_code = 400
-        return message, status_code
-    try:
-        due_date = data['due_date']
-    except:
-        message = "due date not provided"
-        status_code = 400
-        return message, status_code
-    try:
-        priority = data['priority']
-    except:
-        message = "priority not provided"
-        status_code = 400
-        return message, status_code
-    try:
-        assigned_to = data['assigned_to']
-    except:
-        message = "assigned to not provided"
-        status_code = 400
-        return message, status_code
-    try:
-       task_id = data['task_id']
-    except:
-       message = "task ID not provided"
-       status_code = 400
-       return message, status_code
-    try:
-       closed_at = data['closed_id']
-    except:
-       message = "closed_at not provided"
-       status_code = 400
-       return message, status_code
-
-    mp = MongoHelper().getCollection(TASKS_COLLECTION)
-    task = mp.find_one({'_id': ObjectId(task_id)})
-    print(task)
-    task['subject'] = subject
-    task['due_date'] = due_date
-    task['priority'] = priority
-    task['assigned_to'] = assigned_to
-    task['closed_at'] = closed_at
-
-    mp.update({'_id': task['_id']}, {'$set': task})
-    message = "Success"
-    status_code = 200
-    return message, status_code
-
-
-def delete_task_util(task_id):
-    mp = MongoHelper().getCollection(TASKS_COLLECTION)
-    task = mp.find_one({'_id': ObjectId(task_id)})
-    isdeleted = task.get('isdeleted')
-    if not isdeleted:
-        task['isdeleted'] = True
-    mp.update({'_id': task['_id']}, {'$set': task})
-    message = "Success"
-    status_code = 200
-    return message, status_code
-
-
-def create_todo_util(data):
-    try:
-        task_id = data['task_id']
-    except:
-        message = "task ID not provided"
-        staus_code = 400
-        return message, status_code
-    try:
-        notes = data['notes']
-    except:
-        message = "notes not provided"
-        status_code = 400
-        return message, status_code
-    try:
-        duration = data['duration']
-    except:
-        message = "duration not provided"
-        status_code = 400
-        return message, status_code
-    collection_obj = {
-        "task_id": task_id,
-        "notes": notes,
-        "duration": duration,
-        "isdeleted": False}
-
-    mp = MongoHelper().getCollection(str(task_id)+"_TodoList")
-    mp.insert(collection_obj)
-    message = "success"
-    status_code = 200
-    return message, status_code
-
-
-def get_all_todo_util(task_id):
-    todo_list = []
-    mp = MongoHelper().getCollection(str(task_id)+"_TodoList")
-    todo_list = [p for p in mp.find()]
-    return todo_list
-
-
-def update_todo_util(data):
-    try:
-        task_id = data['task_id']
-    except:
-        message = "task ID not provided"
-        status_code = 400
-        return message, status_code
-    try:
-        notes = data['notes']
-    except:
-        message = "notes not provided "
-        status_code = 400
-        return message, status_code
-    try:
-        duration = data['duration']
-    except:
-        message = "duration not provided"
-        status_code = 400
-        return message, status_code
-    try:
-        todo_id = data['todo_id']
-    except:
-        message = "todo not provided"
-        status_code = 400
-        return message, status_code
-    mp = MongoHelper().getCollection(str(task_id)+"_TodoList")
-    todo = mp.find_one({'_id': ObjectId(todo_id)})
-    todo['notes'] = notes
-    todo['duration'] = duration
-    mp.update({'_id': todo['_id']}, {'$set': todo})
-    message = "success"
-    status_code = 200
-    return message, status_code
-
-
-def delete_todo_util(task_id,todo_id):
-    mp = MongoHelper().getCollection(str(task_id)+"_TodoList")
-    todo = mp.find_one({'_id':ObjectId(todo_id)})
-    isdeleted = todo.get('isdeleted')
-    if not isdeleted:
-        todo['isdeleted'] = True
-    mp.update({'_id': todo['_id']}, {'$set': todo})
-    message = "Success"
-    status_code = 200
-    return message, status_code
-
 
 def update_lead_status_util(data):
     try:
@@ -561,14 +328,3 @@ def delete_lead_source_util(id):
 def get_users_util():
     users = {"tim", "kat", "john", "ram"}
     return users
-
-
-def get_tasks_by_user_util(user):
-    mp = MongoHelper().getCollection(TASKS_COLLECTION)
-    colls = [p for p in mp.find({"assigned_to": user})]
-    if colls:
-        return colls
-    else:
-        return []
-
-
