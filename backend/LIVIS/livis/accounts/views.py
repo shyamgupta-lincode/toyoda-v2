@@ -241,6 +241,207 @@ def get_user_masters(request):
     response = get_user_masters_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 
     
+    
+#########################################################ADMIN CRUDS ############################################################
+
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def add_user_admin(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "add admin user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    data = json.loads(request.body)
+    from accounts.utils import add_user_admin_util
+    message = add_user_admin_util(data)
+    return HttpResponse(json.dumps({'message' : message}), content_type="application/json") 
+
+
+
+@api_view(['PATCH'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def update_user_admin(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "update admin user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    data = json.loads(request.body)
+    from accounts.utils import update_user_admin_util
+    message = update_user_admin_util(data)
+    return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
+
+
+@api_view(['DELETE'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def delete_user_admin(request, client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "delete admin user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    from accounts.utils import delete_user_admin_util
+    message = delete_user_admin_util(client_id)
+    return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_user_admin(request,client_id):
+
+    from accounts.utils import get_user_admin_util
+    response = get_user_admin_util(client_id)
+    return HttpResponse(json.dumps(response), content_type="application/json") 
+
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_user_admins(request):
+
+    from accounts.utils import get_user_admins_util
+    response = get_user_admins_util()
+    return  HttpResponse(json.dumps(response), content_type="application/json") 
+    
+
+#########################################################Business_manager CRUDS ############################################################
+
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def add_user_business_manager(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "add business_manager user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    data = json.loads(request.body)
+    from accounts.utils import add_user_business_manager_util
+    message = add_user_business_manager_util(data)
+    return HttpResponse(json.dumps({'message' : message}), content_type="application/json") 
+
+
+
+@api_view(['PATCH'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def update_user_business_manager(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "update business_manager user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    data = json.loads(request.body)
+    from accounts.utils import update_user_business_manager_util
+    message = update_user_business_manager_util(data)
+    return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
+
+
+@api_view(['DELETE'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def delete_user_business_manager(request, client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "delete business_manager user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    from accounts.utils import delete_user_business_manager_util
+    message = delete_user_business_manager_util(client_id)
+    return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_user_business_manager(request,client_id):
+
+    from accounts.utils import get_user_business_manager_util
+    response = get_user_business_manager_util(client_id)
+    return HttpResponse(json.dumps(response), content_type="application/json") 
+
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_user_business_managers(request):
+
+    from accounts.utils import get_user_business_managers_util
+    response = get_user_business_managers_util()
+    return  HttpResponse(json.dumps(response), content_type="application/json") 
+
+
+
+#########################################################sales_executive CRUDS ############################################################
+
+
+@api_view(['POST'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def add_user_sales_executive(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "add sales_executive user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    data = json.loads(request.body)
+    from accounts.utils import add_user_sales_executive_util
+    message = add_user_sales_executive_util(data)
+    return HttpResponse(json.dumps({'message' : message}), content_type="application/json") 
+
+
+
+@api_view(['PATCH'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def update_user_sales_executive(request):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "update sales_executive user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    data = json.loads(request.body)
+    from accounts.utils import update_user_sales_executive_util
+    message = update_user_sales_executive_util(data)
+    return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
+
+
+@api_view(['DELETE'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def delete_user_sales_executive(request, client_id):
+    token_user_id = request.user.user_id
+    operation_type = "accounts"
+    notes = "delete sales_executive user"
+    
+    add_logs_util(token_user_id,operation_type,notes)
+    from accounts.utils import delete_user_sales_executive_util
+    message = delete_user_sales_executive_util(client_id)
+    return HttpResponse(json.dumps({'message' : message}), content_type="application/json")
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_user_sales_executive(request,client_id):
+
+    from accounts.utils import get_user_sales_executive_util
+    response = get_user_sales_executive_util(client_id)
+    return HttpResponse(json.dumps(response), content_type="application/json") 
+
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_user_sales_executives(request):
+
+    from accounts.utils import get_user_sales_executives_util
+    response = get_user_sales_executives_util()
+    return  HttpResponse(json.dumps(response), content_type="application/json") 
 #########################################################USER_SI CRUDS############################################################
 
 

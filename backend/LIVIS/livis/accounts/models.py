@@ -65,8 +65,32 @@ class User_Master(User):
         #permissions = (("can_add_si", "can_add_si"), ("can_update_si","can_update_si"), ("can_get_si","can_get_si"), ("can_get_sis","can_get_sis"),("can_delete_si","can_delete_si"),)
 
 
+class User_Admin(User):
+    #master = models.ForeignKey('User_Master',on_delete=models.DO_NOTHING)
+    admin_id = models.CharField(max_length=50, unique=True,primary_key=True)
+    #master_name = models.CharField(max_length=50)
+    #master_address = models.CharField(max_length=500)
+    #is_deleted = models.BooleanField(default=False)
     
+    class Meta:
+        #Add verbose name 
+        verbose_name = 'User: Admin List'
+        #permissions = (("can_add_si", "can_add_si"), ("can_update_si","can_update_si"), ("can_get_si","can_get_si"), ("can_get_sis","can_get_sis"),("can_delete_si","can_delete_si"),)
+    
+class User_Business_Manager(User):
+    business_manager_id = models.CharField(max_length=50, unique=True,primary_key=True)
+    
+    class Meta:
+        #Add verbose name 
+        verbose_name = 'User: Business_Manager List'
 
+class User_Sales_Executive(User):
+    sales_executive_id = models.CharField(max_length=50, unique=True,primary_key=True)
+    
+    class Meta:
+        #Add verbose name 
+        verbose_name = 'User: Sales_Executive List'
+        
 class User_Client(User):
     """
     Usage: Class representation of User_Client Schema which extends User Schema.
