@@ -867,7 +867,11 @@ def get_user_business_managers_util():
 ################################################################USER_sales_executive#######################################################################
 
 
-def add_user_sales_executive_util(data):
+def add_user_sales_executive_util(data,request):
+
+    print("user_idddddddddddddddddddddddddddd is")
+    print(request.user.user_id)
+
 
     resp = {}
     try:
@@ -886,13 +890,14 @@ def add_user_sales_executive_util(data):
         is_superuser = data.get('is_superuser',None)
         role_name = data.get('role_name',None)
         phone_number = data.get('phone_number',None)
-        created_by = data.get('created_by',None)
+        created_by = str(request.user.user_id)
         user_sales_executive_obj = User_Sales_Executive(
             user_id =  user_id,
             sales_executive_id =  sales_executive_id,
             first_name =  first_name,
             last_name =  last_name,
             username =  username,
+            created_by = created_by,
             email =  email,
             user_address =  user_address,
             date_joined =  date_joined,
