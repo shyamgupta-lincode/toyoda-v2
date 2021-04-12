@@ -3,9 +3,9 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import TemplateHTMLRenderer,JSONRenderer
 from django.http import HttpResponse
-from crm.Leadsutils import *
-from crm.Tasksutils import *
-from crm.Todoutils import *
+from .Leadsutils import *
+from .Tasksutils import *
+from .Todoutils import *
 #from crm.utils import *
 import json
 from common.utils import *
