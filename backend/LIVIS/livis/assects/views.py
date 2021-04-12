@@ -25,7 +25,7 @@ def add_assects(request):
     data = json.loads(request.body)
     response,status_code = add_assects_util(data)
     if status_code != 200:
-        return HttpResponse( {message}, status=status_code)
+        return HttpResponse( {response}, status=status_code)
     else:
         return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
@@ -43,7 +43,7 @@ def update_assect(request):
     data = json.loads(request.body)
     response,status_code = update_assect_util(data)
     if status_code != 200:
-        return HttpResponse( {message}, status=status_code)
+        return HttpResponse( {response}, status=status_code)
     else:
         return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
@@ -63,7 +63,7 @@ def get_assect(request):
     
     response,status_code = get_assect_util()
     if status_code != 200:
-        return HttpResponse( {message}, status=status_code)
+        return HttpResponse( {response}, status=status_code)
     else:
         return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
@@ -74,6 +74,6 @@ def get_assect(request):
 def validate(request):
     response,status_code = get_validation()
     if status_code != 200:
-        return HttpResponse( {message}, status=status_code)
+        return HttpResponse( {response}, status=status_code)
     else:
         return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")

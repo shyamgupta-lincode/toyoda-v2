@@ -317,6 +317,7 @@ def get_user_admins(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def add_user_business_manager(request):
+    check_permission(request,"can_add_business_manager")
     token_user_id = request.user.user_id
     operation_type = "accounts"
     notes = "add business_manager user"
@@ -333,6 +334,7 @@ def add_user_business_manager(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_user_business_manager(request):
+    check_permission(request,"can_update_business_manager")
     token_user_id = request.user.user_id
     operation_type = "accounts"
     notes = "update business_manager user"
@@ -348,6 +350,7 @@ def update_user_business_manager(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def delete_user_business_manager(request, client_id):
+    check_permission(request,"can_delete_business_manager")
     token_user_id = request.user.user_id
     operation_type = "accounts"
     notes = "delete business_manager user"
@@ -361,7 +364,7 @@ def delete_user_business_manager(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_business_manager(request,client_id):
-
+    check_permission(request,"can_get_business_manager")
     from accounts.utils import get_user_business_manager_util
     response = get_user_business_manager_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -371,7 +374,7 @@ def get_user_business_manager(request,client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_business_managers(request):
-
+    check_permission(request,"can_get_business_managers")
     from accounts.utils import get_user_business_managers_util
     response = get_user_business_managers_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 
@@ -385,6 +388,9 @@ def get_user_business_managers(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def add_user_sales_executive(request):
+
+    check_permission(request,"can_add_sales_executive")
+    
     token_user_id = request.user.user_id
     operation_type = "accounts"
     notes = "add sales_executive user"
@@ -392,7 +398,7 @@ def add_user_sales_executive(request):
     add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from accounts.utils import add_user_sales_executive_util
-    message = add_user_sales_executive_util(data)
+    message = add_user_sales_executive_util(data,request)
     return HttpResponse(json.dumps({'message' : message}), content_type="application/json") 
 
 
@@ -401,6 +407,7 @@ def add_user_sales_executive(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_user_sales_executive(request):
+    check_permission(request,"can_update_sales_executive")
     token_user_id = request.user.user_id
     operation_type = "accounts"
     notes = "update sales_executive user"
@@ -416,6 +423,7 @@ def update_user_sales_executive(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def delete_user_sales_executive(request, client_id):
+    check_permission(request,"can_delete_sales_executive")
     token_user_id = request.user.user_id
     operation_type = "accounts"
     notes = "delete sales_executive user"
@@ -429,7 +437,7 @@ def delete_user_sales_executive(request, client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_sales_executive(request,client_id):
-
+    check_permission(request,"can_get_sales_executive")
     from accounts.utils import get_user_sales_executive_util
     response = get_user_sales_executive_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -439,7 +447,7 @@ def get_user_sales_executive(request,client_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_user_sales_executives(request):
-
+    check_permission(request,"can_get_sales_executives")
     from accounts.utils import get_user_sales_executives_util
     response = get_user_sales_executives_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 
@@ -467,6 +475,9 @@ def get_user_sales_executives(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def add_user_si(request):
+
+    check_permission(request,"can_add_user_si")
+    
     token_user_id = request.user.user_id
     operation_type = "accounts"
     notes = "add si user"
@@ -499,6 +510,9 @@ def add_user_si(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_user_si(request):
+
+    check_permission(request,"can_update_user_si")
+    
     token_user_id = request.user.user_id
     operation_type = "accounts"
     notes = "update si user"
@@ -514,6 +528,9 @@ def update_user_si(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def delete_user_si(request, client_id):
+
+    check_permission(request,"can_delete_user_si")
+    
     token_user_id = request.user.user_id
     operation_type = "accounts"
     notes = "delete si user"
@@ -528,6 +545,8 @@ def delete_user_si(request, client_id):
 @csrf_exempt
 def get_user_si(request,client_id):
 
+    check_permission(request,"can_get_user_si")
+    
     from accounts.utils import get_user_si_util
     response = get_user_si_util(client_id)
     return HttpResponse(json.dumps(response), content_type="application/json") 
@@ -538,6 +557,7 @@ def get_user_si(request,client_id):
 @csrf_exempt
 def get_user_sis(request):
 
+    check_permission(request,"can_get_user_sis")
     from accounts.utils import get_user_sis_util
     response = get_user_sis_util()
     return  HttpResponse(json.dumps(response), content_type="application/json") 
@@ -762,8 +782,6 @@ def get_all_client_accounts(request):
 @csrf_exempt
 def add_si_account(request):
 
-    check_permission(request,"can_add_si")
-
     token_user_id = request.user.user_id
     operation_type = "accounts"
     notes = "add si account"
@@ -781,7 +799,7 @@ def add_si_account(request):
 @csrf_exempt
 def get_si_account(request,client_id):
 
-    check_permission(request,"can_get_si")
+    
     
     from accounts.utils import get_si_account_util
     response = get_si_account_util(client_id)
@@ -794,7 +812,7 @@ def get_si_account(request,client_id):
 @csrf_exempt
 def update_si_account(request):
 
-    check_permission(request,"can_update_si")
+    
     
     token_user_id = request.user.user_id
     operation_type = "accounts"
@@ -812,7 +830,7 @@ def update_si_account(request):
 @csrf_exempt
 def delete_si_account(request, client_id):
 
-    check_permission(request,"can_delete_si")
+    
 
     token_user_id = request.user.user_id
     operation_type = "accounts"
@@ -830,7 +848,6 @@ def delete_si_account(request, client_id):
 @csrf_exempt
 def get_all_si_accounts(request):
     
-    check_permission(request,"can_get_sis")
 
     from accounts.utils import get_all_si_accounts_util
     response = get_all_si_accounts_util()
