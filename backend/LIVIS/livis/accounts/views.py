@@ -312,6 +312,7 @@ def get_user_admins(request):
 #########################################################Business_manager CRUDS ############################################################
 
 
+
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
