@@ -8,6 +8,30 @@ urlpatterns = [
     re_path(r'^delete_user_account/(?P<client_id>[A-Za-z0-9-_]+)$', views.delete_user_account),
     re_path(r'^user_accounts/$', views.get_all_user_accounts),
 
+    re_path(r'^add_user_master/$', views.add_user_master),
+    re_path(r'^get_user_master/(?P<client_id>[A-Za-z0-9-_]+)', views.get_user_master),
+    re_path(r'^update_user_master/$', views.update_user_master),
+    re_path(r'^delete_user_master/(?P<client_id>[A-Za-z0-9-_]+)$', views.delete_user_master),
+    re_path(r'^get_user_masters/$', views.get_user_masters),
+    
+    re_path(r'^add_user_admin/$', views.add_user_admin),
+    re_path(r'^get_user_admin/(?P<client_id>[A-Za-z0-9-_]+)', views.get_user_admin),
+    re_path(r'^update_user_admin/$', views.update_user_admin),
+    re_path(r'^delete_user_admin/(?P<client_id>[A-Za-z0-9-_]+)$', views.delete_user_admin),
+    re_path(r'^get_user_admins/$', views.get_user_admins),
+
+    re_path(r'^add_user_business_manager/$', views.add_user_business_manager),
+    re_path(r'^get_user_business_manager/(?P<client_id>[A-Za-z0-9-_]+)', views.get_user_business_manager),
+    re_path(r'^update_user_business_manager/$', views.update_user_business_manager),
+    re_path(r'^delete_user_business_manager/(?P<client_id>[A-Za-z0-9-_]+)$', views.delete_user_business_manager),
+    re_path(r'^get_user_business_managers/$', views.get_user_business_managers),
+
+    re_path(r'^add_user_sales_executive/$', views.add_user_sales_executive),
+    re_path(r'^get_user_sales_executive/(?P<client_id>[A-Za-z0-9-_]+)', views.get_user_sales_executive),
+    re_path(r'^update_user_sales_executive/$', views.update_user_sales_executive),
+    re_path(r'^delete_user_sales_executive/(?P<client_id>[A-Za-z0-9-_]+)$', views.delete_user_sales_executive),
+    re_path(r'^get_user_sales_executives/$', views.get_user_sales_executives),
+    
     re_path(r'^add_user_client/$', views.add_user_client),
     re_path(r'^get_user_client/(?P<client_id>[A-Za-z0-9-_]+)', views.get_user_client),
     re_path(r'^get_list_client/(?P<client_id>[A-Za-z0-9-_]+)', views.get_list_client),
@@ -38,5 +62,4 @@ urlpatterns = [
     re_path(r'^logout/$', views.logout_user),
     re_path(r'^change_password/$', views.change_password),
     
-
     ]
