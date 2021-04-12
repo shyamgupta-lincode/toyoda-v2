@@ -81,23 +81,23 @@ def create_lead_util(data):
         status = data['status']
     except:
         message = "status not provided"
-        status = 400
+        status_code = 400
         return message, status_code
     try:
        created_by =data['created_by']
     except:
        message = "created_by not provided"
-       status = 400
+       status_code = 400
        return message, status_code
     try:
        assigned_to = data['assigned_to']
     except:
        message = "assigned_to not provided"
-       status = 400
+       status_code = 400
        return message, status_code
     mp = MongoHelper().getCollection(LEADS_COLLECTION)
     ### Logic to check if kanban exists
-    if mp.find_one({"company_gst":company_gst}):
+    if mp.find_one({"$and":[{"company_gst":company_gst},{"isdeleted":False}]}):
         status_code = 400
         message = "lead already exists"
         return message, status_code
