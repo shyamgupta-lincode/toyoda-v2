@@ -86,7 +86,7 @@ class User_Business_Manager(User):
 
 class User_Sales_Executive(User):
     sales_executive_id = models.CharField(max_length=50, unique=True,primary_key=True)
-    
+    created_by = models.CharField(max_length=50, unique=False,primary_key=False)
     class Meta:
         #Add verbose name 
         verbose_name = 'User: Sales_Executive List'
