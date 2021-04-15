@@ -873,6 +873,7 @@ def add_user_sales_executive_util(data,request):
     print(request.user.user_id)
 
 
+
     resp = {}
     try:
         user_id = str(uuid.uuid4()) 
