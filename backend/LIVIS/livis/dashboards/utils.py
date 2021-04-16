@@ -43,7 +43,7 @@ def production_yield_by_wid_util(data):
     for ins in objs:
         inspection_id = str(ins['_id'])
         mp = MongoHelper().getCollection(inspection_id+"_log")
-        #parts_coll = mp.find({"$and":[{"isAccepted":True},{"workstation_id":w_id}]}).count()
+        #parts_coll = mp.find({"and":[{"isAccepted":True},{"workstation_id":w_id}]}).count()
         #print(parts_coll)
         parts_coll = mp.find({"isAccepted":True}).count()
         total_accepted = total_accepted + parts_coll

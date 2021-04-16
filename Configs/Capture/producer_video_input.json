@@ -1,9 +1,0 @@
-[
-  {
-    "video_input": "part_xyz.mp4",
-    "part_name": "part_a",
-    "topic": "WS1parta",
-    "broker_server": "broker:9092",
-    "file_format": "jpg"
-  }
-]

@@ -82,8 +82,6 @@ def get_camera_feed_urls():
         print(ws_camera_dict)
     
         for i in ws_camera_dict:
-        
-            #url = "http://127.0.0.1:8000/livis/v1/capture/consumer_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
             url = "http://"+BASE_URL+":8000/livis/v1/capture/consumer_camera_preview/{}/{}/".format(workstation_id,i['camera_name'])
             dummmy_dct = {"camera_name":i['camera_name'] , "camera_url":url,"workstation_id":str(workstation_id),"camera_id":str(i['camera_id'])}
             feed_urls.append(dummmy_dct)
@@ -282,8 +280,6 @@ def capture_image_util(data):
     return "success",200               
 
 
-
-
 def start_camera_preview(workstation_id,camera_name):
     # access the workstation table
     workstation_id = ObjectId(workstation_id)
@@ -315,12 +311,10 @@ def start_camera_preview(workstation_id,camera_name):
             
 
         ret, jpeg = cv2.imencode('.jpg', img)
-        #cv2.imwrite("frame.jpg", jpeg)
         
         frame = jpeg.tobytes()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
 
 
 def start_inference(workstation_id,camera_name,partid):
@@ -362,6 +356,7 @@ def start_inference(workstation_id,camera_name,partid):
         frame = jpeg.tobytes()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
 
 def start_camera_selection(data):
     # get data from the JSON POST object
@@ -432,7 +427,6 @@ def start_camera_selection(data):
                     new = {}
                     new = {workstation_id:camera_select_list_from_post}
                     #part_row['camera_selected'] = parts_camera_dict
-                    
                     new1 = {}
                     new1['camera_selected'] = new
                     print(new1)
@@ -463,7 +457,6 @@ def start_camera_selection(data):
                     new = {}
                     new = {workstation_id:camera_select_list_from_post}
                     #part_row['camera_selected'] = parts_camera_dict
-                    
                     new1 = {}
                     new1['camera_selected'] = new
                     print(new1)
@@ -472,13 +465,50 @@ def start_camera_selection(data):
                     status_code = 200
                     return message, status_code
 
-def get_camera_index_util(ws_id):
-    topic = ws_id+"_camera_indexes"
+
+def get_camera_index_util(ws_location, cameraid):
+
+    topic = ws_location
     print("listening to topic "+str(topic))
     consumer = KafkaConsumer(topic, bootstrap_servers=KAFKA_BROKER_URL, auto_offset_reset='latest')
+
+    if ws_location == "":
+        return "workstation location not provided", 400
+
     for message in consumer:
         a = message.value.decode('utf-8')
-        #a = a.replace("_"," ")
-        print(a)
-        break
-    return a, 200
+        b = json.loads(a)
+        im_b64_str = b["frame"]
+        im_b64 = bytes(im_b64_str[2:], 'utf-8')
+        im_binary = base64.b64decode(im_b64)
+
+        im_arr = np.frombuffer(im_binary, dtype=np.uint8)
+        img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
+
+        ret, jpeg = cv2.imencode('.jpg', img)
+        
+        frame = jpeg.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+def get_camera_select_url_util(ws_location):
+    if ws_location == "":
+       return "workstation location not provided", 400
+
+    mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
+    coll = mp.find_one({"workstation_location": ws_location})
+    cam_index_list = coll['available_indexs']
+
+    feed_urls = []
+    for i in eval(cam_index_list):
+        dummmy_dct = {}
+        url = "http://" + BASE_URL + ":8000/livis/v1/capture/camera_select_preview/{}/{}/".format(ws_location, i)
+        dummmy_dct = {"camera_url": url, "workstation_location": str(ws_location), "camera_id": i}
+        feed_urls.append(dummmy_dct)
+
+    if feed_urls:
+        return feed_urls
+    else:
+        return {}
+

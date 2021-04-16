@@ -450,7 +450,19 @@ def get_user_sales_executives(request):
     check_permission(request,"can_get_sales_executives")
     from accounts.utils import get_user_sales_executives_util
     response = get_user_sales_executives_util()
-    return  HttpResponse(json.dumps(response), content_type="application/json") 
+    return  HttpResponse(json.dumps(response), content_type="application/json")
+
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_user_sales_by_business_manager(request, business_manager_id):
+    check_permission(request,"can_get_sales_executives")
+    from accounts.utils import get_user_sales_by_business_manager_util
+    response = get_user_sales_by_business_manager_util(business_manager_id)
+    return  HttpResponse(json.dumps(response), content_type="application/json")
+
+
 #########################################################USER_SI CRUDS############################################################
 
 

@@ -214,31 +214,3 @@ class Camera():
         self.thread.join()
         self.thread = None
         self.killed = False
-
-list_of_topics = []
-mp = MongoHelper().getCollection(WORKSTATION_COLLECTION)
-workstations = [p for p in mp.find({"$and" : [{"isdeleted": False}, { "isdeleted" : {"$exists" : True}}]})]
-print(len(workstations))
-
-
-if workstations:
-    for w_s in workstations:
-        cameras = w_s['cameras']
-        wids = w_s['_id']
-        for c in cameras:
-            camera_ids = c['camera_id']
-            topic = str(wids)+"_"+str(camera_ids)+"_input"
-            topic = topic.replace(":","-")
-            list_of_topics.append(topic)
-            topic = ""
-
-print(list_of_topics)
-for i in list_of_topics:
-    topic = i
-    print(topic.split('_'))
-    camera_id = str(topic.split('_')[1])
-    camera_id = camera_id.replace("-",":")
-    
-
-    cc = Camera(KAFKA_BROKER_URL, topic, camera_id)
-    cc.start()
