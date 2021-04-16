@@ -12,7 +12,7 @@ from copy import deepcopy
 import xml.etree.cElementTree as ET
 from lxml import etree
 import csv
-from livis.constants import *
+#from livis.constants import *
 from annotate.salient_detector.u2net_test import *
 import shutil
 import imutils

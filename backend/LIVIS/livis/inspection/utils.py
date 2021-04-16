@@ -583,11 +583,13 @@ def kanban_check(inspection_id, detections):
                     part_failed_flag = True
                     reason_part_failed.append('{} {} missing in part!'.format(feat_qty_flag ,feature))
                 else:
-                    pos_mismatch_idx = match_kanban_pos(kanban['kanban_details'][feature], coords)
-                    feat_pos_flag = False if len(pos_mismatch_idx) > 0 else True
-                    if not feat_pos_flag:
-                        part_failed_flag = True
-                        reason_part_failed.append('{} {} out of position in part!'.format(pos_mismatch_idx ,feature))
+                    pass
+                    
+                    #pos_mismatch_idx = match_kanban_pos(kanban['kanban_details'][feature], coords)
+                    #feat_pos_flag = False if len(pos_mismatch_idx) > 0 else True
+                    #if not feat_pos_flag:
+                    #    part_failed_flag = True
+                    #    reason_part_failed.append('{} {} out of position in part!'.format(pos_mismatch_idx ,feature))
             else:
                 part_failed_flag = True
                 reason_part_failed.append('{} missing in part!'.format(feature))

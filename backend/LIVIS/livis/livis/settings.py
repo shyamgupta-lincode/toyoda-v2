@@ -32,12 +32,13 @@ ALLOWED_HOSTS = ['*']
 DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000
 
 
-CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = (
-       'http://127.0.0.1:4200',
-       'http://127.0.0.1',
-       'http://localhost:4200',
-)
+CORS_ORIGIN_ALLOW_ALL = True
+#CORS_ORIGIN_WHITELIST = (
+#       'http://127.0.0.1:4200',
+#       'http://127.0.0.1',
+#       'http://localhost:4200',
+#       'http://13.234.202.181:4200'
+#)
 
 ENCRYPT_ID = '$pbkdf2-sha256$29000$6/3/XysF4JxT6j3H.J/Tug$uGi.a8mgaM1m5ze1mCTMNu0oljqOI78ha9TyMFtekbs'
 # Application definition
@@ -92,14 +93,14 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
+#CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3030',
-] # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
-CORS_ORIGIN_REGEX_WHITELIST = [
-    'http://localhost:3030',
-]
+#CORS_ORIGIN_REGEX_WHITELIST = [
+#    'http://localhost:3030','http://13.234.202.181:4200','http://127.0.0.1:4200','http://127.0.0.1','http://localhost:4200',
+#] # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
+#CORS_ORIGIN_REGEX_WHITELIST = [
+#    'http://localhost:3030',
+#]
 
 ROOT_URLCONF = 'livis.urls'
 
