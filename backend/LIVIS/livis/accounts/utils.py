@@ -1041,28 +1041,41 @@ def get_user_sales_by_business_manager_util(business_manager_id):
     user_list_details = []
     try:
 
-        user_sales_executive_obj = User_Sales_Executive.objects.filter(created_by=business_manager_id)
+        user_sales_executive_obj = User_Sales_Executive.objects.filter(is_deleted=False)
         for i in range(len(user_sales_executive_obj)):
-            user_sales_executive_obj_json = json.loads(serializers.serialize('json', user_sales_executive_obj))
-
+            user_sales_executive_obj_json = json.loads(serializers.serialize('json',user_sales_executive_obj))
+            print(user_sales_executive_obj_json)
+            
             user_sales_executive_obj_json = user_sales_executive_obj_json[i]
             resp.append(user_sales_executive_obj_json)
-
+        dct = []
+        
         for i in resp:
-            user_list.append(i['fields']['user_ptr'])
+            
+            dct1 = { "user_ptr":i['fields']['user_ptr'] , "created_by": i['fields']['created_by'] }
+            dct.append(dct1)
+            #user_list.append(i['fields']['created_by'])
+            #user_list.append(i['fields']['user_ptr'])
+            
+        for i in dct:
+            j = i['user_ptr']
+            k = i['created_by']
+            print("k isssssssss")
+            print(k)
+            if str(k) == str(business_manager_id):
+                print("in imnuanfuanab")
+                user_obj = User.objects.filter(user_id=j)
+                user_obj_json = json.loads(serializers.serialize('json',user_obj))
+                resp = user_obj_json[0]['fields']
+                resp['created_by'] = str(k)
+                resp['user_id'] = str(j)
+            
+                user_list_details.append(resp)
 
-        for i in user_list:
-            user_obj = User.objects.filter(user_id=i)
-            user_obj_json = json.loads(serializers.serialize('json', user_obj))
-            resp = user_obj_json[0]['fields']
-
-            resp['user_id'] = str(i)
-
-            user_list_details.append(resp)
 
         return user_list_details
     except Exception as e:
-        resp = "Could not retrieve all the existing user sales_executive. " + str(e)
+        resp = "Could not retrieve all the existing user sales_executive. "+str(e)
         return resp
 ################################################################USER_CLIENT CRUDS################################################################
 def add_user_client_util(data):
