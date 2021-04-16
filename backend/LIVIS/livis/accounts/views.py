@@ -31,6 +31,7 @@ from logs.utils import add_logs_util
 
 #############################################################USER CRUDS################################################################
 
+
 def check_permission(request,perm_name):
     
     role = request.user.role_name
