@@ -20,19 +20,28 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import user_passes_test
 
 from django.shortcuts import get_object_or_404
-from logs.utils import add_logs_util
 import six
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import user_passes_test
 from common.utils import MongoHelper
 
-################################################################USER CRUDS################################################################
+from rest_framework.permissions import AllowAny
+
+from logs.utils import add_logs_util
+
+#############################################################USER CRUDS################################################################
+
 
 def check_permission(request,perm_name):
     
     role = request.user.role_name
+    print("user issssssssssssssssssssss")
+    print(role)
     mp = MongoHelper().getCollection("permissions")
     p = [i for i in mp.find()]
+    print("p is")
+    print(p)
+    print(p[0][role])
     if perm_name in p[0][role]:
         pass
     else:
@@ -450,7 +459,19 @@ def get_user_sales_executives(request):
     check_permission(request,"can_get_sales_executives")
     from accounts.utils import get_user_sales_executives_util
     response = get_user_sales_executives_util()
-    return  HttpResponse(json.dumps(response), content_type="application/json") 
+    return  HttpResponse(json.dumps(response), content_type="application/json")
+
+
+@api_view(['GET'])
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_user_sales_by_business_manager(request, business_manager_id):
+    check_permission(request,"can_get_sales_executives")
+    from accounts.utils import get_user_sales_by_business_manager_util
+    response = get_user_sales_by_business_manager_util(business_manager_id)
+    return  HttpResponse(json.dumps(response), content_type="application/json")
+
+
 #########################################################USER_SI CRUDS############################################################
 
 
@@ -474,7 +495,9 @@ def get_user_sales_executives(request):
 @api_view(['POST'])
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
+@permission_classes((AllowAny,))
 def add_user_si(request):
+    print("im hereeeeeeee")
 
     check_permission(request,"can_add_user_si")
     

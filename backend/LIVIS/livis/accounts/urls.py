@@ -31,6 +31,8 @@ urlpatterns = [
     re_path(r'^update_user_sales_executive/$', views.update_user_sales_executive),
     re_path(r'^delete_user_sales_executive/(?P<client_id>[A-Za-z0-9-_]+)$', views.delete_user_sales_executive),
     re_path(r'^get_user_sales_executives/$', views.get_user_sales_executives),
+    re_path(r'^get_user_sales_by_business_manager/(?P<business_manager_id>[A-Za-z0-9-_]+)$',
+            views.get_user_sales_by_business_manager),
     
     re_path(r'^add_user_client/$', views.add_user_client),
     re_path(r'^get_user_client/(?P<client_id>[A-Za-z0-9-_]+)', views.get_user_client),
