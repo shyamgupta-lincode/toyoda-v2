@@ -118,8 +118,9 @@ class User_SI(User):
     Attributes: si (foreign key reference): reference to SI Schema.
                 is_system_integrator (boolean): Constant, always set as True for User_SI.
     """
-    si = models.ForeignKey('SI',on_delete=models.DO_NOTHING)
-    is_system_integrator = models.BooleanField(default=True)
+    #si = models.ForeignKey('SI',on_delete=models.DO_NOTHING)
+    #is_system_integrator = models.BooleanField(default=True)
+    si_id = models.CharField(max_length=50, unique=True,primary_key=True)
 
     class Meta: 
         #Add verbose name 

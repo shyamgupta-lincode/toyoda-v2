@@ -1006,21 +1006,27 @@ def get_user_sales_executives_util():
         user_sales_executive_obj = User_Sales_Executive.objects.filter(is_deleted=False)
         for i in range(len(user_sales_executive_obj)):
             user_sales_executive_obj_json = json.loads(serializers.serialize('json',user_sales_executive_obj))
+            print(user_sales_executive_obj_json)
             
             user_sales_executive_obj_json = user_sales_executive_obj_json[i]
             resp.append(user_sales_executive_obj_json)
-            
-        for i in resp:
-            user_list.append(i['fields']['user_ptr'])
-            
-        for i in user_list:
+        dct = []
         
-
-            user_obj = User.objects.filter(user_id=i)
+        for i in resp:
+            
+            dct1 = { "user_ptr":i['fields']['user_ptr'] , "created_by": i['fields']['created_by'] }
+            dct.append(dct1)
+            #user_list.append(i['fields']['created_by'])
+            #user_list.append(i['fields']['user_ptr'])
+            
+        for i in dct:
+            j = i['user_ptr']
+            k = i['created_by']
+            user_obj = User.objects.filter(user_id=j)
             user_obj_json = json.loads(serializers.serialize('json',user_obj))
             resp = user_obj_json[0]['fields']
-            
-            resp['user_id'] = str(i)
+            resp['created_by'] = str(k)
+            resp['user_id'] = str(j)
             
             user_list_details.append(resp)
 
