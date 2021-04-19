@@ -205,6 +205,10 @@ LEAD_SOURCE_COLLECTION = 'lead_source'
 REDIS_CLIENT_HOST = "localhost"
 REDIS_CLIENT_PORT = 6379
 
+# settings for AWS REDIS 
+REDIS_CLIENT_HOST_AWS = "13.235.133.102"
+REDIS_CLIENT_PORT_AWS = 5051
+
 CELERY_BROKER_URL = 'redis://localhost:6379'
 BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
