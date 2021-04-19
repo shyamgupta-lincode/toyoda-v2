@@ -693,15 +693,21 @@ def interrupt_training_utils(config):
 
     experiment_id = config.get('experiment_id')
     mp = MongoHelper().getCollection('experiment')
-    # cursor = mp.find({'_id':ObjectId(experiment_id)})
-    # for ele in cursor:
-    #     part_id = ele["part_id"]
+    cursor = mp.find({'_id':ObjectId(experiment_id)})
+    for ele in cursor:
+        status = ele["status"]
+        # print(status)
+   
+    if status.lower() == "initialized":
+        mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'status': 'Failed'}}, upsert=False, full_response= True)
+        # changing status to failed so that celery won't pick up the experiment
 
-    comm2 = "docker stop" + " " + str(experiment_id)   
-    import subprocess
-    process = subprocess.Popen(comm2.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()    
-    mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'status': 'Failed'}}, upsert=False, full_response= True)
+    if status.lower() =="running":
+        comm2 = "docker stop" + " " + str(experiment_id)   
+        import subprocess
+        process = subprocess.Popen(comm2.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()    
+        mp.find_and_modify(query={'_id' : ObjectId(experiment_id)}, update={"$set": {'status': 'Failed'}}, upsert=False, full_response= True)
     return experiment_id 
 
 
