@@ -194,8 +194,17 @@ Thumbs.db
 
 
 /backend/LIVIS/livis/training/image_data/*
-
-
+/backend_may_2.tar.xz
+/backend/AI_Controller/models
+/backend/AI_Controller/models/backup/inference_graph_Pillar_ss
+/backend/AI_Controller/models/backup/inference_graph_roofpart_rs2
+/backend/AI_Controller/models/backup/inference_graph_roofside_rs3
+/backend/AI_Controller/models/backup/inference_graph_roofside_rsss4
+/backend/AI_Controller/models/inference_graph_Pillar
+/backend/AI_Controller/models/inference_graph_Pillar_presence_abs
+/backend/AI_Controller/models/inference_graph_roofside
+/backend/LIVIS/livis/supervisor_logs
+/backend/camera_service.zip
 object_detection_tf2/models/research/object_detection/training/faster_rcnn_resnet50_v1_1024x1024_coco17_tpu-8/checkpoint
 object_detection_tf2/models/research/object_detection/training/faster_rcnn_resnet50_v1_1024x1024_coco17_tpu-8/saved_model
 /backend/LIVIS/livis/training/models/experiments

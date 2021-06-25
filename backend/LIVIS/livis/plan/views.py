@@ -5,8 +5,9 @@ from rest_framework.renderers import TemplateHTMLRenderer,JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes
 from common.utils import Encoder
 
+from rest_framework.decorators import api_view, permission_classes
 from logs.utils import add_logs_util
-
+from rest_framework.permissions import AllowAny
 from drf_yasg import openapi
 from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
 from drf_yasg.utils import swagger_auto_schema
@@ -21,19 +22,27 @@ from drf_yasg.utils import swagger_auto_schema
     }
 ))
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
-def add_plan(request):
 
-    token_user_id = request.user.user_id
-    operation_type = "plan"
-    notes = "add plan"
-    
-    add_logs_util(token_user_id,operation_type,notes)
+def add_plan(request):
     data = json.loads(request.body)
     from plan.utils import add_plan
     response = add_plan(data)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+# def add_plan(request):
+
+#     token_user_id = request.user.user_id
+#     operation_type = "plan"
+#     notes = "add plan"
+    
+#     add_logs_util(token_user_id,operation_type,notes)
+#     data = json.loads(request.body)
+#     from plan.utils import add_plan
+#     response = add_plan(data)
+#     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
 
 @swagger_auto_schema(method='patch', request_body=openapi.Schema(
@@ -44,6 +53,7 @@ def add_plan(request):
     }
 ))    
 @api_view(['PATCH'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_plan(request):
@@ -59,36 +69,49 @@ def update_plan(request):
 
 
 @api_view(['DELETE'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
-def delete_plan(request, plan_id):
-    token_user_id = request.user.user_id
-    operation_type = "plan"
-    notes = "delete plan"
+# def delete_plan(request, plan_id):
+#     token_user_id = request.user.user_id
+#     operation_type = "plan"
+#     notes = "delete plan"
     
-    add_logs_util(token_user_id,operation_type,notes)
+#     add_logs_util(token_user_id,operation_type,notes)
+#     from plan.utils import delete_plan
+#     response = delete_plan(plan_id)
+#     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+
+def delete_plan(request, plan_id):
     from plan.utils import delete_plan
     response = delete_plan(plan_id)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
-
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def plan_list(request):
-    token_user_id = request.user.user_id
-    operation_type = "plan"
-    notes = "plan list"
-    
-    add_logs_util(token_user_id,operation_type,notes)
     skip = request.GET.get('skip', 0)
     limit = request.GET.get('limit', 100)
     from plan.utils import plan_list
     response = plan_list(skip, limit)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
+# def plan_list(request):
+#     token_user_id = request.user.user_id
+#     operation_type = "plan"
+#     notes = "plan list"
+    
+#     add_logs_util(token_user_id,operation_type,notes)
+#     skip = request.GET.get('skip', 0)
+#     limit = request.GET.get('limit', 100)
+#     from plan.utils import plan_list
+#     response = plan_list(skip, limit)
+#     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def plan_single(request,plan_id):  
@@ -103,6 +126,7 @@ def plan_single(request,plan_id):
 
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_todays_planned_production(request,part_id):

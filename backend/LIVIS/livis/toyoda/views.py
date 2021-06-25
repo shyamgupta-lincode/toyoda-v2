@@ -6,11 +6,12 @@ from rest_framework.renderers import TemplateHTMLRenderer,JSONRenderer
 from django.http import HttpResponse,StreamingHttpResponse
 import json
 from common.utils import *
-
+from rest_framework.permissions import AllowAny
 from drf_yasg import openapi
 from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
 from drf_yasg.utils import swagger_auto_schema
 
+from rest_framework.decorators import api_view, permission_classes
 
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT, 
@@ -25,6 +26,7 @@ from drf_yasg.utils import swagger_auto_schema
     }
 ))
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def start_process_toyoda(request):
@@ -41,6 +43,7 @@ def start_process_toyoda(request):
     }
 ))
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def end_process_toyoda(request):
@@ -51,6 +54,7 @@ def end_process_toyoda(request):
 
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_toyoda_running_process(request,workstation_id):
@@ -70,6 +74,7 @@ def get_toyoda_running_process(request,workstation_id):
     }
 ))
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_manual_inspection_result(request):
@@ -94,6 +99,7 @@ def update_manual_inspection_result(request):
     }
 ))
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def rescan(request):
@@ -104,6 +110,7 @@ def rescan(request):
 
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_camera_feed_urls(request, workstation_id):
@@ -120,6 +127,7 @@ def get_camera_feed_urls(request, workstation_id):
     }
 ))
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def plan_production_counter_modify(request):
@@ -130,6 +138,7 @@ def plan_production_counter_modify(request):
 
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def generate_QRcode(request, inspection_id):
@@ -139,27 +148,61 @@ def generate_QRcode(request, inspection_id):
 
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @csrf_exempt
 def get_camera_stream(request, wid, cameraid):
     from toyoda.utils import redis_camera
     key = RedisKeyBuilderServer(wid).get_key(cameraid, 'predicted-frame')
-    print(key)
+    # key = RedisKeyBuilderServer(wid).get_key(cameraid, 'original-frame')
+    print("streaming key is ",key)
     return StreamingHttpResponse(redis_camera(key), content_type='multipart/x-mixed-replace; boundary=frame')
 
 
+
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @csrf_exempt
 def get_redis_stream(request, key):
     from toyoda.utils import redis_camera
-    #key = RedisKeyBuilderServer(wid).get_key(cameraid, 'predicted-frame')
-    #print(key)
+    # key = RedisKeyBuilderServer(wid).get_key(cameraid, 'predicted-frame')
+    # print(key)
     return StreamingHttpResponse(redis_camera(key), content_type='multipart/x-mixed-replace; boundary=frame')
 
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_inspection_qc_list(request,process_id):
     from toyoda.utils import get_inspection_qc_list
     response = get_inspection_qc_list(process_id)
     return HttpResponse(json.dumps(response,cls=Encoder), content_type="application/json")
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_toyoda_process(request,process_id):
+    from toyoda.utils import get_toyoda_process
+    response = get_toyoda_process(process_id)
+    return HttpResponse(json.dumps(response,cls=Encoder), content_type="application/json") 
+
+
+@swagger_auto_schema(method='post', request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT, 
+    properties={
+        'process_id' : openapi.Schema(type=openapi.TYPE_STRING, example='5f342b784d7295d5763ffd13'),
+        'status' : openapi.Schema(type=openapi.TYPE_STRING, example='completed')
+    }
+))
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+@csrf_exempt
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+def update_toyoda_process(request):
+    data = json.loads(request.body)
+    from toyoda.utils import update_toyoda_process
+    response = update_toyoda_process(data)
+    return HttpResponse(json.dumps(response,cls=Encoder), content_type="application/json")
+

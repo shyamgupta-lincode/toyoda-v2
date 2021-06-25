@@ -1,7 +1,7 @@
 const livisConfig:any = {
     "development": {
-        BASE_URL:"http://164.52.194.78:8000/livis/v1/",
-        W_BASE_URL:"http://127.0.0.1:8000/livis/",
+        BASE_URL:"http://localhost:8000/livis/v1/",
+        W_BASE_URL:"http://localhost:8000/livis/",
 
     },
     "testing": {

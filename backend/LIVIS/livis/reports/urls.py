@@ -4,6 +4,7 @@ from reports import views
 urlpatterns = [
     re_path(r'^get_metrics/(?P<inspectionid>[A-Za-z0-9-_]+)', views.get_metrics),
     re_path(r'^get_defect_list/(?P<inspectionid>[A-Za-z0-9-_]+)', views.get_last_defect_list),
+    re_path(r'^getDefectListReport/$', views.get_defect_list_report),
     re_path(r'^get_accepted_rejected_parts/$', views.get_accepted_rejected_parts_list),
     re_path(r'^getMegaReport/$', views.get_mega_report),
     re_path(r'^edit_remark/$', views.edit_remark),

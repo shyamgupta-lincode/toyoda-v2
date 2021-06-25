@@ -324,3 +324,44 @@ def get_master_features():
     return master_feature_list
     
 
+
+def get_defect_list_report_util(data):
+    from_date = data.get('from_date')
+    to_date = data.get('to_date')
+    operator_name = data.get('operator_name',None)
+    #print('----operator_name',operator_name)
+    defect_type = data.get('defect_type',None)
+    #print('----defect_type',defect_type)
+    feature_type = data.get('feature_type',None)
+    mp = MongoHelper().getCollection('inspection_data')
+    if operator_name is not None :
+        pr = [i['_id'] for i in mp.find({'user.name': operator_name})]
+    else :
+        pr = [i['_id'] for i in mp.find()]
+    process_attributes = {}
+    inspection_attributes = {}
+    all_defects_list = []
+    query = []
+    query.append({'timestamp': {"$gte":from_date,"$lte":to_date}})
+    if defect_type:
+        query.append({'defect_list': {"$in":defect_type}})
+    if feature_type:
+        query.append({'feature_list': {"$in": feature_type}})
+    for id1 in pr:
+        process_attributes = mp.find_one({'_id' : ObjectId(id1)})
+        process_attributes['process_id'] = process_attributes.pop('_id')
+        #print("process_id:::::::::::",id1, ":::::::::::::process_attributes:::::::::::",process_attributes)
+        inspectionid_collection = MongoHelper().getCollection(str(id1)) 
+        objs =  inspectionid_collection.find(
+            {
+                "$and": query
+
+            }).sort([( '$natural', -1 )] )
+        #print("object::::::",[obj for obj in objs])
+        for inspection_attributes in objs:
+            inspection_attributes['inspected_part_id'] = inspection_attributes.pop('_id')
+            print("inspection_attributes:::::::::::",inspection_attributes)
+            defect_list_temp = dict(list(process_attributes.items()) + list(inspection_attributes.items()))
+            all_defects_list.append(deepcopy(defect_list_temp))
+    print("all_defects_list count:::::",len(all_defects_list))
+    return all_defects_list

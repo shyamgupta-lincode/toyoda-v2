@@ -11,6 +11,10 @@ urlpatterns = [
     re_path(r'^rescan/$', views.rescan),
     re_path(r'^generate_QRcode/(?P<inspection_id>[A-Za-z0-9-_]+)', views.generate_QRcode),
     re_path(r'^stream/(?P<wid>[A-Za-z0-9-_]+)/(?P<cameraid>[A-Za-z0-9-_.]+)/$', views.get_camera_stream), 
+    # re_path(r'^stream/(?P<wid>[A-Za-z0-9-_]+)/(?P<camera_name>[A-Za-z0-9-_.]+)/$', views.get_camera_stream),
     re_path(r'^stream1/(?P<key>[A-Za-z0-9-_.]+)/$', views.get_redis_stream), 
     re_path(r'^get_inspection_qc_list/(?P<process_id>[A-Za-z0-9-_]+)', views.get_inspection_qc_list),
+    re_path(r'^get_process/(?P<process_id>[A-Za-z0-9-_]+)', views.get_toyoda_process),
+    re_path(r'^update_process/$', views.update_toyoda_process),
+
 ]

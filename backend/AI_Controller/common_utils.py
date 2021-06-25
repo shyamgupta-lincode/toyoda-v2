@@ -25,11 +25,12 @@ def singleton(cls):
     except:
         pass    
 
-
-
+#Server Static IP Address
+SERVER_HOST = "192.168.198.150"
+# SERVER_HOST = "10.0.0.2"
 
 #Settings for MongoDB
-MONGO_SERVER_HOST = "localhost"
+MONGO_SERVER_HOST = SERVER_HOST
 MONGO_SERVER_PORT = 27017
 #MONGO_DB = "LIVIS"
 MONGO_DB = "TOYODA"
@@ -38,8 +39,10 @@ MONGO_COLLECTIONS = {MONGO_COLLECTION_PARTS: "parts"}
 WORKSTATION_COLLECTION = 'workstations'
 PARTS_COLLECTION = 'parts'
 SHIFT_COLLECTION = 'shift'
-PLAN_COLLECTION = 'plan'
+PLAN_COLLECTION = 'plan'    
 
+WORKSTATION_ID1_PATH = "/home/toyoda/livis_v2_toyota/republic/backend/AI_Controller/workstation_id.json"
+WORKSTATION_ID2_PATH = "/home/toyoda/livis_v2_toyota/republic/backend/AI_Controller/workstation_id_ws2.json"
 
 
 @singleton
@@ -48,7 +51,7 @@ class MongoHelper:
         client = None
         def __init__(self):
             if not self.client:
-                self.client = MongoClient(host=MONGO_SERVER_HOST, port=MONGO_SERVER_PORT)
+                self.client = MongoClient(host=SERVER_HOST, port=MONGO_SERVER_PORT)
             self.db = self.client[MONGO_DB]
 
         def getDatabase(self):
@@ -170,9 +173,9 @@ import pickle
 
 @singleton
 class CacheHelper():
-    try:
+    try: #192.168.0.20
         def __init__(self):
-            self.redis_cache = redis.StrictRedis(host="127.0.0.1", port="6379", db=0, socket_timeout=1)
+            self.redis_cache = redis.StrictRedis(host="localhost", port=6379, db=0, socket_timeout=1)
             #self.redis_cache = redis.StrictRedis(host=settings.REDIS_CLIENT_HOST, port=settings.REDIS_CLIENT_PORT, db=0, socket_timeout=1)
             #settings.REDIS_CLIENT_HOST
             print("REDIS CACHE UP!")
@@ -211,7 +214,7 @@ class CacheHelper():
 class CacheHelperLocal():
     try:
         def __init__(self):
-            self.redis_cache = redis.StrictRedis(host="localhost", port="6379", db=0, socket_timeout=1)
+            self.redis_cache = redis.StrictRedis(host=SERVER_HOST, port="6379", db=0, socket_timeout=1)
             print("REDIS CACHE UP!")
 
         def get_redis_pipeline(self):
@@ -323,7 +326,7 @@ def get_workstation_by_id(wid):
     mp = MongoHelper().getCollection("workstations")
     pp = mp.find_one({'_id' : ObjectId(wid)})
     #pp = data
-    #print(data)
+    # print(pp)
     return pp
 
 
@@ -344,6 +347,7 @@ class RedisKeyBuilderServer():
         self.workstation_info = get_workstation_by_id(wid)
     
     def get_key(self, camera_id, identifier):
+        
         return "{}_{}_{}".format(self.workstation_info["workstation_name"], str(camera_id), identifier)
 
 
@@ -360,7 +364,7 @@ def start_toyoda_process(data):
     workstation_id = str(data.get('workstation_id'))
     user_id = data.get('user_id')
     #user_details = get_user_account_util(user_id)
-    url = "http://127.0.0.1:8000/livis/v1/accounts/get_user_account/{}"
+    url = "http://"+SERVER_HOST+":8000/livis/v1/accounts/get_user_account/{}"
     user_details = requests.get(url.format(user_id))
     user_details_json = user_details.json()
     #role_name = user_details['role_name']

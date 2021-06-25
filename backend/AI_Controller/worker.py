@@ -8,19 +8,26 @@ from qrcode_generator import *
 from common_utils import *
 import time
 import random
+import gc
     
 rch = CacheHelper()
 wid = json.load(open("workstation_id.json"))
 
-def set_mongo_payload(predicted_taco ,short_number, part_counter, camera_index):
+def set_mongo_payload(predicted_taco, defects_list, taco_fail ,short_number, part_counter, camera_index):
     cname =  rch.get_json(RedisKeyBuilderServer(wid).get_key(0,current_inspection_id_keyholder))
     mh = MongoHelper().getCollection(cname)
-
+    # taco_fail = taco_fail
     # print('inside set mongo pyload:',camera_index)
     # print("rescan_value : ",rch.get_json(RedisKeyBuilderServer(wid).get_key(camera_index,rescan_keyholder)))
     # print('key: ', RedisKeyBuilderServer(wid).get_key(camera_index,rescan_keyholder))
 
-    taco_pass ,taco_fail ,features_list,defects_list, accepted  =  match_kanban(predicted_taco,short_number)
+    taco_pass, features_list, accepted, taco_fail  =  match_kanban(predicted_taco,short_number, taco_fail)
+    print("taco_fail>>>>>>>>", taco_fail)
+    print("taco_pass>>>>>>>>", taco_pass)
+    print("features_list>>>>", features_list)
+    print("defects_list>>>>>", defects_list)
+    print("isAccepted status", accepted)
+
     date_time = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
     # date_time = datetime.now()
     # print("date_time:::::",date_time)
@@ -45,9 +52,10 @@ def set_mongo_payload(predicted_taco ,short_number, part_counter, camera_index):
 
         rch.set_json({RedisKeyBuilderServer(wid).get_key(0,part_accepted_keyholder) : True})
         rch.set_json({RedisKeyBuilderServer(wid).get_key(0,process_completed) : True})  
+        rch.set_json({RedisKeyBuilderServer(wid).get_key(0,qr_string_keyholder) : qr_string})
 
-
-
+    else:
+        rch.set_json({RedisKeyBuilderServer(wid).get_key(0,qr_string_keyholder) : ""})  
 
    
     if rch.get_json(RedisKeyBuilderServer(wid).get_key(camera_index,rescan_keyholder)):#Rescan
@@ -79,8 +87,8 @@ def set_mongo_payload(predicted_taco ,short_number, part_counter, camera_index):
             part_counter = mh.find({'isAccepted' : True}).count()
             print("upd_obj  1111::::::::::",upd_obj)
             production_count = rch.get_json(RedisKeyBuilderServer(wid).get_key(0,production_count_keyholder))
-            print("part_counter::::::::::",part_counter)
-            print("production_count::::::::::",production_count)
+            # print("part_counter::::::::::",part_counter)
+            # print("production_count::::::::::",production_count)
             #print("serial_number::::::::::",upd_obj['serial_number'])
             if int(production_count) > int(part_counter):
                 #print("production_count::::::::::",production_count)
@@ -94,25 +102,13 @@ def set_mongo_payload(predicted_taco ,short_number, part_counter, camera_index):
     return part_counter
 
 
-
-
-    # insertion_dict = {'taco_feature_fail': taco_feature_fail, "taco_defect_fail": , 'status' : accepted ,'date_time' : date_time}
-
-    # _ = mh.insert_one(insertion_dict)
-    # print(insertion_dict , predicted_taco)
-    #print("updated-object",upd_obj)
-
-
-def match_kanban(predicted_taco,short_number):
+def match_kanban(predicted_taco,short_number,taco_fail):
 
     ## if predicted_taco is same as kanban : 
-    taco_fail = {}
+    # taco_fail = {}
     taco_pass = {}
     features_list = []
-    defects_list = []
-
-
-
+    # defects_list = []
     #print('static_kanban:')
     #print((static_kanban[str(short_number)]['feature_list']))
     #print('predicted_taco')
@@ -123,7 +119,7 @@ def match_kanban(predicted_taco,short_number):
 
         # print("d main>>>>", d)
         # class_name = static_kanban['IG95']['feature_list'][d] 
-        if d in predicted_taco:
+        """if d in predicted_taco:
             # print('d' , d)
             fn , cnt = list(d.values())
             if fn != 'Shot_Shot_Absence': 
@@ -134,49 +130,38 @@ def match_kanban(predicted_taco,short_number):
             fn , cnt = list(d.values()) 
             if (fn == 'Shot_Shot_Absence'):
                 defects_list.append("Shot_Shot_Presence")
-                taco_fail.update({"Shot_Shot_Presence":1})
+                taco_fail.update({"Shot_Shot_Presence":cnt})
 
             else:        
-                taco_fail.update({fn : cnt})
+                taco_fail.update({fn : cnt})"""
+
+        if d in predicted_taco:
+            fn, cnt = list(d.values())
+            features_list.append(fn)
+            taco_pass.update({fn : cnt})
+        else:
+            fn, cnt = list(d.values())
+            # if (fn != "Part_Presence") and (fn != "Felt_Presence") and (fn != "Clip_Presence") and (fn != "Black_Clip_Presence"): #and (fn != "Shot_Shot_Absence"):
+            taco_fail.update({fn : cnt})
+        # else:
+        #     try:
+        #         fn, cnt = list(d.values())
+        #         taco_fail.update({fn : cnt})
+
+        #     except:
+        #         pass
+
+        #     fn, cnt = list(d.values())
+        #     if fn != 'Shot_Shot_Absence':
+        #         taco_fail.update({fn : cnt})
+                         
 
     if bool(taco_fail):
         accepted = False
     else:
         accepted = True
-    # else:
-        # print("There is missing of detection")
-        # for  d in static_kanban[str(short_number)]['feature_list']:
 
-        #     print("d main>>>>", d)
-        #     # class_name = static_kanban['IG95']['feature_list'][d] 
-        #     if d in predicted_taco:
-        #         print('d' , d)
-        #         fn , cnt = list(d.values())
-        #         if fn != 'Shot_Shot_Absence': 
-        #             features_list.append(fn)
-        #             taco_pass.append({fn : cnt})
-        #         pass
-            
-        #     else:
-
-        #         print("d>>>>", d)
-        #         fn , cnt = list(d.values()) 
-        #         if (fn == 'Shot_Shot_Presence') & (cnt != 0):
-        #             defects_list.append(fn)
-        #         taco_fail.append({fn : cnt})
-        # taco_fail.append({"Reason": 'Detection_missing'})
-        # if bool(taco_fail):
-        #     accepted = False
-        # else:
-        #     accepted
-
-    print("taco_fail>>>>>>>>", taco_fail)
-    print("taco_pass>>>>>>>>", taco_pass)
-    print("features_list>>>>", features_list)
-    print("defects_list>>>>>", defects_list)
-    print("isAccepted status", accepted)
-
-    return taco_pass, taco_fail, features_list, defects_list, accepted 
+    return taco_pass, features_list, accepted, taco_fail 
 
 
 def worker():
@@ -185,7 +170,6 @@ def worker():
     #pr = mp.find_one()
     #wid = pr['workstation_id']
     data = RedisKeyBuilderServer(wid).workstation_info
-    #print("data...........worker", data)
     part_counter = 0
     part_presence = False
     models_loaded = False
@@ -202,151 +186,153 @@ def worker():
     rch.set_json({RedisKeyBuilderServer(wid).get_key(camera_index,rescan_keyholder) : False})
     # print("rescan_value : ",rch.get_json(RedisKeyBuilderServer(wid).get_key(camera_index,rescan_keyholder)))
     # print('key: ', RedisKeyBuilderServer(wid).get_key(camera_index,rescan_keyholder))
-
+    # print("checking first camera index>>>>>>>>>", camera_index )
     model_1 = Pillar_part_presence_abs()    
 
     ii = 0
     short_number = None
+    prediction_frame_done = 0
+    # cap_tmp = cv2.VideoCapture("/home/gokul/Desktop/Toyoda/utilsandmodels/101.mp4")
+    tin = time.time()
     while True:
-        try:
-            #### Load models
-            # short_number = rch.get_json("current_part")
-            curr_inspection_id = rch.get_json(RedisKeyBuilderServer(wid).get_key(0,current_inspection_id_keyholder)) 
-            key1 = RedisKeyBuilderServer(wid).get_key(camera_index,predicted_frame_keyholder)
-            #setting the frame to reddis
+        # try:
+        
+        curr_inspection_id = rch.get_json(RedisKeyBuilderServer(wid).get_key(0,current_inspection_id_keyholder)) 
+        key1 = RedisKeyBuilderServer(wid).get_key(camera_index,predicted_frame_keyholder)
+        data1 = RedisKeyBuilderServer(wid).workstation_info
+        #setting the frame to reddis
 
-            cr = MongoHelper().getCollection('inspection_data')
-            insp_obj = cr.find_one({'_id' : ObjectId(curr_inspection_id)})
-            # print("insp_obj//////////////",insp_obj)
-            #if 'is_manual' in insp_obj:
-            #    print("in Manual Mode!!")
-            #    if insp_obj['is_manual']:
-            #        short_number = insp_obj["short_number"]
-            #        part_number = insp_obj["part_number"]
-            if insp_obj:
-                if insp_obj['is_manual'] == True:
-                    print("in Manual Mode!!")
-                    short_number = insp_obj["short_number"]
-                    part_number = insp_obj["part_number"]
-                    # print("short-number:::::::::", short_number)
-                    # print("part-number::::::::::", part_number)
+        cr = MongoHelper().getCollection('inspection_data')
+        insp_obj = cr.find_one({'_id' : ObjectId(curr_inspection_id)})
 
-                elif insp_obj['is_manual'] == False:
-                    print("in Automatic Mode!!")
-                    short_number = rch.get_json(RedisKeyBuilderServer(wid).get_key(kanban_camera_index,short_number_keyholder))
-                    part_number = rch.get_json(RedisKeyBuilderServer(wid).get_key(kanban_camera_index,part_number_keyholder))
-                    print("testing.........short_number", short_number)
-                    print("testing.........part_number", part_number)
+        if insp_obj:
+            if insp_obj['is_manual'] == True:
+                print("in Manual Mode!!")
+                short_number = insp_obj["short_number"]
+                part_number = insp_obj["part_number"]
+                print("short-number:::::::::", short_number)
+                # print("part-number::::::::::", part_number)
 
-                else:
-                    print("No mode is selected")    
-                # print('short_number:',short_number)
-
-            ##Loading Models:
-            if bool(short_number):
-                if models_loaded is False:
-                    if short_number not in requested_models:
-                        requested_models[short_number] = [i() for i in MODEL_MAP[short_number]]
-
-                        # print(short_number)
-                        models_loaded = True
-                        # print("hereeeeeeeeeeeeeeeee")
-
-                #### Iterate cameras and sent to predictors
-                predicted_taco = []
-                # for cam in data['camera_config']['cameras']:
-                #     camera_index = cam['camera_id']
-                #     camera_name = cam['camera_name']
-
-
-                #     if cam['camera_name'] == 'top_camera':
-                key = RedisKeyBuilderServer(wid).get_key(camera_index,original_frame_keyholder)
-
-                frame = rch.get_json(key)
-                rch.set_json({key1 : frame})
-                # cv2.imshow('input_frame',frame)
-                # print('length of models',len(requested_models) )
-                # print(requested_models)
-
-
-                # part_presence  = random.choice([True,False])
-                # print("part_presence:",part_presence)
-                #if part_presence is False:
-                if rch.get_json(RedisKeyBuilderServer(wid).get_key(0,process_start_keyholder)):
-
-                    try:
-                        model_1.inference(frame)
-                        frame_failed = False
-                    except:
-                        frame_failed = True
-                    # print("hereee!")
-                    if bool(model_1.predictions) and not frame_failed:
-                        if model_1.predictions['count'] == 1 and model_1.predictions["feature_name"] == "Part_Presence" :
-                            part_presence = True
-                            predicted_taco.append(model_1.predictions)
-                            # print('Here!!!!!!!!! pillar')
-                            # part_counter += 1
-                        else:
-                            part_presence = False
-                            ii = 0
-                        # print(part_presence)
-                        if part_presence is True: # and ii == 0: 
-                            i = 0
-                            for model in requested_models[short_number]:
-                                frame = rch.get_json(RedisKeyBuilderServer(wid).get_key(camera_index,original_frame_keyholder))
-
-                                try:
-                                    st = time.time()
-                                    model.inference(frame)
-                                    print(time.time() -st, "********************---------")
-                                    key = RedisKeyBuilderServer(wid).get_key(camera_index,predicted_frame_keyholder)
-                                    #setting the frame to reddis
-                                    rch.set_json({key : model.predicted_frame})
-                                    # print(key)
-                                    # print("Predicted Frame",model.predicted_frame.shape)
-                                    predicted_taco.append(model.predictions)
-                                    resized_frame = cv2.resize(model.predicted_frame,(640,480))
-                                    # cv2.imshow("Predicted_frame_"+str(i), model.predicted_frame)
-                                    # cv2.imshow("Predicted_frame_"+str(i), resized_frame)
-                                    i += 1
-                                except Exception as e:
-                                    print(e)
-                                    pass    
-                                
-                                
-                            part_counter = set_mongo_payload(predicted_taco ,short_number, part_counter, camera_index)    
-                            # ii+=1
-                            # print('Here!!!!!!!!!')
-                            #part_presence = False
-                            # cv2.imshow("predicted_frame",model_1.predicted_frame)
-                            rch.set_json({RedisKeyBuilderServer(wid).get_key(0,process_start_keyholder) : False}) 
+            elif insp_obj['is_manual'] == False:
+                print("in Automatic Mode!!")
+                short_number = rch.get_json(RedisKeyBuilderServer(wid).get_key(kanban_camera_index,short_number_keyholder))
+                part_number = rch.get_json(RedisKeyBuilderServer(wid).get_key(kanban_camera_index,part_number_keyholder))
+                print("testing.........short_number", short_number)
+                print("testing.........part_number", part_number)
 
             else:
-                requested_models = {}
-                # data = RedisKeyBuilderWorkstation().workstation_info
-                part_counter = 0
-                part_presence = False
-                models_loaded = False            
+                print("No mode is selected")    
+            # print('short_number:',short_number)
 
-        except Exception as e:
-            print(e)
-            pass
+        ############ Load models ##############
+        if bool(short_number):
+            # checking if model in Requested_models and clearnig when new model is chose
+            if short_number not in requested_models:
+                requested_models.clear()
+                requested_models[short_number] = [i() for i in MODEL_MAP[short_number]]
+            print("Requested_models:::::::::::::::",requested_models)
+
+            #### Iterate cameras and sent to predictors
+            predicted_taco = []
+
+            for cam in data1['cameras']:
+                if cam['camera_name'] == 'top':
+                    camera_index1 = cam['camera_id']
+                    print("cam ind:::::",camera_index1)
+                    
+            #Getting the original frame using original_frame_keyholder and camera_index
+            key = RedisKeyBuilderServer(wid).get_key(camera_index1,original_frame_keyholder)
+            frame = rch.get_json(key)
+
+            if prediction_frame_done == 0:
+                rch.set_json({key1 : frame})
+              
+            # part_presence  = random.choice([True,False])
+            # print("part_presence:",part_presence)
+            #if part_presence is False:
+            #shyamdd
+            time_tmp = tin - time.time()
+            if rch.get_json(RedisKeyBuilderServer(wid).get_key(0,process_start_keyholder)):
+                #Inferencing the Part Presnce and absence model 
+                model_1.inference(frame)
+                frame_failed = False
+                print("model_1.predictions", model_1.predictions)
+
+                ##Based on the model Inference setting the flag Part_Presence
+                if bool(model_1.predictions) and not frame_failed:
+                    print("inside-----------------")
+                    if model_1.predictions['count'] == 1 and model_1.predictions["feature_name"] == "Part_Presence" :
+                        part_presence = True
+
+                    else:
+                        part_presence = False
+                        ii = 0
+
+                    ###If part_presence flag is true making predictions on the same image for features and defects models.
+                    print("Part_presence>>>>>>", part_presence)
+                    if part_presence is True: # and ii == 0: 
+                        i = 0
+                        frame1 = frame.copy()
+                        #frame1 = rch.get_json(RedisKeyBuilderServer(wid).get_key(camera_index,original_frame_keyholder))
+                        for model in requested_models[short_number]:
+                            print(" >>>>>", model)
+                            st = time.time()
+
+                            ###Inferencing the models and giving predicted_tco, defects_list, taco_fail
+                            model.inference(frame)
+                            key = RedisKeyBuilderServer(wid).get_key(camera_index1,predicted_frame_keyholder)
+                            
+                            #setting the frame to reddis
+                            rch.set_json({key : model.predicted_frame})
+
+                            ###Getting the results after prediction from detector_module
+                            prediction_frame_done = 1
+                            predicted_taco = model.predicted_taco
+                            defects_list = model.defects_list
+                            taco_fail = model.taco_fail
+                            print("predicted_taco::::::::::::", predicted_taco)
+                            i += 1
+
+                            ###making the bounding box and labels on the image 
+                            (boxes, scores, classes, num) = model.meta 
+                            frame1 = vis_util.visualize_boxes_and_labels_on_image_array(
+                                                            frame1,
+                                                            np.squeeze(boxes),
+                                                            np.squeeze(classes).astype(np.int32),
+                                                            np.squeeze(scores),
+                                                            model.category_index,
+                                                            use_normalized_coordinates=True,
+                                                            line_thickness=3,
+                                                            min_score_thresh = model.min_threshold)
+
+                            cv2.imshow("Frame last::", cv2.resize(frame1, (640, 480)))
+
+                        ###final frame that will be set as predicted_frame    
+                        rch.set_json({key : frame1})  
+                        part_counter = set_mongo_payload(predicted_taco, defects_list, taco_fail, short_number, part_counter, camera_index)    
+                        # ii+=1
+                        # part_presence = False
+                        rch.set_json({RedisKeyBuilderServer(wid).get_key(0,process_start_keyholder) : False})
+                        del frame1
+                        del key
+            
+
+        else:
+            requested_models = {}
+            # data = RedisKeyBuilderWorkstation().workstation_info
+            part_counter = 0
+            part_presence = False
+            models_loaded = False            
+
+        # except Exception as e:
+        #     print(e)
+        #     pass
 
 
         if cv2.waitKey(1) & 0xFF == ord('q'): 
             break
-    cv2.destroyAllWindows() 
 
+cv2.destroyAllWindows() 
 
-# def kanban_card_status():
-#     short_number, part_number = kanban_reading()
-
-#     if short_number is Null:
-#         pass
-#     else:
-#         worker(kanban_id)
-
-# worker()        
-
-
+###calling the worker funtion while running the script
 worker()    

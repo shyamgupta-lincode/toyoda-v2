@@ -6,13 +6,15 @@ from rest_framework.renderers import TemplateHTMLRenderer,JSONRenderer
 from django.http import HttpResponse
 import json
 from common.utils import *
-
+from rest_framework.permissions import AllowAny
 from drf_yasg import openapi
 from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
 from drf_yasg.utils import swagger_auto_schema
 
+from rest_framework.decorators import api_view, permission_classes
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_metrics(request, inspectionid):
@@ -22,6 +24,7 @@ def get_metrics(request, inspectionid):
 
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_last_defect_list(request, inspectionid):
@@ -34,6 +37,7 @@ def get_last_defect_list(request, inspectionid):
     return HttpResponse(json.dumps(resp, cls=Encoder), content_type="application/json")
 
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def edit_remark(request):
@@ -43,6 +47,7 @@ def edit_remark(request):
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def set_flag(request):
@@ -52,6 +57,7 @@ def set_flag(request):
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")
 
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_accepted_rejected_parts_list(request):
@@ -76,6 +82,7 @@ def get_accepted_rejected_parts_list(request):
     }
 ))
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_mega_report(request):
@@ -86,6 +93,7 @@ def get_mega_report(request):
 
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_summary_end_process(request,inspectionid):
@@ -95,6 +103,7 @@ def get_summary_end_process(request,inspectionid):
 
 
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def defect_type_based_report(request):
@@ -105,6 +114,7 @@ def defect_type_based_report(request):
 
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @csrf_exempt
 def get_master_defect_list(request):
     from reports.utils import get_master_defects
@@ -113,9 +123,19 @@ def get_master_defect_list(request):
 
 
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 @csrf_exempt
 def get_master_feature_list(request):
     from reports.utils import get_master_features
     resp = get_master_features()
     return HttpResponse(json.dumps(resp, cls=Encoder), content_type="application/json")
     
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+@renderer_classes((TemplateHTMLRenderer,JSONRenderer))
+@csrf_exempt
+def get_defect_list_report(request):
+    from reports.utils import get_defect_list_report_util
+    data = json.loads(request.body)
+    response = get_defect_list_report_util(data)
+    return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")

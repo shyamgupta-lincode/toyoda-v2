@@ -18,37 +18,38 @@ def set_kanban_on_redis(workstation_name, short_number):
 def start_toyoda_process(data):
     part_number = data.get('part_number',None)
     user_id = data.get('user_id')
-    #model_number = data.get('model_number')
-    #short_number = data.get('short_number')
+    model_number = data.get('model_number')
+    short_number = data.get('short_number')
     part_description = data.get('part_description')
-    #plan = get_todays_planned_production_util(short_number)
-    #current_production_count = plan['planned_production_count']
+    plan = get_todays_planned_production_util(short_number)
+    current_production_count = plan['planned_production_count']
     workstation_id = data.get('workstation_id')
+    user_id = data.get('user_id')
     user_details = get_user_account_util(user_id)
-    print("user_details::::",user_details)
+    #print("user_details::::",user_details)
     role_name = user_details['role_name']
     print("role_name::::",role_name,type(role_name))
     user = { "user_id": user_id,
                 "role": user_details['role_name'],
                 "name": (user_details['first_name']+" "+user_details['last_name'])
             }
-    print("user:::: ",user)
+    #print("user:::: ",user)
     createdAt = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
     mp = MongoHelper().getCollection('inspection_data')
     obj = {
         'part_number' : part_number,
         'user' : user,
-        #"model_number" : model_number,
+        "model_number" : model_number,
         "workstation_id" : workstation_id,
-        #"short_number" : short_number,
+        "short_number" : short_number,
         "part_description" : part_description,
-        #"plan" : plan,
+        "plan" : plan,
         "status" : 'started',
         'createdAt' : createdAt,
-        #'current_production_count' : current_production_count,
+        'current_production_count' : current_production_count,
         'is_manual' : True
     }
-    #set_kanban_on_redis(workstation_id, short_number) 
+    set_kanban_on_redis(workstation_id, short_number) 
     _id = mp.insert(obj)
     workstation_info = RedisKeyBuilderServer(workstation_id).workstation_info
     cc = CacheHelper()
@@ -75,7 +76,7 @@ def end_toyoda_process(data):
         duration = completedAt - createdAt
         pr['duration'] = str(duration)
         pr['status'] = 'completed'
-        #pr['plan'] = get_todays_planned_production_util(pr['short_number'])
+        pr['plan'] = get_todays_planned_production_util(pr['short_number'])
         inspection_attributes = MongoHelper().getCollection(str(_id))
         total_accepted_parts = inspection_attributes.find({"isAccepted" : True}).count()
         total_parts = inspection_attributes.find().count()
@@ -104,12 +105,12 @@ def get_toyoda_running_process(worksatation_id):
                 }).sort([( '$natural', -1 )] )
     if prs.count() > 0:
         pr = prs[0]
-        #plan_update = pr['plan']
-        #plan_update['planned_production_count'] = pr['current_production_count']
+        plan_update = pr['plan']
+        plan_update['planned_production_count'] = pr['current_production_count']
         #print("plan_update:::::::",plan_update)
-        #pr['plan'] = plan_update
+        pr['plan'] = plan_update
         cc = CacheHelper()
-        #production_count = pr['current_production_count']
+        production_count = pr['current_production_count']
         production_count_key = RedisKeyBuilderServer(worksatation_id).get_key(0, 'production_count_key')
         #print("production_count:::::::",production_count)
         cc.set_json({production_count_key : production_count}) 
@@ -147,15 +148,52 @@ def update_inspection_manual(data):
 def get_camera_feed_urls(workstation_id):
     feed_urls = {}
     workstation_info = RedisKeyBuilderServer(workstation_id).workstation_info
-    for camera_info in workstation_info['cameras']:
-        #url = "http://127.0.0.1:8000/livis/v1/toyoda/stream/{}/{}/".format(workstation_info['workstation_name'],camera_info['camera_id'])
-        url = "http://127.0.0.1:8000/livis/v1/toyoda/stream/{}/{}/".format(workstation_id,camera_info['camera_id'])
-        feed_urls[camera_info['camera_name']] = url
-    if feed_urls:
+    mp = MongoHelper().getCollection('inspection_data')
+    prs = mp.find({
+    "$and": [
+        {'status' : 'started'},
+        {"workstation_id": workstation_id}
+    ]
+        })
+
+    for item in prs:
+        print(item)
+        short_number = item["short_number"]
+        if short_number in settings.top_camera:
+            stream_direction = "top"
+  
+        elif short_number in settings.side_camera:
+            stream_direction = "side"
+        else:
+            stream_direction = "kanban"   
+                
+    print(prs)    
+    for camera_info in workstation_info["cameras"]:
+        if camera_info["camera_name"] == stream_direction:
+            camera_id = camera_info["camera_id"]
+            url = "http://"+SERVER_HOST+":8000/livis/v1/toyoda/stream/{}/{}/".format(workstation_id,camera_id)
+    
+    feed_urls["streaming_url"] =  url
+    
+    if feed_urls :
         return feed_urls
     else:
         return {}
 
+
+
+# def get_camera_feed_urls(workstation_id):
+#     feed_urls = {}
+#     workstation_info = RedisKeyBuilderServer(workstation_id).workstation_info
+#     for camera_info in workstation_info['cameras']:
+#         # url = "http://10.0.0.5:8000/livis/v1/toyoda/stream/{}/{}/".format(workstation_id,camera_info['camera_id'])
+#         # url  = "http://"+"0.0.0.0"+":8000/livis/v1/toyoda/stream/{}/{}/".format(workstation_id,camera_info['camera_id'])
+#         url = "http://"+SERVER_HOST+":8000/livis/v1/toyoda/stream/{}/{}/".format(workstation_id,camera_info['camera_id'])
+#         feed_urls[camera_info['camera_name']] = url
+#     if feed_urls:
+#         return feed_urls
+#     else:
+#         return {}
 
 def rescan_util(data):
     mp = MongoHelper().getCollection('inspection_data')
@@ -252,4 +290,30 @@ def get_inspection_qc_list(process_id):
             return qc_inspection
     else:
         return ['process id not found.']
+
+def get_toyoda_process(process_id):
+    mp = MongoHelper().getCollection('inspection_data')
+    pr = mp.find_one({'_id' : ObjectId(process_id)})
+    if pr:
+        return pr
+    else:
+        return {}
+
+
+def update_toyoda_process(data):
+    process_id = data.get('process_id')
+    if process_id:
+        mp = MongoHelper().getCollection('inspection_data')
+        pr = mp.find_one({'_id' : ObjectId(process_id)})
+        print("pr::::::::::",pr)
+        if pr:
+            status = data.get('status')
+            if status:
+                pr['status'] = status
+            mp.update({'_id' : pr['_id']}, {'$set' :  pr})
+            return pr
+        else:
+            return {}
+    else:
+        return {}
 

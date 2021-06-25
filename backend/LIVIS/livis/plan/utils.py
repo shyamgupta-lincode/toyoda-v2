@@ -4,6 +4,47 @@ from bson import ObjectId
 import datetime
 
 
+# def strToDate(date_str):
+#     date_object =  datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
+#     return date_object
+
+# def add_plan(data):
+#     """
+#     Input
+#         {
+#         "start_time" : "1997-12-02",
+#         "end_time" : "1998-01-02",
+#         "part_number" : "aaserer3423",
+#         "planned_production_count" : 100 
+#         }    
+#     """
+#     try:
+#         start_time = data.get('start_time')
+#         end_time = data.get('end_time')
+#         part_number = data.get('part_number')
+#         part_id = data.get('part_id')
+
+#         planned_production_count = data.get('planned_production_count')
+#         is_deleted = False
+
+#         mp = MongoHelper().getCollection(settings.PLAN_COLLECTION)
+
+#         collection_obj = {
+#             'start_time' : start_time,
+#             'end_time' : end_time,
+#             'part_number' : part_number,
+#             'part_id':part_id,
+#             'is_deleted' : is_deleted,
+#             'planned_production_count' : planned_production_count
+#         }
+
+#         _id = mp.insert(collection_obj)    
+#         return mp.find_one({'_id' : _id})
+#     except Exception as e:
+#         return "Could not add plan: "+str(e)
+
+
+
 def strToDate(date_str):
     date_object =  datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
     return date_object
@@ -15,6 +56,7 @@ def add_plan(data):
         "start_time" : "1997-12-02",
         "end_time" : "1998-01-02",
         "part_number" : "aaserer3423",
+        "short_number" : "dsfsgss",
         "planned_production_count" : 100 
         }    
     """
@@ -22,8 +64,7 @@ def add_plan(data):
         start_time = data.get('start_time')
         end_time = data.get('end_time')
         part_number = data.get('part_number')
-        part_id = data.get('part_id')
-
+        short_number = data.get('short_number')
         planned_production_count = data.get('planned_production_count')
         is_deleted = False
 
@@ -33,7 +74,7 @@ def add_plan(data):
             'start_time' : start_time,
             'end_time' : end_time,
             'part_number' : part_number,
-            'part_id':part_id,
+            'short_number' : short_number,
             'is_deleted' : is_deleted,
             'planned_production_count' : planned_production_count
         }
@@ -42,7 +83,6 @@ def add_plan(data):
         return mp.find_one({'_id' : _id})
     except Exception as e:
         return "Could not add plan: "+str(e)
-
 def update_plan(data):
     """
     Input
@@ -118,14 +158,27 @@ def plan_single(plan_id):
         return {"message" : "Please enter the plan ID."}
 
 
-def get_todays_planned_production_util(part_id):
+# def get_todays_planned_production_util(part_id):
+#     current_date = str(datetime.date.today())
+#     mp = MongoHelper().getCollection(settings.PLAN_COLLECTION)
+#     obj = mp.find_one({"$and" : [{"part_number": part_id}, {"start_time": {"$lte": current_date}}, {"end_time": {"$gte": current_date}}]})
+#     if obj:
+#         resp = obj
+#         return resp
+#     else:
+#         resp = {"message" : "Today's planned production details not found."}
+        # return resp
+
+
+def get_todays_planned_production_util(short_number):
     current_date = str(datetime.date.today())
     mp = MongoHelper().getCollection(settings.PLAN_COLLECTION)
-    obj = mp.find_one({"$and" : [{"part_number": part_id}, {"start_time": {"$lte": current_date}}, {"end_time": {"$gte": current_date}}]})
+    obj = mp.find_one({"$and" : [{"short_number": short_number}, {"start_time": {"$lte": current_date}}, {"end_time": {"$gte": current_date}}]})
+    print("object:::::::",obj)
     if obj:
         resp = obj
         return resp
     else:
         resp = {"message" : "Today's planned production details not found."}
+        # resp = {}
         return resp
-

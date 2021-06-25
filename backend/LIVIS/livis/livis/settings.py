@@ -33,12 +33,12 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000
 
 
 CORS_ORIGIN_ALLOW_ALL = True
-#CORS_ORIGIN_WHITELIST = (
+# CORS_ORIGIN_WHITELIST = (
 #       'http://127.0.0.1:4200',
 #       'http://127.0.0.1',
-#       'http://localhost:4200',
-#       'http://13.234.202.181:4200'
-#)
+    # 'http://localhost:4200',
+    #   'http://13.234.202.181:4200'
+# )
 
 ENCRYPT_ID = '$pbkdf2-sha256$29000$6/3/XysF4JxT6j3H.J/Tug$uGi.a8mgaM1m5ze1mCTMNu0oljqOI78ha9TyMFtekbs'
 # Application definition
@@ -180,11 +180,20 @@ AUTH_USER_MODEL = 'accounts.User'
 
 #Settings for MongoDB
 
-MONGO_SERVER_HOST = "13.234.202.181"
-MONGO_SERVER_PORT = 7778
+# MONGO_SERVER_HOST = "13.234.202.181"             
+# MONGO_SERVER_PORT = 7778
 
-MONGO_DB = "LIVIS"
-#MONGO_DB = "TOYODA"
+
+SERVER_HOST = "localhost"
+# SERVER_HOST = "192.168.198.150"
+
+#Settings for MongoDB
+MONGO_SERVER_HOST = SERVER_HOST
+MONGO_SERVER_PORT = 27017
+
+# MONGO_DB = "LIVIS"
+MONGO_DB = "TOYODA"
+
 MONGO_COLLECTION_PARTS = "parts"
 MONGO_COLLECTIONS = {MONGO_COLLECTION_PARTS: "parts"}
 WORKSTATION_COLLECTION = 'workstations'
@@ -221,8 +230,8 @@ CELERYD_FORCE_EXECV = True
 TRAIN_DATA_STATIC = "/datadrive/image_data"
 EXPERIMENT_DATA_STATIC = '/root/experiments'
 print("AREEEEE: : : : :   " , TRAIN_DATA_STATIC)
-if not os.path.exists(TRAIN_DATA_STATIC):
-    os.makedirs(TRAIN_DATA_STATIC)
+# if not os.path.exists(TRAIN_DATA_STATIC):
+    # os.makedirs(TRAIN_DATA_STATIC)
 
 BASE_URL = '13.234.202.181'
 
@@ -236,3 +245,6 @@ mongo_port = 27017
 # List of Avalaible ports for Tensprbaords
 TF_PORTS = [4200,3306,4400,3000,9092,2181,37685,33253]
 
+#top camera feeds
+top_camera = ["IG97", "IG95", "IG98", "IG96"]
+side_camera = ["IH07", "IH06"]
