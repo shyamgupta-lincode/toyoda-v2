@@ -107,7 +107,7 @@ cam_t1 = datetime.datetime.now()
 # print("cam_list ...........",cam_list)
 
 
-def sending_frames(kafka_key,frame):
+def sending_frames(kafka_key,frame,producer):
     image_buffer = imEncoder(frame)
     payload = {"frame":image_buffer}
     # print("Kafka topic:",kafka_key)
@@ -127,7 +127,7 @@ t2 = threading.Thread(target=print_cube, args=(10,))
     t2.start()
 """
 
-producer =  KafkaProducer(bootstrap_servers=['localhost:9092'])
+producers =  [KafkaProducer(bootstrap_servers=['localhost:9092']) for i in cap_list]
 
 gc_counter = 0
 while True:
@@ -151,15 +151,15 @@ while True:
 
         if cam_name == "top":
             # kafka_key = key+"_"+cam_name
-            t1 = threading.Thread(target=sending_frames, args=(kafka_key,frame,))
+            t1 = threading.Thread(target=sending_frames, args=(kafka_key,frame,producers[0]))
             t1.start()
             t1.join()
         if cam_name == "side":
-            t2 = threading.Thread(target=sending_frames, args=(kafka_key,frame,))
+            t2 = threading.Thread(target=sending_frames, args=(kafka_key,frame,producers[1]))
             t2.start()
             t2.join()
         if cam_name == "kanban":
-            t3 = threading.Thread(target=sending_frames, args=(kafka_key,frame,))    
+            t3 = threading.Thread(target=sending_frames, args=(kafka_key,frame,producers[2]))    
             t3.start()
             t3.join()
         # t1.start()
@@ -167,13 +167,13 @@ while True:
         # t3.start()
         end = time.time() -st
 
-        print(end)
+        #print(end)
         # print(key,frame)
         # print("Kafka:",kafka_key)
 
-        # if "top" in kafka_key.split('_'):
+        if "top" in kafka_key.split('_'):
 
-        #     cv2.imwrite("camera_Service_image.jpg", cv2.resize(frame,(640, 480)))
+            cv2.imwrite("camera_Service_image.jpg", cv2.resize(frame,(640, 480)))
         # cv2.imshow("frame",frame)
 
 

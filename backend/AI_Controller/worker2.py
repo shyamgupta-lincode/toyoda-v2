@@ -13,12 +13,19 @@ import gc
 import datetime
 # from flask import Flask, Response
 from kafka import KafkaConsumer
+import subprocess
 
 from kafka_utils import Subscriber,imDecoder,imEncoder
 
 rch = CacheHelper()
 # wid = json.load(open("workstation_id_ws2.json"))
 wid = json.load(open(WORKSTATION_ID2_PATH))
+
+
+#def #delete_kafka_topic(topic_name):
+ #   subprocess.call(["/home/toyoda/livis_v2_toyota/kafka/kafka_2.12-2.8.0/bin/kafka-topics.sh", "--zookeeper", "zookeeper-1:2181", "--delete", "--topic", topic_name])
+
+
 
 def set_mongo_payload(predicted_taco, defects_list, taco_fail ,short_number, part_counter, camera_index, frame, frame1):
     cname =  rch.get_json(RedisKeyBuilderServer(wid).get_key(0,current_inspection_id_keyholder))
@@ -215,16 +222,18 @@ def worker():
             camera_index = cam['camera_id']
             key = RedisKeyBuilderServer(wid).get_key(cam['camera_id'],original_frame_keyholder)
             sub2 = Subscriber(subscriber_broker_url="localhost:9092",subscriber_topic=key+"_"+cam['camera_name'])
-
+            #delete_kafka_topic(key+"_"+cam['camera_name'])
         if cam['camera_name'] == 'side':
             camera_index_side = cam['camera_id']
             key = RedisKeyBuilderServer(wid).get_key(cam['camera_id'],original_frame_keyholder)
             sub3 = Subscriber(subscriber_broker_url="localhost:9092",subscriber_topic=key+"_"+cam['camera_name'])
+            #delete_kafka_topic(key+"_"+cam['camera_name'])
 
         if cam['camera_name'] == 'kanban':
             kanban_camera_index = cam['camera_id']
             key = RedisKeyBuilderServer(wid).get_key(cam['camera_id'],original_frame_keyholder)
             sub1 = Subscriber(subscriber_broker_url="localhost:9092",subscriber_topic=key+"_"+cam['camera_name'])
+            #delete_kafka_topic(key+"_"+cam['camera_name'])
 
         
 
@@ -241,9 +250,14 @@ def worker():
     prediction_frame_done = 0
     # cap_tmp = cv2.VideoCapture("/home/gokul/Desktop/Toyoda/utilsandmodels/101.mp4")
     tin = time.time()
+    # fsk = []
+    # fsk_count = 15
+    # fsk_temp_count = 0
     while True:
         # try:
         
+        temp = [i.get_data() for i in [sub1, sub2, sub3]]
+        del temp
         curr_inspection_id = rch.get_json(RedisKeyBuilderServer(wid).get_key(0,current_inspection_id_keyholder)) 
         key1 = RedisKeyBuilderServer(wid).get_key(camera_index,predicted_frame_keyholder)
         data1 = RedisKeyBuilderServer(wid).workstation_info
@@ -322,9 +336,14 @@ def worker():
             
             st = time.time()
             kafka_data = sub.get_data()
-            print("kafka data is ======",kafka_data)
-
+            # print("kafka data is ======",kafka_data)
+            # fsk.append(kafka_data)
             frame = imDecoder(kafka_data["frame"])
+            # if fsk_temp_count >=fsk_count:
+            #     frame = imDecoder(fsk.pop(0)["frame"])
+            # else:
+            #     frame = imDecoder(kafka_data["frame"])
+            #     fsk_temp_count+=1
 
             cv2.imshow("frame1 checkin", cv2.resize(frame, (320, 240)))
             # cv2.imwrite("worker_input.jpg",cv2.resize(frame, (640, 480)))

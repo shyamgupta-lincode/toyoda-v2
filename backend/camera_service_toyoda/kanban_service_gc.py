@@ -55,7 +55,7 @@ def kanban_reading():
 
         kafka_data = sub1.get_data()
         frame = imDecoder(kafka_data["frame"])
-        cv2.imshow("frame_kanban",cv2.resize(frame, (324, 240)))
+        # cv2.imshow("frame_kanban",cv2.resize(frame, (324, 240)))
         # cv2.imwrite("kanban_temp.jpg", cv2.resize(frame, (640, 480)))
 
 

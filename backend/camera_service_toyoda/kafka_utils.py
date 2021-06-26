@@ -3,6 +3,9 @@ import json
 import base64
 from kafka import KafkaProducer, KafkaConsumer
 import numpy as np
+from bson import ObjectId
+import os 
+
 
 class Publisher: 
 
@@ -54,8 +57,9 @@ def imDecoder(img_str):
     return frame
 
 def imEncoder(image):
-    
-    cv2.imwrite("temp.jpg",image)
-    with open("temp.jpg", 'rb') as f:
+    img = str(ObjectId()) + ".jpg"
+    cv2.imwrite(img,image)
+    with open(img, 'rb') as f:
         im_b64 = base64.b64encode(f.read())
+    os.remove(img)
     return str(im_b64)

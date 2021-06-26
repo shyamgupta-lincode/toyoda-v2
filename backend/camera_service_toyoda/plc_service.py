@@ -66,10 +66,11 @@ while 1:
 		time.sleep(0.2)
 
 		if t.read(5) == 1 and prev_buttonstate == 0:
-			time.sleep(5) 
+			time.sleep(1)
 			rch.set_json({RedisKeyBuilderServer(wid).get_key(0,process_start_keyholder) : True}) 
-			print(1)
+			print(1,datetime.datetime.now())
 			prev_buttonstate = 1
+			time.sleep(0.1) 
 
 		elif t.read(5)== 0 and prev_buttonstate == 1:
 			prev_buttonstate = 0

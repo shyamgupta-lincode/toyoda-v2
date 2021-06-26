@@ -152,11 +152,11 @@ def add_part_details(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def delete_part(request, part_id):
-    token_user_id = request.user.user_id
+    # token_user_id = request.user.user_id
     operation_type = "parts"
     notes = "delete part"
     
-    add_logs_util(token_user_id,operation_type,notes)
+    # add_logs_util(token_user_id,operation_type,notes)
     from parts.utils import delete_part_task
     delete_part_task(part_id)
     return HttpResponse(json.dumps({'message' : 'Part deleted Successfully!'}, cls=Encoder), content_type="application/json")
@@ -180,11 +180,11 @@ def delete_part(request, part_id):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def update_part(request):
-    token_user_id = request.user.user_id
+    # token_user_id = request.user.user_id
     operation_type = "parts"
     notes = "update part"
     
-    add_logs_util(token_user_id,operation_type,notes)
+    # add_logs_util(token_user_id,operation_type,notes)
     data = json.loads(request.body)
     from parts.utils import update_part_task
     response = update_part_task(data)
@@ -195,11 +195,11 @@ def update_part(request):
 @renderer_classes((TemplateHTMLRenderer,JSONRenderer))
 @csrf_exempt
 def get_part_details(request, part_id):
-    token_user_id = request.user.user_id
+    # token_user_id = request.user.user_id
     operation_type = "parts"
     notes = "get part details"
     
-    add_logs_util(token_user_id,operation_type,notes)
+    # add_logs_util(token_user_id,operation_type,notes)
     from parts.utils import get_part_details_task
     response = get_part_details_task(part_id)
     return HttpResponse(json.dumps(response, cls=Encoder), content_type="application/json")

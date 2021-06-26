@@ -3,6 +3,7 @@ import json
 import base64
 import numpy as np
 from kafka import KafkaProducer, KafkaConsumer, TopicPartition
+from bson import ObjectId
 
 class Publisher: 
 
@@ -29,14 +30,17 @@ class Subscriber:
         self.subscriber_broker_url = subscriber_broker_url
         self.subscriber_topic = subscriber_topic
         self.consumer = KafkaConsumer(bootstrap_servers=[self.subscriber_broker_url])
-        self.consumer.subscribe(topics=[self.subscriber_topic])
-        # tp = TopicPartition(list(self.subscriber_topic)[0], 0)
-        # tp = TopicPartition(list(self.subscriber_topic), 0)
-        # self.consumer.assign([tp])
+        #self.consumer.subscribe(topics=[self.subscriber_topic])
+        print("topic_inference_feed----",subscriber_topic)
+        
         # self.consumer.seek_to_end(tp)
 
     def get_data(self):
-
+        tp = TopicPartition(self.subscriber_topic,0)
+        self.consumer.assign([tp])
+        self.consumer.seek_to_end(tp)
+        last_offset = self.consumer.position(tp)
+        print(last_offset)
         try:
             print("Fetching Data")
             print("Topics:", self.consumer.topics())
@@ -59,8 +63,9 @@ def imDecoder(img_str):
     return frame
 
 def imEncoder(image):
-    
-    cv2.imwrite("temp.jpg",image)
-    with open("temp.jpg", 'rb') as f:
+    img = str(ObjectId()) + ".jpg"
+    cv2.imwrite(img ,image)
+    with open(img, 'rb') as f:
         im_b64 = base64.b64encode(f.read())
+    os.remove(img)
     return str(im_b64)
